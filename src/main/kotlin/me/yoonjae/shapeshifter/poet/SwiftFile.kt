@@ -2,7 +2,7 @@ package me.yoonjae.shapeshifter.poet
 
 import java.io.Writer
 
-class SwiftFile {
+class SwiftFile : File {
 
     private val imports = mutableListOf<Import>()
     private val structs = mutableListOf<Struct>()
@@ -17,7 +17,7 @@ class SwiftFile {
         return this
     }
 
-    fun writeTo(writer: Writer) {
+    override fun writeTo(writer: Writer) {
         imports.forEach { it.render(writer) }
         writer.write("\n")
         structs.forEach { it.render(writer) }

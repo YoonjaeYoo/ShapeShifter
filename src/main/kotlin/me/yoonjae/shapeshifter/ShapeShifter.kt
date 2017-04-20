@@ -1,6 +1,7 @@
 package me.yoonjae.shapeshifter
 
 import me.yoonjae.shapeshifter.translator.ColorsTranslator
+import me.yoonjae.shapeshifter.translator.StringsTranslator
 
 class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
     companion object {
@@ -8,6 +9,7 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
     }
 
     fun shift() {
-        listOf(ColorsTranslator(androidAppDir, iosAppDir)).forEach { it.translate() }
+        listOf(ColorsTranslator(androidAppDir, iosAppDir),
+                StringsTranslator(androidAppDir, iosAppDir)).forEach { it.translate() }
     }
 }

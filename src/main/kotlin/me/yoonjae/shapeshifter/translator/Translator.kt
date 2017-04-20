@@ -1,13 +1,16 @@
 package me.yoonjae.shapeshifter.translator
 
-import me.yoonjae.shapeshifter.poet.SwiftFile
 import org.w3c.dom.Document
+import org.w3c.dom.Node
+import org.w3c.dom.NodeList
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
 import javax.xml.parsers.DocumentBuilderFactory
 
-abstract class Translator(val androidAppDir: String, val iosAppDir: String) {
+abstract class Translator<out F : me.yoonjae.shapeshifter.poet.File>(
+        val androidAppDir: String, val iosAppDir: String
+) {
 
     abstract fun getAndroidFilePath(): String
     abstract fun getIosFilePath(): String
@@ -15,7 +18,7 @@ abstract class Translator(val androidAppDir: String, val iosAppDir: String) {
     open fun translate() {
         FileInputStream("$androidAppDir/${getAndroidFilePath()}").use {
             val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it)
-            val swiftFile = generateSwiftFile(doc)
+            val swiftFile = generateFile(doc)
             val file = File("$iosAppDir/${getIosFilePath()}")
             if (!file.exists()) {
                 val parentFile = file.parentFile
@@ -28,5 +31,15 @@ abstract class Translator(val androidAppDir: String, val iosAppDir: String) {
         }
     }
 
-    abstract fun generateSwiftFile(doc: Document): SwiftFile
+    abstract fun generateFile(doc: Document): F
+}
+
+fun NodeList.iterator(): Iterator<Node?> {
+    return object : Iterator<Node?> {
+        var index: Int = 0
+
+        override fun hasNext() = index < length
+
+        override fun next() = item(index++)
+    }
 }

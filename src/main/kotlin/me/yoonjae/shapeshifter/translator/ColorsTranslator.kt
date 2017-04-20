@@ -7,13 +7,14 @@ import me.yoonjae.shapeshifter.poet.SwiftFile
 import org.w3c.dom.Document
 import org.w3c.dom.NodeList
 
-class ColorsTranslator(androidAppDir: String, iosAppDir: String) : Translator(androidAppDir, iosAppDir) {
+class ColorsTranslator(androidAppDir: String, iosAppDir: String) :
+        Translator<SwiftFile>(androidAppDir, iosAppDir) {
 
     override fun getAndroidFilePath(): String = "/src/main/res/values/colors.xml"
 
     override fun getIosFilePath(): String = "/Values/Colors.swift"
 
-    override fun generateSwiftFile(doc: Document): SwiftFile {
+    override fun generateFile(doc: Document): SwiftFile {
         val file = SwiftFile().addImport(Import("UIKit"))
         val struct = Struct("Color")
         createColorMap(doc.getElementsByTagName("color")).forEach { name, value ->
@@ -25,8 +26,7 @@ class ColorsTranslator(androidAppDir: String, iosAppDir: String) : Translator(an
 
     private fun createColorMap(colors: NodeList): Map<String, String> {
         val colorMap = mutableMapOf<String, String>()
-        for (i in 0..colors.length) {
-            val color = colors.item(i)
+        for (color in colors.iterator()) {
             if (color != null) {
                 val name = color.attributes.getNamedItem("name").textContent
                 var value = color.firstChild.nodeValue
