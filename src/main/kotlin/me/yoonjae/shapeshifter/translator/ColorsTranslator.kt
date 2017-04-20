@@ -1,9 +1,6 @@
 package me.yoonjae.shapeshifter.translator
 
-import me.yoonjae.shapeshifter.poet.Field
-import me.yoonjae.shapeshifter.poet.Import
-import me.yoonjae.shapeshifter.poet.Struct
-import me.yoonjae.shapeshifter.poet.SwiftFile
+import me.yoonjae.shapeshifter.poet.*
 import org.w3c.dom.Document
 import org.w3c.dom.NodeList
 
@@ -28,7 +25,7 @@ class ColorsTranslator(androidAppDir: String, iosAppDir: String) :
         val colorMap = mutableMapOf<String, String>()
         for (color in colors.iterator()) {
             if (color != null) {
-                val name = color.attributes.getNamedItem("name").textContent
+                val name = color.attributes.getNamedItem("name").textContent.toCamelCase()
                 var value = color.firstChild.nodeValue
                 if (value.startsWith("@color/")) {
                     value = value.substring(7)

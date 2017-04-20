@@ -18,8 +18,10 @@ class SwiftFile : File {
     }
 
     override fun writeTo(writer: Writer) {
-        imports.forEach { it.render(writer) }
-        writer.write("\n")
+        if (imports.isNotEmpty()) {
+            imports.forEach { it.render(writer) }
+            writer.write("\n")
+        }
         structs.forEach { it.render(writer) }
     }
 }
