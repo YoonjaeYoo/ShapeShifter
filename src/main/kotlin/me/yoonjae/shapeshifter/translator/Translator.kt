@@ -8,18 +8,13 @@ import java.io.FileInputStream
 import java.io.FileWriter
 import javax.xml.parsers.DocumentBuilderFactory
 
-abstract class Translator<out F : me.yoonjae.shapeshifter.poet.File>(
-        val androidAppDir: String, val iosAppDir: String
-) {
+abstract class Translator<out F : me.yoonjae.shapeshifter.poet.File> {
 
-    abstract fun getAndroidFilePath(): String
-    abstract fun getIosFilePath(): String
-
-    open fun translate() {
-        FileInputStream("$androidAppDir/${getAndroidFilePath()}").use {
+    open fun translate(inputPath: String, outputPath: String) {
+        FileInputStream(inputPath).use {
             val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it)
             val swiftFile = generateFile(doc)
-            val file = File("$iosAppDir/${getIosFilePath()}")
+            val file = File(outputPath)
             if (!file.exists()) {
                 val parentFile = file.parentFile
                 if (!parentFile.exists()) parentFile.mkdirs()

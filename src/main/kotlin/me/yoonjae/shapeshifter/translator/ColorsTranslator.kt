@@ -4,12 +4,7 @@ import me.yoonjae.shapeshifter.poet.*
 import org.w3c.dom.Document
 import org.w3c.dom.NodeList
 
-class ColorsTranslator(androidAppDir: String, iosAppDir: String) :
-        Translator<SwiftFile>(androidAppDir, iosAppDir) {
-
-    override fun getAndroidFilePath(): String = "/src/main/res/values/colors.xml"
-
-    override fun getIosFilePath(): String = "/Values/Colors.swift"
+class ColorsTranslator : Translator<SwiftFile>() {
 
     override fun generateFile(doc: Document): SwiftFile {
         val file = SwiftFile().addImport(Import("UIKit"))

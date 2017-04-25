@@ -7,12 +7,7 @@ import me.yoonjae.shapeshifter.poet.toCamelCase
 import org.w3c.dom.Document
 import org.w3c.dom.NodeList
 
-class DimensTranslator(androidAppDir: String, iosAppDir: String) :
-        Translator<SwiftFile>(androidAppDir, iosAppDir) {
-
-    override fun getAndroidFilePath() = "/src/main/res/values/dimens.xml"
-
-    override fun getIosFilePath() = "/Values/Dimens.swift"
+class DimensTranslator : Translator<SwiftFile>() {
 
     override fun generateFile(doc: Document): SwiftFile {
         val file = SwiftFile()

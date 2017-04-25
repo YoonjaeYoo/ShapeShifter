@@ -1,6 +1,5 @@
 package me.yoonjae.shapeshifter.poet
 
-import me.yoonjae.shapeshifter.ShapeShifter
 import java.io.Writer
 
 abstract class Element {
@@ -8,7 +7,7 @@ abstract class Element {
 }
 
 fun Writer.write(string: String, indentLevel: Int) {
-    for (i in 0 until (ShapeShifter.indentWidth * indentLevel)) {
+    for (i in 0 until (4 * indentLevel)) {
         write(" ")
     }
     write(string)
