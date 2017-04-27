@@ -1,22 +1,24 @@
 package me.yoonjae.shapeshifter.translator
 
-import me.yoonjae.shapeshifter.poet.Field
-import me.yoonjae.shapeshifter.poet.Struct
-import me.yoonjae.shapeshifter.poet.SwiftFile
+import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifier
+import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.toCamelCase
 import org.w3c.dom.Document
 import org.w3c.dom.NodeList
+import java.io.File
 
 class DimensTranslator : Translator<SwiftFile>() {
 
-    override fun generateFile(doc: Document): SwiftFile {
-        val file = SwiftFile()
-        val struct = Struct("Dimens")
-        createDimenMap(doc.getElementsByTagName("dimen")).forEach { name, value ->
-            struct.addField(Field(name).value(value).static(true).let(true))
+    override fun generateFile(doc: Document, inputFile: File, outputFile: File): SwiftFile {
+        return SwiftFile.create {
+            struct("Dimens") {
+                createDimenMap(doc.getElementsByTagName("dimen")).forEach { name, value ->
+                    constant(name, value = value) {
+                        modifier(DeclarationModifier.STATIC)
+                    }
+                }
+            }
         }
-        file.addStruct(struct)
-        return file
     }
 
     private fun createDimenMap(dimens: NodeList): Map<String, String> {

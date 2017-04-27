@@ -1,11 +1,12 @@
 package me.yoonjae.shapeshifter.translator
 
-import me.yoonjae.shapeshifter.poet.StringsFile
+import me.yoonjae.shapeshifter.poet.file.StringsFile
 import org.w3c.dom.Document
+import java.io.File
 
 class StringsTranslator : Translator<StringsFile>() {
 
-    override fun generateFile(doc: Document): StringsFile {
+    override fun generateFile(doc: Document, inputFile: File, outputFile: File): StringsFile {
         val file = StringsFile()
         for (string in doc.getElementsByTagName("string").iterator()) {
             if (string != null) {

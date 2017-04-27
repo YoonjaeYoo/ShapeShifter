@@ -1,19 +1,25 @@
 package me.yoonjae.shapeshifter.translator
 
-import me.yoonjae.shapeshifter.poet.*
+import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifier
+import me.yoonjae.shapeshifter.poet.file.SwiftFile
+import me.yoonjae.shapeshifter.poet.toCamelCase
 import org.w3c.dom.Document
 import org.w3c.dom.NodeList
+import java.io.File
 
 class ColorsTranslator : Translator<SwiftFile>() {
 
-    override fun generateFile(doc: Document): SwiftFile {
-        val file = SwiftFile().addImport(Import("UIKit"))
-        val struct = Struct("Color")
-        createColorMap(doc.getElementsByTagName("color")).forEach { name, value ->
-            struct.addField(Field(name).value(value).static(true).let(true))
+    override fun generateFile(doc: Document, inputFile: File, outputFile: File): SwiftFile {
+        return SwiftFile.create {
+            import("UIKit")
+            struct("Colors") {
+                createColorMap(doc.getElementsByTagName("color")).forEach { name, value ->
+                    constant(name, value) {
+                        modifier(DeclarationModifier.STATIC)
+                    }
+                }
+            }
         }
-        file.addStruct(struct)
-        return file
     }
 
     private fun createColorMap(colors: NodeList): Map<String, String> {

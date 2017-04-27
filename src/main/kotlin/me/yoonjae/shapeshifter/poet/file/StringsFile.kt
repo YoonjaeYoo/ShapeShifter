@@ -1,4 +1,4 @@
-package me.yoonjae.shapeshifter.poet
+package me.yoonjae.shapeshifter.poet.file
 
 import java.io.Writer
 
@@ -10,8 +10,9 @@ class StringsFile : File {
         strings.put(key, value)
     }
 
-    override fun writeTo(writer: Writer) {
+    override fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
         for ((key, value) in strings) {
+            beforeEachLine?.invoke(writer)
             writer.write("\"$key\" = \"$value\";\n")
         }
     }

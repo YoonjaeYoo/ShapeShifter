@@ -8,25 +8,24 @@ import java.io.FileInputStream
 import java.io.FileWriter
 import javax.xml.parsers.DocumentBuilderFactory
 
-abstract class Translator<out F : me.yoonjae.shapeshifter.poet.File> {
+abstract class Translator<out F : me.yoonjae.shapeshifter.poet.file.File> {
 
-    open fun translate(inputPath: String, outputPath: String) {
-        FileInputStream(inputPath).use {
+    open fun translate(inputFile: File, outputFile: File) {
+        FileInputStream(inputFile).use {
             val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it)
-            val swiftFile = generateFile(doc)
-            val file = File(outputPath)
-            if (!file.exists()) {
-                val parentFile = file.parentFile
+            val swiftFile = generateFile(doc, inputFile, outputFile)
+            if (!outputFile.exists()) {
+                val parentFile = outputFile.parentFile
                 if (!parentFile.exists()) parentFile.mkdirs()
-                file.createNewFile()
+                outputFile.createNewFile()
             }
-            FileWriter(file).use {
-                swiftFile.writeTo(it)
+            FileWriter(outputFile).use {
+                swiftFile.render(it)
             }
         }
     }
 
-    abstract fun generateFile(doc: Document): F
+    abstract fun generateFile(doc: Document, inputFile: File, outputFile: File): F
 }
 
 fun NodeList.iterator(): Iterator<Node?> {

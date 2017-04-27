@@ -2,15 +2,12 @@ package me.yoonjae.shapeshifter.poet
 
 import java.io.Writer
 
-abstract class Element {
-    abstract fun render(writer: Writer, indentLevel: Int = 0)
+interface Element {
+    fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)? = null)
 }
 
-fun Writer.write(string: String, indentLevel: Int) {
-    for (i in 0 until (4 * indentLevel)) {
-        write(" ")
-    }
-    write(string)
+fun Writer.writeln(str: String) {
+    write("$str\n")
 }
 
 fun String.toCamelCase(): String {
