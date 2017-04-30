@@ -1,6 +1,8 @@
 package me.yoonjae.shapeshifter.poet.modifier
 
-class DeclarationModifier private constructor(name: String) : Modifier(name) {
+import me.yoonjae.shapeshifter.poet.Describer
+
+class DeclarationModifier constructor(name: String) : Modifier(name) {
 
     companion object {
         val CLASS = DeclarationModifier("class")
@@ -17,5 +19,14 @@ class DeclarationModifier private constructor(name: String) : Modifier(name) {
         val STATIC = DeclarationModifier("static")
         val UNOWNED = DeclarationModifier("unowned")
         val WEAK = DeclarationModifier("weak")
+    }
+}
+
+interface DeclarationModifierDescriber : Describer {
+
+    val declarationModifiers: MutableList<DeclarationModifier>
+
+    fun declarationModifier(modifier: DeclarationModifier) {
+        declarationModifiers.add(modifier)
     }
 }

@@ -1,11 +1,11 @@
 package me.yoonjae.shapeshifter.poet.declaration
 
+import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Indent
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Class(val name: String, val superClassName: String? = null) : Declaration,
-        GenericParameterContainer, DeclarationContainer {
+class Class(val name: String) : Declaration, GenericParameterDescriber, DeclarationDescriber {
 
     override val genericParameters = mutableListOf<GenericParameter>()
     override val imports = mutableListOf<Import>()
@@ -17,12 +17,23 @@ class Class(val name: String, val superClassName: String? = null) : Declaration,
     override val enums = mutableListOf<Enum>()
     override val structs = mutableListOf<Struct>()
     override val classes = mutableListOf<Class>()
+    val superTypeNames = mutableListOf<String>()
+
+    fun superType(name: String) {
+        superTypeNames.add(name)
+    }
 
     override fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
         beforeEachLine?.invoke(writer)
         writer.write("class $name")
         genericParameters.render(writer, beforeEachLine)
-        writer.write(if (superClassName == null) "" else ": $superClassName")
+        if (superTypeNames.isNotEmpty()) {
+            writer.write(": ")
+            superTypeNames.forEachIndexed { index, superType ->
+                if (index > 0) writer.write(", ")
+                writer.write(superType)
+            }
+        }
         writer.writeln(" {")
         writer.writeln("")
         renderDeclarations(beforeEachLine, writer)
@@ -47,12 +58,12 @@ class Class(val name: String, val superClassName: String? = null) : Declaration,
     }
 }
 
-interface ClassContainer {
+interface ClassDescriber : Describer {
 
     val classes: MutableList<Class>
 
-    fun clazz(name: String, superClassName: String, init: (Class.() -> Unit)? = null): Class {
-        val clazz = Class(name, superClassName)
+    fun clazz(name: String, init: (Class.() -> Unit)? = null): Class {
+        val clazz = Class(name)
         init?.invoke(clazz)
         classes.add(clazz)
         return clazz

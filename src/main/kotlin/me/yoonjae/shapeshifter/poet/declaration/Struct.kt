@@ -1,10 +1,11 @@
 package me.yoonjae.shapeshifter.poet.declaration
 
+import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Indent
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Struct(val name: String) : Declaration, GenericParameterContainer, DeclarationContainer {
+class Struct(val name: String) : Declaration, GenericParameterDescriber, DeclarationDescriber {
 
     override val genericParameters = mutableListOf<GenericParameter>()
     override val imports = mutableListOf<Import>()
@@ -16,11 +17,23 @@ class Struct(val name: String) : Declaration, GenericParameterContainer, Declara
     override val enums = mutableListOf<Enum>()
     override val structs = mutableListOf<Struct>()
     override val classes = mutableListOf<Class>()
+    val superTypeNames = mutableListOf<String>()
+
+    fun superType(name: String) {
+        superTypeNames.add(name)
+    }
 
     override fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
         beforeEachLine?.invoke(writer)
         writer.write("struct $name")
         genericParameters.render(writer, beforeEachLine)
+        if (superTypeNames.isNotEmpty()) {
+            writer.write(": ")
+            superTypeNames.forEachIndexed { index, superType ->
+                if (index > 0) writer.write(", ")
+                writer.write(superType)
+            }
+        }
         writer.writeln(" {")
         renderDeclarations(beforeEachLine, writer)
         beforeEachLine?.invoke(writer)
@@ -45,7 +58,7 @@ class Struct(val name: String) : Declaration, GenericParameterContainer, Declara
     }
 }
 
-interface StructContainer {
+interface StructDescriber : Describer {
 
     val structs: MutableList<Struct>
 

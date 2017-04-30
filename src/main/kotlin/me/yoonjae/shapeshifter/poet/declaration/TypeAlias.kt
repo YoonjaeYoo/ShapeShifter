@@ -12,7 +12,7 @@ class TypeAlias(val name: String, val type: String) : Declaration {
     }
 }
 
-interface TypeAliasContainer {
+interface TypeAliasDescriber : Describer {
 
     val typeAliases: MutableList<TypeAlias>
 

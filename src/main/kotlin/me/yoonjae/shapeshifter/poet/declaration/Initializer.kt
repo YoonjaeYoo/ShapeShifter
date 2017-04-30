@@ -1,11 +1,10 @@
 package me.yoonjae.shapeshifter.poet.declaration
 
 import me.yoonjae.shapeshifter.poet.modifier.Modifier
-import me.yoonjae.shapeshifter.poet.modifier.ModifierContainer
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Initializer : Declaration, ModifierContainer, ParameterContainer {
+class Initializer : Declaration, Modifier.Describer, Parameter.Describer {
 
     override val modifiers = mutableListOf<Modifier>()
     override val parameters = mutableListOf<Parameter>()
@@ -28,7 +27,7 @@ class Initializer : Declaration, ModifierContainer, ParameterContainer {
     }
 }
 
-interface InitializerContainer {
+interface InitializerDescriber : Describer {
 
     val initializers: MutableList<Initializer>
 

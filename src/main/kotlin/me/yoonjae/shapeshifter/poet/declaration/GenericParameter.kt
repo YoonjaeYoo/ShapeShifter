@@ -23,7 +23,7 @@ class GenericParameter(val name: String) : Element {
     }
 }
 
-interface GenericParameterContainer {
+interface GenericParameterDescriber : Describer {
 
     val genericParameters: MutableList<GenericParameter>
 

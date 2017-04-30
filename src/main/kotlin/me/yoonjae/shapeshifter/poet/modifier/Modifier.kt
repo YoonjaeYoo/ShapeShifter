@@ -10,12 +10,3 @@ abstract class Modifier(val name: String) : Element {
         writer.write("$name ")
     }
 }
-
-interface ModifierContainer {
-
-    val modifiers: MutableList<Modifier>
-
-    fun modifier(modifier: DeclarationModifier) {
-        modifiers.add(modifier)
-    }
-}

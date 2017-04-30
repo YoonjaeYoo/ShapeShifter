@@ -1,5 +1,6 @@
 package me.yoonjae.shapeshifter.poet.declaration
 
+import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifier
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
@@ -23,8 +24,7 @@ class Constant(val name: String, val value: String, val type: String? = null) : 
     }
 }
 
-interface ConstantContainer {
-
+interface ConstantDescriber : Describer {
     val constants: MutableList<Constant>
 
     fun constant(name: String, value: String, type: String? = null,

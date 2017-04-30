@@ -1,5 +1,6 @@
 package me.yoonjae.shapeshifter.poet.declaration
 
+import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
@@ -11,7 +12,7 @@ class Import(val name: String) : Declaration {
     }
 }
 
-interface ImportContainer {
+interface ImportDescriber : Describer {
 
     val imports: MutableList<Import>
 

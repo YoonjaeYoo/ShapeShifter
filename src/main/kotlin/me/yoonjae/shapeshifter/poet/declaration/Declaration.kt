@@ -6,9 +6,10 @@ import java.io.Writer
 
 interface Declaration : Element
 
-interface DeclarationContainer : ImportContainer, ConstantContainer, VariableContainer,
-        TypeAliasContainer, FunctionContainer, InitializerContainer, EnumContainer, StructContainer,
-        ClassContainer
+interface DeclarationDescriber : ImportDescriber, ConstantDescriber, VariableDescriber,
+        TypeAliasDescriber, FunctionDescriber, InitializerDescriber, EnumDescriber,
+        StructDescriber, ClassDescriber
+
 
 fun List<Declaration>.render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
     if (isNotEmpty()) {

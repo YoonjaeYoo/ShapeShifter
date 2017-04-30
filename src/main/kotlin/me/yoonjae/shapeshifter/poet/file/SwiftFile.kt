@@ -5,8 +5,8 @@ import me.yoonjae.shapeshifter.poet.declaration.Enum
 import me.yoonjae.shapeshifter.poet.declaration.Function
 import java.io.Writer
 
-class SwiftFile : File, ImportContainer, ConstantContainer, VariableContainer,
-        TypeAliasContainer, FunctionContainer, EnumContainer, StructContainer, ClassContainer {
+class SwiftFile : File, ImportDescriber, ConstantDescriber, VariableDescriber,
+        TypeAliasDescriber, FunctionDescriber, EnumDescriber, StructDescriber, ClassDescriber {
 
     companion object {
         fun create(init: SwiftFile.() -> Unit): SwiftFile {

@@ -1,5 +1,6 @@
 package me.yoonjae.shapeshifter.poet.declaration
 
+import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import java.io.Writer
 
@@ -18,8 +19,7 @@ class Parameter(val name: String?, val type: String, val label: String? = null,
     }
 
     override fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
-        writer.write(label ?: "_")
-        writer.write(" ")
+        writer.write(if (label == null) "" else "$label ")
         writer.write(name ?: "")
         writer.write(": $type")
         writer.write(if (variadic) "..." else "")
@@ -27,7 +27,7 @@ class Parameter(val name: String?, val type: String, val label: String? = null,
     }
 }
 
-interface ParameterContainer {
+interface ParameterDescriber : Describer {
 
     val parameters: MutableList<Parameter>
 

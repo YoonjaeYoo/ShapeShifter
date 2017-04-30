@@ -38,7 +38,7 @@ class Enum(val name: String) : Declaration {
     }
 }
 
-interface EnumContainer {
+interface EnumDescriber : Describer {
 
     val enums: MutableList<Enum>
 

@@ -1,20 +1,26 @@
 package me.yoonjae.shapeshifter.poet.declaration
 
+import me.yoonjae.shapeshifter.poet.Describer
+import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifierDescriber
 import me.yoonjae.shapeshifter.poet.modifier.Modifier
-import me.yoonjae.shapeshifter.poet.modifier.ModifierContainer
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Function(val name: String, val returnType: String? = null) : Declaration,
-        ModifierContainer, GenericParameterContainer, ParameterContainer {
+class Function(val name: String) : Declaration,
+        DeclarationModifierDescriber, GenericParameterDescriber, ParameterDescriber {
 
-    override val modifiers = mutableListOf<Modifier>()
+    override val declarationModifiers = mutableListOf<Modifier>()
     override val genericParameters = mutableListOf<GenericParameter>()
     override val parameters = mutableListOf<Parameter>()
+    private var returnType: String? = null
+
+    fun returnType(returnType: String?) {
+        this.returnType = returnType
+    }
 
     override fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
         beforeEachLine?.invoke(writer)
-        modifiers.forEach { it.render(writer) }
+        declarationModifiers.forEach { it.render(writer) }
         writer.write("func ")
         writer.write(name)
         if (genericParameters.isNotEmpty()) {
@@ -38,13 +44,13 @@ class Function(val name: String, val returnType: String? = null) : Declaration,
     }
 }
 
-interface FunctionContainer {
+interface FunctionDescriber : Describer {
 
     val functions: MutableList<Function>
 
-    fun function(name: String, returnType: String? = null, init: (Function.() -> Unit)? = null):
+    fun function(name: String, init: (Function.() -> Unit)? = null):
             Function {
-        val function = Function(name, returnType)
+        val function = Function(name)
         init?.invoke(function)
         functions.add(function)
         return function

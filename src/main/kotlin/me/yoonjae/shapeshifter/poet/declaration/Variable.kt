@@ -1,5 +1,6 @@
 package me.yoonjae.shapeshifter.poet.declaration
 
+import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifier
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
@@ -24,7 +25,7 @@ class Variable(val name: String, val value: String? = null, val type: String? = 
     }
 }
 
-interface VariableContainer {
+interface VariableDescriber : Describer {
 
     val variables: MutableList<Variable>
 

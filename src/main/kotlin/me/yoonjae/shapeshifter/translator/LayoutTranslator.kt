@@ -1,7 +1,6 @@
 package me.yoonjae.shapeshifter.translator
 
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
-import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifier
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
@@ -13,16 +12,6 @@ class LayoutTranslator : Translator<SwiftFile>() {
         return SwiftFile.create {
             import("UIKit")
             import("LayoutKit")
-            clazz(parseClassName(outputFile), "StackLayout") {
-                genericParameter("T")
-                initializer {
-                    modifier(DeclarationModifier.CONVENIENCE)
-                    parameter("str", "String", "a", "\"STR\"") {
-                        inout(true)
-                        variadic(true)
-                    }
-                }
-            }
         }
     }
 
