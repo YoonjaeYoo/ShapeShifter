@@ -1,11 +1,14 @@
 package me.yoonjae.shapeshifter.poet.declaration
 
+import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import me.yoonjae.shapeshifter.poet.Indent
+import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifier
+import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifierDescriber
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Enum(val name: String) : Declaration {
+class Enum(val name: String) : Declaration, AccessLevelModifierDescriber {
 
     class EnumCase(val name: String) : Element {
         override fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
@@ -15,6 +18,7 @@ class Enum(val name: String) : Declaration {
         }
     }
 
+    override val accessLevelModifiers = mutableListOf<AccessLevelModifier>()
     val cases = mutableListOf<EnumCase>()
 
     fun case(name: String) {
@@ -24,6 +28,7 @@ class Enum(val name: String) : Declaration {
 
     override fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
         beforeEachLine?.invoke(writer)
+        accessLevelModifiers.forEach { it.render(writer) }
         writer.write("enum ")
         writer.write(name)
         writer.writeln(" {")

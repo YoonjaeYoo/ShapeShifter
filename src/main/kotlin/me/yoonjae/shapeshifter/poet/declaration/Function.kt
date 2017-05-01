@@ -1,15 +1,15 @@
 package me.yoonjae.shapeshifter.poet.declaration
 
 import me.yoonjae.shapeshifter.poet.Describer
+import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifier
 import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifierDescriber
-import me.yoonjae.shapeshifter.poet.modifier.Modifier
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
 class Function(val name: String) : Declaration,
         DeclarationModifierDescriber, GenericParameterDescriber, ParameterDescriber {
 
-    override val declarationModifiers = mutableListOf<Modifier>()
+    override val declarationModifiers = mutableListOf<DeclarationModifier>()
     override val genericParameters = mutableListOf<GenericParameter>()
     override val parameters = mutableListOf<Parameter>()
     private var returnType: String? = null

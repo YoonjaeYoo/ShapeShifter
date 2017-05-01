@@ -2,11 +2,15 @@ package me.yoonjae.shapeshifter.poet.declaration
 
 import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Indent
+import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifier
+import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifierDescriber
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Class(val name: String) : Declaration, GenericParameterDescriber, DeclarationDescriber {
+class Class(val name: String) : Declaration, AccessLevelModifierDescriber,
+        GenericParameterDescriber, DeclarationDescriber {
 
+    override val accessLevelModifiers = mutableListOf<AccessLevelModifier>()
     override val genericParameters = mutableListOf<GenericParameter>()
     override val imports = mutableListOf<Import>()
     override val typeAliases = mutableListOf<TypeAlias>()
@@ -25,6 +29,7 @@ class Class(val name: String) : Declaration, GenericParameterDescriber, Declarat
 
     override fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
         beforeEachLine?.invoke(writer)
+        accessLevelModifiers.forEach { it.render(writer) }
         writer.write("class $name")
         genericParameters.render(writer, beforeEachLine)
         if (superTypeNames.isNotEmpty()) {

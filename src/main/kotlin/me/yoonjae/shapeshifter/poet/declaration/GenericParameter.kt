@@ -1,5 +1,6 @@
 package me.yoonjae.shapeshifter.poet.declaration
 
+import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import java.io.Writer
 

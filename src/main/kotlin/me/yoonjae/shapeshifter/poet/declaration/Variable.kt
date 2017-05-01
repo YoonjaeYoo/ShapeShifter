@@ -2,22 +2,18 @@ package me.yoonjae.shapeshifter.poet.declaration
 
 import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifier
+import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifierDescriber
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
 class Variable(val name: String, val value: String? = null, val type: String? = null) :
-        Declaration {
+        Declaration, DeclarationModifierDescriber {
 
-    private val modifiers = mutableListOf<DeclarationModifier>()
-
-    fun modifier(modifier: DeclarationModifier) {
-        modifiers.add(modifier)
-    }
+    override val declarationModifiers = mutableListOf<DeclarationModifier>()
 
     override fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
-        modifiers.forEachIndexed { index, modifier ->
-            modifier.render(writer, if (index == 0) beforeEachLine else null)
-        }
+        beforeEachLine?.invoke(writer)
+        declarationModifiers.forEach { it.render(writer) }
         writer.write("var ")
         writer.write(name)
         writer.write(if (type == null) "" else ": $type")

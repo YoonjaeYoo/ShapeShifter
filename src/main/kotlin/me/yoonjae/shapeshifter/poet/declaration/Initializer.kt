@@ -1,17 +1,19 @@
 package me.yoonjae.shapeshifter.poet.declaration
 
-import me.yoonjae.shapeshifter.poet.modifier.Modifier
+import me.yoonjae.shapeshifter.poet.Describer
+import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifier
+import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifierDescriber
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Initializer : Declaration, Modifier.Describer, Parameter.Describer {
+class Initializer : Declaration, DeclarationModifierDescriber, ParameterDescriber {
 
-    override val modifiers = mutableListOf<Modifier>()
+    override val declarationModifiers = mutableListOf<DeclarationModifier>()
     override val parameters = mutableListOf<Parameter>()
 
     override fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
         beforeEachLine?.invoke(writer)
-        modifiers.forEach { it.render(writer) }
+        declarationModifiers.forEach { it.render(writer) }
         writer.write("init(")
         parameters.forEachIndexed { index, parameter ->
             writer.write(if (index > 0) ", " else "")
