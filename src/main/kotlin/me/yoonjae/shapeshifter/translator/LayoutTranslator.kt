@@ -1,39 +1,16 @@
 package me.yoonjae.shapeshifter.translator
 
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
-import org.w3c.dom.Document
-import org.w3c.dom.Element
-import org.w3c.dom.Node
 import java.io.File
+import javax.xml.parsers.DocumentBuilderFactory
 
 class LayoutTranslator : Translator<SwiftFile>() {
 
-    override fun generateFile(doc: Document, inputFile: File, outputFile: File): SwiftFile {
+    override fun translate(file: File): SwiftFile {
+        val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)
         return SwiftFile.create {
             import("UIKit")
             import("LayoutKit")
         }
-    }
-
-    private fun parseClassName(outputFile: File): String {
-        val name = outputFile.name
-        return name.substring(0, name.indexOfLast { it == '.' })
-    }
-
-    fun parseChildNodes(parent: Node): List<String> {
-        val nodes = mutableListOf<String>()
-        for (node in parent.childNodes.iterator()) {
-            if (node != null && node.nodeType == Node.ELEMENT_NODE) {
-                val element = node as Element
-                var name = element.nodeName
-                nodes.add(name)
-                println("  $name")
-
-//                if (node.hasChildNodes()) {
-//                    nodes.addAll(parseChildNodes(node))
-//                }
-            }
-        }
-        return nodes
     }
 }

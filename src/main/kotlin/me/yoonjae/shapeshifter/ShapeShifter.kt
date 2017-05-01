@@ -1,74 +1,60 @@
 package me.yoonjae.shapeshifter
 
+import me.yoonjae.shapeshifter.poet.toIosResourceName
 import me.yoonjae.shapeshifter.translator.ColorsTranslator
 import me.yoonjae.shapeshifter.translator.DimensTranslator
 import me.yoonjae.shapeshifter.translator.LayoutTranslator
 import me.yoonjae.shapeshifter.translator.StringsTranslator
 import java.io.File
+import java.io.FileWriter
 
 class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
 
     fun shift() {
-//        shiftStrings()
-//        shiftColors()
-//        shiftDimens()
+        shiftStrings()
+        shiftColors()
+        shiftDimens()
         shiftLayouts()
     }
 
     private fun shiftStrings() {
-        StringsTranslator().translate(File(androidAppDir + "/src/main/res/values/strings.xml"),
-                File(iosAppDir + "/ko.lproj/Localizable.strings"))
+        val input = File(androidAppDir + "/src/main/res/values/strings.xml")
+        val output = File(iosAppDir + "/ko.lproj/Localizable.strings")
+        output.createWithParent()
+        FileWriter(output).use { StringsTranslator().translate(input).render(it) }
     }
 
     private fun shiftColors() {
-        ColorsTranslator().translate(File(androidAppDir + "/src/main/res/values/colors.xml"),
-                File(iosAppDir + "/Values/Colors.swift"))
+        val input = File(androidAppDir + "/src/main/res/values/colors.xml")
+        val output = File(iosAppDir + "/Values/Colors.swift")
+        output.createWithParent()
+        FileWriter(output).use { ColorsTranslator().translate(input).render(it) }
     }
 
     private fun shiftDimens() {
-        DimensTranslator().translate(File(androidAppDir + "/src/main/res/values/dimens.xml"),
-                File(iosAppDir + "/Values/Dimens.swift"))
+        val input = File(androidAppDir + "/src/main/res/values/dimens.xml")
+        val output = File(iosAppDir + "/Values/Dimens.swift")
+        output.createWithParent()
+        FileWriter(output).use { DimensTranslator().translate(input).render(it) }
     }
 
     private fun shiftLayouts() {
         val translator = LayoutTranslator()
         val layoutDir = File(androidAppDir + "/src/main/res/layout/")
-        val nodes = mutableListOf<String>()
         layoutDir.listFiles { file ->
-            //            FileInputStream(file.path).use {
-//                val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it)
-//                translator.parseChildNodes(doc).forEach { node ->
-//                    if (!nodes.contains(node)) {
-//                        nodes.add(node)
-//                    }
-//                }
-//            }
             if (file.name == "activity_main.xml") {
-                translator.translate(file, File(iosAppDir + "/Layout/${iosFileName(file)}.swift"))
+                val output = File(iosAppDir + "/Layout/${file.name.toIosResourceName()}Layout.swift")
+                output.createWithParent()
+                FileWriter(output).use { translator.translate(file).render(it) }
             }
             true
         }
     }
 
-    private fun iosFileName(androidFile: File): String {
-        val name = androidFile.name
-        val prefixBuilder = StringBuilder()
-        val builder = StringBuilder()
-        var prefix = true
-        var initial = true
-        for (c in name.toCharArray()) {
-            if (c == '_') {
-                if (prefix) prefix = false
-                initial = true
-            } else if (c == '.') {
-                break
-            } else {
-                val b = if (prefix) prefixBuilder else builder
-                b.append(if (initial) c.toUpperCase() else c)
-                initial = false
-            }
+    private fun File.createWithParent() {
+        if (!exists()) {
+            if (!parentFile.exists()) parentFile.mkdirs()
+            createNewFile()
         }
-        return ((if (builder.isEmpty()) "" else builder.toString()) +
-                (if (prefixBuilder.isEmpty()) "" else prefixBuilder.toString())) + "Layout"
     }
 }

@@ -4,9 +4,17 @@ import java.io.Writer
 
 class StringsFile : File {
 
+    companion object {
+        fun create(init: StringsFile.() -> Unit): StringsFile {
+            val file = StringsFile()
+            file.init()
+            return file
+        }
+    }
+
     private val strings = LinkedHashMap<String, String>()
 
-    fun addString(key: String, value: String) {
+    fun string(key: String, value: String) {
         strings.put(key, value)
     }
 
