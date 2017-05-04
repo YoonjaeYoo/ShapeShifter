@@ -23,21 +23,21 @@ class Function(val name: String, override var accessLevelModifier: AccessLevelMo
 
     override fun render(writer: Writer, linePrefix: Element?) {
         accessLevelModifier?.let {
-            it.render(writer)
+            it.render(writer, linePrefix)
             writer.write(" ")
         }
         declarationModifiers.forEach {
-            it.render(writer)
+            it.render(writer, linePrefix)
             writer.write(" ")
         }
         writer.write("func $name")
-        genericParameters.render(writer)
+        genericParameters.render(writer, linePrefix)
         writer.write(" ")
-        parameters.render(writer)
+        parameters.render(writer, linePrefix)
         writer.write(" ")
         result?.let {
             writer.write("-> ")
-            it.render(writer)
+            it.render(writer, linePrefix)
             writer.write(" ")
         }
         writer.writeln("{")

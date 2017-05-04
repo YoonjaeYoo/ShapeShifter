@@ -1,6 +1,9 @@
 package me.yoonjae.shapeshifter.translator
 
-import me.yoonjae.shapeshifter.poet.declaration.Class
+import me.yoonjae.shapeshifter.poet.expression.ClosureExpression
+import me.yoonjae.shapeshifter.poet.expression.CustomExpression
+import me.yoonjae.shapeshifter.poet.expression.Expression
+import me.yoonjae.shapeshifter.poet.expression.InitializerExpression
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifier
 import me.yoonjae.shapeshifter.poet.toIosResourceName
@@ -18,22 +21,36 @@ class LayoutTranslator : Translator<SwiftFile>() {
             import("LayoutKit")
 
             val className = file.name.substring(0, file.name.lastIndexOf('.')).toIosResourceName()
+            val rootElement = doc.documentElement
             clazz(className, Type("InsetLayout")) {
                 initializer(AccessLevelModifier.PUBLIC) {
                     initializerExpression("super") {
                         argument("insets", "0")
-                        argument("alignment", "Alignment.FILL")
+                        translateLayout(rootElement)?.let {
+                            argument("sublayout", it)
+                        }
                     }
-                }
-                val rootElement = doc.documentElement
-                when (rootElement.tagName) {
-                    "FrameLayout" -> translateFrameLayout(this, rootElement)
                 }
             }
         }
     }
 
-    private fun translateFrameLayout(clazz: Class, rootElement: Element) {
-
+    private fun translateLayout(element: Element): Expression? {
+        return when (element.tagName) {
+            "FrameLayout" -> translateFrameLayout(element)
+            else -> null
+        }?.apply {
+            val id = element.getAttribute("android:id")
+            if (id != null) {
+                trailingClosure = ClosureExpression().apply {
+                    closureParameter("id", Type("String"))
+                    customExpression("let test = 1")
+                }
+            }
+        }
     }
+
+    private fun translateFrameLayout(element: Element): InitializerExpression? =
+            InitializerExpression(CustomExpression("InsetLayout")).apply {
+            }
 }

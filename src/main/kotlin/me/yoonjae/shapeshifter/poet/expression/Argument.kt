@@ -4,11 +4,11 @@ import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import java.io.Writer
 
-class Argument(val name: String?, val value: Expression) : Element {
+class Argument(val name: String?, var value: Expression) : Element {
 
     override fun render(writer: Writer, linePrefix: Element?) {
         name?.let { writer.write("$name: ") }
-        value.render(writer)
+        value.render(writer, linePrefix)
     }
 }
 
@@ -32,7 +32,7 @@ fun List<Argument>.render(writer: Writer, linePrefix: Element? = null) {
         writer.write("(")
         forEachIndexed { index, argument ->
             if (index > 0) writer.write(", ")
-            argument.render(writer)
+            argument.render(writer, linePrefix)
         }
         writer.write(")")
     }

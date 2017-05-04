@@ -12,15 +12,11 @@ import java.io.Writer
 class ClosureExpression : Expression, ClosureParameterDescriber, StatementDescriber {
 
     override val closureParameters = mutableListOf<ClosureParameter>()
-    override val customExpressions = mutableListOf<CustomExpression>()
-    override val initializerExpressions = mutableListOf<InitializerExpression>()
-    override val closureExpressions = mutableListOf<ClosureExpression>()
-    override val expressions = mutableListOf<Expression>()
     override val statements = mutableListOf<Statement>()
 
     override fun render(writer: Writer, linePrefix: Element?) {
-        writer.writeln("{")
-        closureParameters.render(writer)
+        writer.write("{ ")
+        closureParameters.render(writer, linePrefix)
         writer.writeln(" in")
         statements.render(writer, Indent(1) + linePrefix)
         linePrefix?.render(writer)

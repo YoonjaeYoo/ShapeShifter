@@ -26,14 +26,14 @@ class Struct(val name: String, override var superClass: Type? = null) : Declarat
 
     override fun render(writer: Writer, linePrefix: Element?) {
         accessLevelModifier?.let {
-            it.render(writer)
+            it.render(writer, linePrefix)
             writer.write(" ")
         }
         writer.write("struct $name")
-        genericParameters.render(writer)
+        genericParameters.render(writer, linePrefix)
         superClass?.let {
             writer.write(": ")
-            it.render(writer)
+            it.render(writer, linePrefix)
         }
         writer.writeln(" {")
         writer.writeln()

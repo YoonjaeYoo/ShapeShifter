@@ -42,7 +42,7 @@ fun List<GenericParameter>.render(writer: Writer, linePrefix: Element? = null) {
         writer.write("<")
         forEachIndexed { index, parameter ->
             if (index > 0) writer.write(", ")
-            parameter.render(writer)
+            parameter.render(writer, linePrefix)
         }
         writer.write(">")
     }

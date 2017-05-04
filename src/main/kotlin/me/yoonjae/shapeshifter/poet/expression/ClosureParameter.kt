@@ -5,11 +5,14 @@ import me.yoonjae.shapeshifter.poet.Element
 import me.yoonjae.shapeshifter.poet.type.Type
 import java.io.Writer
 
-class ClosureParameter(val name: String, val type: Type? = null) : Element {
+class ClosureParameter(val name: String, var type: Type? = null) : Element {
 
     override fun render(writer: Writer, linePrefix: Element?) {
         writer.write(name)
-        type.let { writer.write(": $it") }
+        type?.let {
+            writer.write(": ")
+            it.render(writer, linePrefix)
+        }
     }
 }
 
@@ -31,7 +34,7 @@ fun List<ClosureParameter>.render(writer: Writer, linePrefix: Element? = null) {
         writer.write("(")
         forEachIndexed { index, closureParameter ->
             if (index > 0) writer.write(", ")
-            closureParameter.render(writer)
+            closureParameter.render(writer, linePrefix)
         }
         writer.write(")")
     }

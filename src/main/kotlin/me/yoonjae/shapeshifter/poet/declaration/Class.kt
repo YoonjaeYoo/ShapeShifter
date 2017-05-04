@@ -26,14 +26,14 @@ class Class(val name: String, override var superClass: Type? = null) : Declarati
 
     override fun render(writer: Writer, linePrefix: Element?) {
         accessLevelModifier?.let {
-            it.render(writer)
+            it.render(writer, linePrefix)
             writer.write(" ")
         }
         writer.write("class $name")
-        genericParameters.render(writer)
+        genericParameters.render(writer, linePrefix)
         superClass?.let {
             writer.write(": ")
-            it.render(writer)
+            it.render(writer, linePrefix)
         }
         writer.writeln(" {")
         writer.writeln()

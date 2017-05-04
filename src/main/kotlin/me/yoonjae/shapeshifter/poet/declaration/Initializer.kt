@@ -21,15 +21,15 @@ class Initializer(override var accessLevelModifier: AccessLevelModifier? = null)
 
     override fun render(writer: Writer, linePrefix: Element?) {
         accessLevelModifier?.let {
-            it.render(writer)
+            it.render(writer, linePrefix)
             writer.write(" ")
         }
         declarationModifiers.forEach {
-            it.render(writer)
+            it.render(writer, linePrefix)
             writer.write(" ")
         }
         writer.write("init")
-        parameters.render(writer)
+        parameters.render(writer, linePrefix)
         writer.writeln(" {")
         statements.render(writer, Indent(1) + linePrefix)
         linePrefix?.render(writer)

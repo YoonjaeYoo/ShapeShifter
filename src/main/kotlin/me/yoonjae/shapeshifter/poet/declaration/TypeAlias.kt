@@ -6,13 +6,13 @@ import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifier
 import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifierDescriber
 import java.io.Writer
 
-class TypeAlias(val name: String, val type: String) : Declaration, AccessLevelModifierDescriber {
+class TypeAlias(val name: String, var type: String) : Declaration, AccessLevelModifierDescriber {
 
     override var accessLevelModifier: AccessLevelModifier? = null
 
     override fun render(writer: Writer, linePrefix: Element?) {
         accessLevelModifier.let {
-            render(writer)
+            render(writer, linePrefix)
             writer.write(" ")
         }
         writer.write("typealias $name = $type")

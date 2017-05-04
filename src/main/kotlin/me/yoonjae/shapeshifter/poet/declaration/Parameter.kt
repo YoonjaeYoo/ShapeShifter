@@ -6,8 +6,8 @@ import me.yoonjae.shapeshifter.poet.expression.Expression
 import me.yoonjae.shapeshifter.poet.type.Type
 import java.io.Writer
 
-class Parameter(val name: String?, val type: Type, val label: String? = null,
-                val value: Expression? = null, val variadic: Boolean = false) : Element {
+class Parameter(val name: String?, var type: Type, var label: String? = null,
+                var value: Expression? = null, var variadic: Boolean = false) : Element {
 
     override fun render(writer: Writer, linePrefix: Element?) {
         label?.let { writer.write("$label ") }
@@ -35,7 +35,7 @@ fun List<Parameter>.render(writer: Writer, linePrefix: Element? = null) {
     writer.write("(")
     forEachIndexed { index, parameter ->
         if (index > 0) writer.write(", ")
-        parameter.render(writer)
+        parameter.render(writer, linePrefix)
     }
     writer.write(")")
 }

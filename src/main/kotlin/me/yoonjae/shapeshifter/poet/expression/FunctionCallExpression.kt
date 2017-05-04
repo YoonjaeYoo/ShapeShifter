@@ -5,17 +5,17 @@ import me.yoonjae.shapeshifter.poet.Element
 import java.io.Writer
 
 class FunctionCallExpression(val target: Expression,
-                             val trailingClosure: ClosureExpression? = null) :
+                             var trailingClosure: ClosureExpression? = null) :
         Expression, ArgumentDescriber {
 
     override val arguments = mutableListOf<Argument>()
 
     override fun render(writer: Writer, linePrefix: Element?) {
-        target.render(writer)
-        arguments.render(writer)
+        target.render(writer, linePrefix)
+        arguments.render(writer, linePrefix)
         trailingClosure?.let {
             writer.write(" ")
-            it.render(writer)
+            it.render(writer, linePrefix)
         }
     }
 }

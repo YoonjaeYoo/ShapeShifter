@@ -7,7 +7,7 @@ import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifier
 import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifierDescriber
 import java.io.Writer
 
-class Variable(val name: String, val value: String? = null, val type: String? = null) :
+class Variable(val name: String, var value: String? = null, var type: String? = null) :
         Declaration, DeclarationModifierDescriber {
 
     override var accessLevelModifier: AccessLevelModifier? = null
@@ -15,11 +15,11 @@ class Variable(val name: String, val value: String? = null, val type: String? = 
 
     override fun render(writer: Writer, linePrefix: Element?) {
         accessLevelModifier.let {
-            render(writer)
+            render(writer, linePrefix)
             writer.write(" ")
         }
         declarationModifiers.forEach {
-            it.render(writer)
+            it.render(writer, linePrefix)
             writer.write(" ")
         }
         writer.write("var ")

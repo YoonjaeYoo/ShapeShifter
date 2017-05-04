@@ -28,7 +28,7 @@ class Enum(val name: String) : Declaration, AccessLevelModifierDescriber {
 
     override fun render(writer: Writer, linePrefix: Element?) {
         accessLevelModifier?.let {
-            it.render(writer)
+            it.render(writer, linePrefix)
             writer.write(" ")
         }
         writer.writeln("enum $name {")
