@@ -1,9 +1,9 @@
-package me.yoonjae.shapeshifter.poet.modifier
+package me.yoonjae.shapeshifter.poet.type
 
 import me.yoonjae.shapeshifter.poet.Element
 import java.io.Writer
 
-abstract class Modifier(val name: String) : Element {
+class Type(val name: String) : Element {
 
     override fun render(writer: Writer, linePrefix: Element?) {
         writer.write(name)

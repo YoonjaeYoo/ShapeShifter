@@ -1,5 +1,6 @@
 package me.yoonjae.shapeshifter.poet.file
 
+import me.yoonjae.shapeshifter.poet.Element
 import java.io.Writer
 
 class StringsFile : File {
@@ -18,9 +19,8 @@ class StringsFile : File {
         strings.put(key, value)
     }
 
-    override fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
+    override fun render(writer: Writer, linePrefix: Element?) {
         for ((key, value) in strings) {
-            beforeEachLine?.invoke(writer)
             writer.write("\"$key\" = \"$value\";\n")
         }
     }

@@ -1,14 +1,14 @@
 package me.yoonjae.shapeshifter.poet.declaration
 
 import me.yoonjae.shapeshifter.poet.Describer
+import me.yoonjae.shapeshifter.poet.Element
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
 class Import(val name: String) : Declaration {
 
-    override fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
-        beforeEachLine?.invoke(writer)
-        writer.writeln("import $name")
+    override fun render(writer: Writer, linePrefix: Element?) {
+        writer.write("import $name")
     }
 }
 

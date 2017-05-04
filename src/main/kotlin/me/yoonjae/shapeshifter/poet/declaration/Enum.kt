@@ -10,38 +10,38 @@ import java.io.Writer
 
 class Enum(val name: String) : Declaration, AccessLevelModifierDescriber {
 
-    class EnumCase(val name: String) : Element {
-        override fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
-            beforeEachLine?.invoke(writer)
+    class Case(val name: String) : Element {
+
+        override fun render(writer: Writer, linePrefix: Element?) {
             writer.write("case ")
-            writer.writeln(name)
+            writer.write(name)
         }
     }
 
-    override val accessLevelModifiers = mutableListOf<AccessLevelModifier>()
-    val cases = mutableListOf<EnumCase>()
+    override var accessLevelModifier: AccessLevelModifier? = null
+    val cases = mutableListOf<Case>()
 
     fun case(name: String) {
-        val enumCase = EnumCase(name)
+        val enumCase = Case(name)
         cases.add(enumCase)
     }
 
-    override fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
-        beforeEachLine?.invoke(writer)
-        accessLevelModifiers.forEach { it.render(writer) }
-        writer.write("enum ")
-        writer.write(name)
-        writer.writeln(" {")
-        cases.forEach {
-            it.render(writer) { writer ->
-                beforeEachLine?.invoke(writer)
-                Indent(1).render(writer)
-            }
+    override fun render(writer: Writer, linePrefix: Element?) {
+        accessLevelModifier?.let {
+            it.render(writer)
+            writer.write(" ")
         }
-        beforeEachLine?.invoke(writer)
-        writer.writeln("}")
+        writer.writeln("enum $name {")
+        cases.forEach {
+            val prefix = (Indent(1) + linePrefix).apply { render(writer) }
+            it.render(writer, prefix)
+            writer.writeln()
+        }
+        linePrefix?.render(writer)
+        writer.write("}")
     }
 }
+
 
 interface EnumDescriber : Describer {
 

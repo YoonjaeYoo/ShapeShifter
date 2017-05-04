@@ -15,9 +15,5 @@ class AccessLevelModifier private constructor(name: String) : Modifier(name) {
 
 interface AccessLevelModifierDescriber : Describer {
 
-    val accessLevelModifiers: MutableList<AccessLevelModifier>
-
-    fun accessLevelModifier(modifier: AccessLevelModifier) {
-        accessLevelModifiers.add(modifier)
-    }
+    var accessLevelModifier: AccessLevelModifier?
 }

@@ -22,9 +22,9 @@ class DeclarationModifier constructor(name: String) : Modifier(name) {
     }
 }
 
-interface DeclarationModifierDescriber : Describer {
+interface DeclarationModifierDescriber : Describer, AccessLevelModifierDescriber {
 
-    val declarationModifiers: MutableList<DeclarationModifier>
+    val declarationModifiers: MutableList<in DeclarationModifier>
 
     fun declarationModifier(modifier: DeclarationModifier) {
         declarationModifiers.add(modifier)

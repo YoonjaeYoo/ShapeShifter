@@ -12,7 +12,7 @@ class GenericParameter(val name: String) : Element {
         superTypeNames.add(name)
     }
 
-    override fun render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
+    override fun render(writer: Writer, linePrefix: Element?) {
         writer.write(name)
         if (superTypeNames.isNotEmpty()) {
             writer.write(": ")
@@ -37,7 +37,7 @@ interface GenericParameterDescriber : Describer {
     }
 }
 
-fun List<GenericParameter>.render(writer: Writer, beforeEachLine: ((Writer) -> Unit)?) {
+fun List<GenericParameter>.render(writer: Writer, linePrefix: Element? = null) {
     if (isNotEmpty()) {
         writer.write("<")
         forEachIndexed { index, parameter ->
