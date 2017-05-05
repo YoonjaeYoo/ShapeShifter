@@ -3,23 +3,17 @@ package me.yoonjae.shapeshifter.poet.declaration
 import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import me.yoonjae.shapeshifter.poet.Indent
-import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifier
-import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifier
 import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifierDescriber
-import me.yoonjae.shapeshifter.poet.statement.Statement
 import me.yoonjae.shapeshifter.poet.statement.StatementDescriber
 import me.yoonjae.shapeshifter.poet.type.Type
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Function(val name: String, override var accessLevelModifier: AccessLevelModifier? = null,
-               var result: Type? = null) : Declaration, DeclarationModifierDescriber,
-        GenericParameterDescriber, ParameterDescriber, StatementDescriber {
-
-    override val declarationModifiers = mutableListOf<DeclarationModifier>()
-    override val genericParameters = mutableListOf<GenericParameter>()
-    override val parameters = mutableListOf<Parameter>()
-    override val statements = mutableListOf<Statement>()
+class Function(val name: String, var result: Type? = null) : Declaration,
+        DeclarationModifierDescriber by DeclarationModifierDescriber.Delegate(),
+        GenericParameterDescriber by GenericParameterDescriber.Delegate(),
+        ParameterDescriber by ParameterDescriber.Delegate(),
+        StatementDescriber by StatementDescriber.Delegate() {
 
     override fun render(writer: Writer, linePrefix: Element?) {
         accessLevelModifier?.let {
@@ -55,11 +49,15 @@ interface FunctionDescriber : Describer {
 
     val functions: MutableList<Function>
 
-    fun function(name: String, accessLevelModifier: AccessLevelModifier? = null,
-                 result: Type? = null, init: (Function.() -> Unit)? = null): Function {
-        val function = Function(name, accessLevelModifier, result)
+    fun function(name: String, result: Type? = null, init: (Function.() -> Unit)? = null):
+            Function {
+        val function = Function(name, result)
         init?.invoke(function)
         functions.add(function)
         return function
+    }
+
+    class Delegate : FunctionDescriber {
+        override val functions = mutableListOf<Function>()
     }
 }

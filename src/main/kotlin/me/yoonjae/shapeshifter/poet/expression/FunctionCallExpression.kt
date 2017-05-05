@@ -22,13 +22,17 @@ class FunctionCallExpression(val target: Expression,
 
 interface FunctionCallExpressionDescriber : Describer {
 
-    val functionCallExpressions: MutableList<in FunctionCallExpression>
+    val functionCallExpressions: MutableList<FunctionCallExpression>
 
     fun functionCallExpression(target: String,
                                trailingClosure: ClosureExpression? = null,
                                init: (FunctionCallExpression.() -> Unit)? = null):
             FunctionCallExpression {
-        return functionCallExpression(CustomExpression(target), trailingClosure, init)
+        val functionCallExpression = FunctionCallExpression(GeneralExpression(target),
+                trailingClosure)
+        init?.invoke(functionCallExpression)
+        functionCallExpressions.add(functionCallExpression)
+        return functionCallExpression
     }
 
     fun functionCallExpression(target: Expression,
@@ -39,5 +43,9 @@ interface FunctionCallExpressionDescriber : Describer {
         init?.invoke(functionCallExpression)
         functionCallExpressions.add(functionCallExpression)
         return functionCallExpression
+    }
+
+    class Delegate : FunctionCallExpressionDescriber {
+        override val functionCallExpressions = mutableListOf<FunctionCallExpression>()
     }
 }

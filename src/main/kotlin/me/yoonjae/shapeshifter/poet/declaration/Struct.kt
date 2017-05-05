@@ -3,26 +3,15 @@ package me.yoonjae.shapeshifter.poet.declaration
 import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import me.yoonjae.shapeshifter.poet.Indent
-import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifier
 import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifierDescriber
 import me.yoonjae.shapeshifter.poet.type.Type
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Struct(val name: String, override var superClass: Type? = null) : Declaration, Inheritable,
-        AccessLevelModifierDescriber, GenericParameterDescriber, DeclarationDescriber {
-
-    override var accessLevelModifier: AccessLevelModifier? = null
-    override val genericParameters = mutableListOf<GenericParameter>()
-    override val imports = mutableListOf<Import>()
-    override val typeAliases = mutableListOf<TypeAlias>()
-    override val constants = mutableListOf<Constant>()
-    override val variables = mutableListOf<Variable>()
-    override val initializers = mutableListOf<Initializer>()
-    override val functions = mutableListOf<Function>()
-    override val enums = mutableListOf<Enum>()
-    override val structs = mutableListOf<Struct>()
-    override val classes = mutableListOf<Class>()
+class Struct(val name: String, var superClass: Type? = null) : Declaration,
+        AccessLevelModifierDescriber by AccessLevelModifierDescriber.Delegate(),
+        GenericParameterDescriber by GenericParameterDescriber.Delegate(),
+        DeclarationDescriber by DeclarationDescriber.Delegate() {
 
     override fun render(writer: Writer, linePrefix: Element?) {
         accessLevelModifier?.let {
@@ -71,5 +60,9 @@ interface StructDescriber : Describer {
         init?.invoke(struct)
         structs.add(struct)
         return struct
+    }
+
+    class Delegate : StructDescriber {
+        override val structs = mutableListOf<Struct>()
     }
 }

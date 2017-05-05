@@ -24,9 +24,14 @@ class DeclarationModifier constructor(name: String) : Modifier(name) {
 
 interface DeclarationModifierDescriber : Describer, AccessLevelModifierDescriber {
 
-    val declarationModifiers: MutableList<in DeclarationModifier>
+    val declarationModifiers: MutableList<DeclarationModifier>
 
     fun declarationModifier(modifier: DeclarationModifier) {
         declarationModifiers.add(modifier)
+    }
+
+    class Delegate : DeclarationModifierDescriber,
+            AccessLevelModifierDescriber by AccessLevelModifierDescriber.Delegate() {
+        override val declarationModifiers = mutableListOf<DeclarationModifier>()
     }
 }

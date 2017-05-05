@@ -17,13 +17,17 @@ interface ArgumentDescriber : Describer {
     val arguments: MutableList<Argument>
 
     fun argument(name: String?, value: String): Argument {
-        return argument(name, CustomExpression(value))
+        return argument(name, GeneralExpression(value))
     }
 
     fun argument(name: String?, value: Expression): Argument {
         val argument = Argument(name, value)
         arguments.add(argument)
         return argument
+    }
+
+    class Delegate : ArgumentDescriber {
+        override val arguments = mutableListOf<Argument>()
     }
 }
 

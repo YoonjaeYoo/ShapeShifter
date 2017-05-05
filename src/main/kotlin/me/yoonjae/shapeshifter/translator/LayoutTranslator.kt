@@ -1,8 +1,8 @@
 package me.yoonjae.shapeshifter.translator
 
 import me.yoonjae.shapeshifter.poet.expression.ClosureExpression
-import me.yoonjae.shapeshifter.poet.expression.CustomExpression
 import me.yoonjae.shapeshifter.poet.expression.Expression
+import me.yoonjae.shapeshifter.poet.expression.GeneralExpression
 import me.yoonjae.shapeshifter.poet.expression.InitializerExpression
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifier
@@ -23,9 +23,9 @@ class LayoutTranslator : Translator<SwiftFile>() {
             val className = file.name.substring(0, file.name.lastIndexOf('.')).toIosResourceName()
             val rootElement = doc.documentElement
             clazz(className, Type("InsetLayout")) {
-                initializer(AccessLevelModifier.PUBLIC) {
+                initializer {
+                    accessLevelModifier = AccessLevelModifier.PUBLIC
                     initializerExpression("super") {
-                        argument("insets", "0")
                         translateLayout(rootElement)?.let {
                             argument("sublayout", it)
                         }
@@ -44,13 +44,13 @@ class LayoutTranslator : Translator<SwiftFile>() {
             if (id != null) {
                 trailingClosure = ClosureExpression().apply {
                     closureParameter("id", Type("String"))
-                    customExpression("let test = 1")
+                    generalExpression("let test = 1")
                 }
             }
         }
     }
 
     private fun translateFrameLayout(element: Element): InitializerExpression? =
-            InitializerExpression(CustomExpression("InsetLayout")).apply {
+            InitializerExpression(GeneralExpression("InsetLayout")).apply {
             }
 }

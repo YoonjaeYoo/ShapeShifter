@@ -2,16 +2,11 @@ package me.yoonjae.shapeshifter.poet.declaration
 
 import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
-import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifier
-import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifier
 import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifierDescriber
 import java.io.Writer
 
 class Constant(val name: String, var value: String, var type: String? = null) : Declaration,
-        DeclarationModifierDescriber {
-
-    override var accessLevelModifier: AccessLevelModifier? = null
-    override val declarationModifiers = mutableListOf<DeclarationModifier>()
+        DeclarationModifierDescriber by DeclarationModifierDescriber.Delegate() {
 
     override fun render(writer: Writer, linePrefix: Element?) {
         accessLevelModifier?.let {
@@ -30,6 +25,7 @@ class Constant(val name: String, var value: String, var type: String? = null) : 
 }
 
 interface ConstantDescriber : Describer {
+
     val constants: MutableList<Constant>
 
     fun constant(name: String, value: String, type: String? = null,
@@ -38,5 +34,9 @@ interface ConstantDescriber : Describer {
         init?.invoke(constant)
         constants.add(constant)
         return constant
+    }
+
+    class Delegate : ConstantDescriber {
+        override val constants = mutableListOf<Constant>()
     }
 }

@@ -3,21 +3,16 @@ package me.yoonjae.shapeshifter.poet.declaration
 import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import me.yoonjae.shapeshifter.poet.Indent
-import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifier
-import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifier
 import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifierDescriber
-import me.yoonjae.shapeshifter.poet.statement.Statement
 import me.yoonjae.shapeshifter.poet.statement.StatementDescriber
 import me.yoonjae.shapeshifter.poet.statement.render
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Initializer(override var accessLevelModifier: AccessLevelModifier? = null) : Declaration,
-        DeclarationModifierDescriber, ParameterDescriber, StatementDescriber {
-
-    override val declarationModifiers = mutableListOf<DeclarationModifier>()
-    override val parameters = mutableListOf<Parameter>()
-    override val statements = mutableListOf<Statement>()
+class Initializer : Declaration,
+        DeclarationModifierDescriber by DeclarationModifierDescriber.Delegate(),
+        ParameterDescriber by ParameterDescriber.Delegate(),
+        StatementDescriber by StatementDescriber.Delegate() {
 
     override fun render(writer: Writer, linePrefix: Element?) {
         accessLevelModifier?.let {
@@ -41,11 +36,14 @@ interface InitializerDescriber : Describer {
 
     val initializers: MutableList<Initializer>
 
-    fun initializer(accessLevelModifier: AccessLevelModifier? = null,
-                    init: (Initializer.() -> Unit)? = null): Initializer {
-        val initializer = Initializer(accessLevelModifier)
+    fun initializer(init: (Initializer.() -> Unit)? = null): Initializer {
+        val initializer = Initializer()
         init?.invoke(initializer)
         initializers.add(initializer)
         return initializer
+    }
+
+    class Delegate : InitializerDescriber {
+        override val initializers = mutableListOf<Initializer>()
     }
 }

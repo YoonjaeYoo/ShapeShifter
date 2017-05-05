@@ -27,6 +27,7 @@ class GenericParameter(val name: String) : Element {
 interface GenericParameterDescriber : Describer {
 
     val genericParameters: MutableList<GenericParameter>
+        get() = mutableListOf()
 
     fun genericParameter(name: String, init: (GenericParameter.() -> Unit)? = null):
             GenericParameter {
@@ -34,6 +35,10 @@ interface GenericParameterDescriber : Describer {
         init?.invoke(genericParameter)
         genericParameters.add(genericParameter)
         return genericParameter
+    }
+
+    class Delegate : GenericParameterDescriber {
+        override val genericParameters = mutableListOf<GenericParameter>()
     }
 }
 

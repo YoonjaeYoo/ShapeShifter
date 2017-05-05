@@ -3,16 +3,14 @@ package me.yoonjae.shapeshifter.poet.expression
 import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import me.yoonjae.shapeshifter.poet.Indent
-import me.yoonjae.shapeshifter.poet.statement.Statement
 import me.yoonjae.shapeshifter.poet.statement.StatementDescriber
 import me.yoonjae.shapeshifter.poet.statement.render
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class ClosureExpression : Expression, ClosureParameterDescriber, StatementDescriber {
-
-    override val closureParameters = mutableListOf<ClosureParameter>()
-    override val statements = mutableListOf<Statement>()
+class ClosureExpression : Expression,
+        ClosureParameterDescriber by ClosureParameterDescriber.Delegate(),
+        StatementDescriber by StatementDescriber.Delegate() {
 
     override fun render(writer: Writer, linePrefix: Element?) {
         writer.write("{ ")
@@ -33,5 +31,9 @@ interface ClosureExpressionDescriber : Describer {
         init?.invoke(closureExpression)
         closureExpressions.add(closureExpression)
         return closureExpression
+    }
+
+    class Delegate : ClosureExpressionDescriber {
+        override val closureExpressions = mutableListOf<ClosureExpression>()
     }
 }

@@ -16,4 +16,8 @@ class AccessLevelModifier private constructor(name: String) : Modifier(name) {
 interface AccessLevelModifierDescriber : Describer {
 
     var accessLevelModifier: AccessLevelModifier?
+
+    class Delegate : AccessLevelModifierDescriber {
+        override var accessLevelModifier: AccessLevelModifier? = null
+    }
 }

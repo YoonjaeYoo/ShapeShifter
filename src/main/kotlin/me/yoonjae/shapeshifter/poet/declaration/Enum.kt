@@ -3,12 +3,12 @@ package me.yoonjae.shapeshifter.poet.declaration
 import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import me.yoonjae.shapeshifter.poet.Indent
-import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifier
 import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifierDescriber
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Enum(val name: String) : Declaration, AccessLevelModifierDescriber {
+class Enum(val name: String) : Declaration,
+        AccessLevelModifierDescriber by AccessLevelModifierDescriber.Delegate() {
 
     class Case(val name: String) : Element {
 
@@ -18,7 +18,6 @@ class Enum(val name: String) : Declaration, AccessLevelModifierDescriber {
         }
     }
 
-    override var accessLevelModifier: AccessLevelModifier? = null
     val cases = mutableListOf<Case>()
 
     fun case(name: String) {
@@ -52,5 +51,9 @@ interface EnumDescriber : Describer {
         init?.invoke(enum)
         enums.add(enum)
         return enum
+    }
+
+    class Delegate : EnumDescriber {
+        override val enums = mutableListOf<Enum>()
     }
 }

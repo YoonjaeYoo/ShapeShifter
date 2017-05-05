@@ -27,6 +27,10 @@ interface ClosureParameterDescriber : Describer {
         closureParameters.add(closureParameter)
         return closureParameter
     }
+
+    class Delegate : ClosureParameterDescriber {
+        override val closureParameters = mutableListOf<ClosureParameter>()
+    }
 }
 
 fun List<ClosureParameter>.render(writer: Writer, linePrefix: Element? = null) {

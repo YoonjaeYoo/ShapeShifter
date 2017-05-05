@@ -29,6 +29,10 @@ interface ParameterDescriber : Describer {
         parameters.add(parameter)
         return parameter
     }
+
+    class Delegate : ParameterDescriber {
+        override val parameters = mutableListOf<Parameter>()
+    }
 }
 
 fun List<Parameter>.render(writer: Writer, linePrefix: Element? = null) {
