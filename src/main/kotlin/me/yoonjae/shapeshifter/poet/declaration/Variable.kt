@@ -20,8 +20,8 @@ class Variable(val name: String, var value: String? = null, var type: String? = 
         }
         writer.write("var ")
         writer.write(name)
-        type.let { writer.write(": $type") }
-        value.let { writer.write(" = $value") }
+        type?.let { writer.write(": $type") }
+        value?.let { writer.write(" = $value") }
     }
 }
 

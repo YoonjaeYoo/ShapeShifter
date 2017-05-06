@@ -44,7 +44,7 @@ class LayoutTranslator : Translator<SwiftFile>() {
             if (id != null) {
                 trailingClosure = ClosureExpression().apply {
                     closureParameter("id", Type("String"))
-                    generalExpression("let test = 1")
+                    constant("test", "1")
                 }
             }
         }

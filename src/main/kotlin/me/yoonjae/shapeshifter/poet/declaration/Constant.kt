@@ -19,7 +19,7 @@ class Constant(val name: String, var value: String, var type: String? = null) : 
         }
         writer.write("let ")
         writer.write(name)
-        type.let { writer.write(" $it") }
+        type?.let { writer.write(" $it") }
         writer.write(" = $value")
     }
 }
