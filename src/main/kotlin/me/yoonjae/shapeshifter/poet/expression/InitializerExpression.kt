@@ -4,12 +4,11 @@ import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import java.io.Writer
 
-class InitializerExpression(val target: Expression,
-                            var trailingClosure: ClosureExpression? = null) : Expression,
-        ArgumentDescriber by ArgumentDescriber.Delegate() {
+class InitializerExpression(val target: Expression) : Expression,
+        ArgumentDescriber by ArgumentDescriber.Delegate(),
+        TrailingClosureDescriber by TrailingClosureDescriber.Delegate() {
 
-    constructor(target: String, trailingClosure: ClosureExpression? = null) :
-            this(GeneralExpression(target), trailingClosure)
+    constructor(target: String) : this(GeneralExpression(target))
 
     override fun render(writer: Writer, linePrefix: Element?) {
         target.render(writer, linePrefix)
@@ -24,21 +23,19 @@ class InitializerExpression(val target: Expression,
 
 interface InitializerExpressionDescriber : Describer {
 
-    val initializerExpressions: MutableList<in InitializerExpression>
+    val initializerExpressions: MutableList<InitializerExpression>
 
-    fun initializerExpression(target: String, trailingClosure: ClosureExpression? = null,
-                              init: (InitializerExpression.() -> Unit)? = null):
+    fun initializerExpression(target: String, init: (InitializerExpression.() -> Unit)? = null):
             InitializerExpression {
-        val expression = InitializerExpression(target, trailingClosure)
+        val expression = InitializerExpression(target)
         init?.invoke(expression)
         initializerExpressions.add(expression)
         return expression
     }
 
-    fun initializerExpression(target: Expression, trailingClosure: ClosureExpression? = null,
-                              init: (InitializerExpression.() -> Unit)? = null):
+    fun initializerExpression(target: Expression, init: (InitializerExpression.() -> Unit)? = null):
             InitializerExpression {
-        val expression = InitializerExpression(target, trailingClosure)
+        val expression = InitializerExpression(target)
         init?.invoke(expression)
         initializerExpressions.add(expression)
         return expression

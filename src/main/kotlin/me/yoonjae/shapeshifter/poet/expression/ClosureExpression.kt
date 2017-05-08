@@ -24,7 +24,7 @@ class ClosureExpression : Expression,
 
 interface ClosureExpressionDescriber : Describer {
 
-    val closureExpressions: MutableList<in ClosureExpression>
+    val closureExpressions: MutableList<ClosureExpression>
 
     fun closureExpression(init: (ClosureExpression.() -> Unit)? = null): ClosureExpression {
         val closureExpression = ClosureExpression()

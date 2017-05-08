@@ -25,31 +25,29 @@ interface ExpressionDescriber : Describer, GeneralExpressionDescriber,
                     also { expressions.add(it) }
         }
 
-        override fun functionCallExpression(target: String, trailingClosure: ClosureExpression?,
+        override fun functionCallExpression(target: String,
                                             init: (FunctionCallExpression.() -> Unit)?):
                 FunctionCallExpression {
-            return super<ExpressionDescriber>.functionCallExpression(target, trailingClosure, init).
+            return super<ExpressionDescriber>.functionCallExpression(target, init).
                     also { expressions.add(it) }
         }
 
-        override fun functionCallExpression(target: Expression, trailingClosure: ClosureExpression?,
+        override fun functionCallExpression(target: Expression,
                                             init: (FunctionCallExpression.() -> Unit)?):
                 FunctionCallExpression {
-            return super<ExpressionDescriber>.functionCallExpression(target, trailingClosure, init).
+            return super<ExpressionDescriber>.functionCallExpression(target, init).
                     also { expressions.add(it) }
         }
 
-        override fun initializerExpression(target: String, trailingClosure: ClosureExpression?,
-                                           init: (InitializerExpression.() -> Unit)?):
+        override fun initializerExpression(target: String, init: (InitializerExpression.() -> Unit)?):
                 InitializerExpression {
-            return super<ExpressionDescriber>.initializerExpression(target, trailingClosure, init).
+            return super<ExpressionDescriber>.initializerExpression(target, init).
                     also { expressions.add(it) }
         }
 
-        override fun initializerExpression(target: Expression, trailingClosure: ClosureExpression?,
-                                           init: (InitializerExpression.() -> Unit)?):
+        override fun initializerExpression(target: Expression, init: (InitializerExpression.() -> Unit)?):
                 InitializerExpression {
-            return super<ExpressionDescriber>.initializerExpression(target, trailingClosure, init).
+            return super<ExpressionDescriber>.initializerExpression(target, init).
                     also { expressions.add(it) }
         }
 

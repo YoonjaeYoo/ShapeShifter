@@ -4,14 +4,11 @@ import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import java.io.Writer
 
-class FunctionCallExpression(val target: Expression,
-                             var trailingClosure: ClosureExpression? = null) :
-        Expression, ArgumentDescriber {
+class FunctionCallExpression(val target: Expression) : Expression,
+        ArgumentDescriber by ArgumentDescriber.Delegate(),
+        TrailingClosureDescriber by TrailingClosureDescriber.Delegate() {
 
-    override val arguments = mutableListOf<Argument>()
-
-    constructor(target: String, trailingClosure: ClosureExpression? = null) :
-            this(GeneralExpression(target), trailingClosure)
+    constructor(target: String) : this(GeneralExpression(target))
 
     override fun render(writer: Writer, linePrefix: Element?) {
         target.render(writer, linePrefix)
@@ -28,20 +25,18 @@ interface FunctionCallExpressionDescriber : Describer {
     val functionCallExpressions: MutableList<FunctionCallExpression>
 
     fun functionCallExpression(target: String,
-                               trailingClosure: ClosureExpression? = null,
                                init: (FunctionCallExpression.() -> Unit)? = null):
             FunctionCallExpression {
-        val functionCallExpression = FunctionCallExpression(target, trailingClosure)
+        val functionCallExpression = FunctionCallExpression(target)
         init?.invoke(functionCallExpression)
         functionCallExpressions.add(functionCallExpression)
         return functionCallExpression
     }
 
     fun functionCallExpression(target: Expression,
-                               trailingClosure: ClosureExpression? = null,
                                init: (FunctionCallExpression.() -> Unit)? = null):
             FunctionCallExpression {
-        val functionCallExpression = FunctionCallExpression(target, trailingClosure)
+        val functionCallExpression = FunctionCallExpression(target)
         init?.invoke(functionCallExpression)
         functionCallExpressions.add(functionCallExpression)
         return functionCallExpression

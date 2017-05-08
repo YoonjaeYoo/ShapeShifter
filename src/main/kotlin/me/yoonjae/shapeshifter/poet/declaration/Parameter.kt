@@ -8,9 +8,13 @@ import me.yoonjae.shapeshifter.poet.type.Type
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Parameter(val name: String?, var type: Type, var label: String? = null,
-                var variadic: Boolean = false) : Element,
+class Parameter(val name: String?, var type: Type, value: String? = null,
+                var label: String? = null, var variadic: Boolean = false) : Element,
         ExpressionDescriber by ExpressionDescriber.Delegate() {
+
+    init {
+        value?.let { generalExpression(value) }
+    }
 
     override fun render(writer: Writer, linePrefix: Element?) {
         label?.let { writer.write("$label ") }
@@ -29,17 +33,10 @@ interface ParameterDescriber : Describer {
 
     val parameters: MutableList<Parameter>
 
-    fun parameter(name: String?, type: Type, label: String? = null, variadic: Boolean = false,
+    fun parameter(name: String?, type: Type, value: String? = null,
+                  label: String? = null, variadic: Boolean = false,
                   init: (Parameter.() -> Unit)? = null): Parameter {
-        val parameter = Parameter(name, type, label, variadic)
-        init?.invoke(parameter)
-        parameters.add(parameter)
-        return parameter
-    }
-
-    fun parameter(name: String?, type: String, label: String? = null, variadic: Boolean = false,
-                  init: (Parameter.() -> Unit)? = null): Parameter {
-        val parameter = Parameter(name, Type(type), label, variadic)
+        val parameter = Parameter(name, type, value, label, variadic)
         init?.invoke(parameter)
         parameters.add(parameter)
         return parameter

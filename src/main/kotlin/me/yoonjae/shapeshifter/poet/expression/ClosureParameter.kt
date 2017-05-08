@@ -20,8 +20,8 @@ interface ClosureParameterDescriber : Describer {
 
     val closureParameters: MutableList<ClosureParameter>
 
-    fun closureParameter(name: String, type: Type, init: (ClosureParameter.() -> Unit)? = null):
-            ClosureParameter {
+    fun closureParameter(name: String, type: Type? = null,
+                         init: (ClosureParameter.() -> Unit)? = null): ClosureParameter {
         val closureParameter = ClosureParameter(name, type)
         init?.invoke(closureParameter)
         closureParameters.add(closureParameter)

@@ -32,41 +32,82 @@ class LayoutTranslator : Translator<SwiftFile>() {
 
                 initializer {
                     public()
-                    parameter("alignment", "Alignment") { generalExpression(".fill") }
-                    parameter("viewReuseId", "String?") { generalExpression("nil") }
-                    parameter("sublayouts", "[Layout]")
-                    parameter("config", "((V) -> Void)?") { generalExpression("nil") }
+                    parameter("alignment", Type("Alignment"), ".fill")
+                    parameter("viewReuseId", Type("String?"), "nil")
+                    parameter("sublayouts", Type("[Layout]"))
+                    parameter("config", Type("((V) -> Void)?"), "nil")
 
                     generalExpression("self.sublayouts = sublayouts")
                     initializerExpression("super") {
-                        argument("alignment") { generalExpression("alignment") }
-                        argument("flexibility") { generalExpression(".flexible") }
-                        argument("viewReuseId") { generalExpression("viewReuseId") }
-                        argument("config") { generalExpression("config") }
+                        argument("alignment", "alignment")
+                        argument("flexibility", ".flexible")
+                        argument("viewReuseId", "viewReuseId")
+                        argument("config", "config")
                     }
                 }
 
                 function("measurement", Type("LayoutMeasurement")) {
                     open()
-                    parameter("maxSize", "CGSize", "within")
+                    parameter("maxSize", Type("CGSize"), label = "within")
 
                     constant("size", "maxSize")
-                    generalExpression("return LayoutMeasurement(layout: self, size: size, maxSize: maxSize, sublayouts: sublayouts.map { sublayout in\n" +
-                            "sublayout.measurement(within: size)\n" +
-                            "})")
+                    returnStatement {
+                        initializerExpression("LayoutMeasurement") {
+                            argument("layout", "self")
+                            argument("size", "size")
+                            argument("maxSize", "maxSize")
+                            argument("sublayouts") {
+                                functionCallExpression("sublayouts.map") {
+                                    trailingClosure {
+                                        closureParameter("sublayout")
+                                        functionCallExpression("sublayout.measurement") {
+                                            argument("within", "size")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 function("arrangement", Type("LayoutArrangement")) {
                     open()
-                    parameter("rect", "CGRect", "within")
-                    parameter("measurement", "LayoutMeasurement")
+                    parameter("rect", Type("CGRect"), label = "within")
+                    parameter("measurement", Type("LayoutMeasurement"))
 
-                    constant("frame", "alignment.position(size: measurement.size, in: rect)")
-                    constant("sublayoutRect", "CGRect(x: 0, y: 0, width: frame.width, height: frame.height)")
-                    constant("sublayouts", "measurement.sublayouts.map { (measurement) in\n" +
-                            "return measurement.arrangement(within: sublayoutRect)\n" +
-                            "}")
-                    generalExpression("return LayoutArrangement(layout: self, frame: frame, sublayouts: sublayouts)")
+                    constant("frame") {
+                        functionCallExpression("alignment.position") {
+                            argument("size", "measurement.size")
+                            argument("in", "rect")
+                        }
+                    }
+                    constant("sublayoutRect") {
+                        initializerExpression("CGRect") {
+                            argument("x", "0")
+                            argument("y", "0")
+                            argument("width", "frame.width")
+                            argument("height", "frame.height")
+                        }
+                    }
+                    constant("sublayouts") {
+                        functionCallExpression("measurement.sublayouts.map") {
+                            trailingClosure {
+                                closureParameter("measurement")
+                                returnStatement {
+                                    functionCallExpression("measurement.arrangement") {
+                                        argument("within", "sublayoutRect")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    returnStatement {
+                        initializerExpression("LayoutArrangement") {
+                            argument("layout", "self")
+                            argument("frame", "frame")
+                            argument("sublayouts", "sublayouts")
+                        }
+                    }
                 }
             }
         }
@@ -109,16 +150,12 @@ class LayoutTranslator : Translator<SwiftFile>() {
         initializerExpression("InsetLayout") {
             argument("insets") {
                 initializerExpression("EdgeInsets") {
-                    element.insets().forEach { k, v ->
-                        argument(k) { generalExpression(v) }
-                    }
+                    element.insets().forEach { k, v -> argument(k, v) }
                 }
             }
             argument("alignment") {
                 initializerExpression("Alignment") {
-                    element.alignment().forEach { k, v ->
-                        argument(k) { generalExpression(v) }
-                    }
+                    element.alignment().forEach { k, v -> argument(k, v) }
                 }
             }
             argument("sublayout") {

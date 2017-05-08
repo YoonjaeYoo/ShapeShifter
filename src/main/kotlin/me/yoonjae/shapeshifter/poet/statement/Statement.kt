@@ -11,13 +11,14 @@ import java.io.Writer
 
 interface Statement : Element
 
-interface StatementDescriber : ExpressionDescriber, DeclarationDescriber {
+interface StatementDescriber : ExpressionDescriber, DeclarationDescriber, ReturnStatementDescriber {
 
     val statements: MutableList<Statement>
 
     class Delegate : StatementDescriber,
             ExpressionDescriber by ExpressionDescriber.Delegate(),
-            DeclarationDescriber by DeclarationDescriber.Delegate() {
+            DeclarationDescriber by DeclarationDescriber.Delegate(),
+            ReturnStatementDescriber by ReturnStatementDescriber.Delegate() {
 
         override val statements = mutableListOf<Statement>()
 
@@ -27,31 +28,29 @@ interface StatementDescriber : ExpressionDescriber, DeclarationDescriber {
                     also { statements.add(it) }
         }
 
-        override fun functionCallExpression(target: String, trailingClosure: ClosureExpression?,
+        override fun functionCallExpression(target: String,
                                             init: (FunctionCallExpression.() -> Unit)?):
                 FunctionCallExpression {
-            return super<StatementDescriber>.functionCallExpression(target, trailingClosure, init).
+            return super<StatementDescriber>.functionCallExpression(target, init).
                     also { statements.add(it) }
         }
 
-        override fun functionCallExpression(target: Expression, trailingClosure: ClosureExpression?,
+        override fun functionCallExpression(target: Expression,
                                             init: (FunctionCallExpression.() -> Unit)?):
                 FunctionCallExpression {
-            return super<StatementDescriber>.functionCallExpression(target, trailingClosure, init).
+            return super<StatementDescriber>.functionCallExpression(target, init).
                     also { statements.add(it) }
         }
 
-        override fun initializerExpression(target: String, trailingClosure: ClosureExpression?,
-                                           init: (InitializerExpression.() -> Unit)?):
+        override fun initializerExpression(target: String, init: (InitializerExpression.() -> Unit)?):
                 InitializerExpression {
-            return super<StatementDescriber>.initializerExpression(target, trailingClosure, init).
+            return super<StatementDescriber>.initializerExpression(target, init).
                     also { statements.add(it) }
         }
 
-        override fun initializerExpression(target: Expression, trailingClosure: ClosureExpression?,
-                                           init: (InitializerExpression.() -> Unit)?):
+        override fun initializerExpression(target: Expression, init: (InitializerExpression.() -> Unit)?):
                 InitializerExpression {
-            return super<StatementDescriber>.initializerExpression(target, trailingClosure, init).
+            return super<StatementDescriber>.initializerExpression(target, init).
                     also { statements.add(it) }
         }
 
@@ -99,6 +98,10 @@ interface StatementDescriber : ExpressionDescriber, DeclarationDescriber {
         override fun struct(name: String, init: (Struct.() -> Unit)?): Struct {
             return super<StatementDescriber>.struct(name, init).
                     also { statements.add(it) }
+        }
+
+        override fun returnStatement(init: (ReturnStatement.() -> Unit)?): ReturnStatement {
+            return super<StatementDescriber>.returnStatement(init).also { statements.add(it) }
         }
     }
 }

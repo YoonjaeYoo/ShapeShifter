@@ -6,7 +6,12 @@ import me.yoonjae.shapeshifter.poet.Indent
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Argument(val name: String?) : Element, ExpressionDescriber by ExpressionDescriber.Delegate() {
+class Argument(val name: String?, value: String? = null) : Element,
+        ExpressionDescriber by ExpressionDescriber.Delegate() {
+
+    init {
+        value?.let { generalExpression(value) }
+    }
 
     override fun render(writer: Writer, linePrefix: Element?) {
         name?.let { writer.write("$name: ") }
@@ -18,8 +23,9 @@ interface ArgumentDescriber : Describer {
 
     val arguments: MutableList<Argument>
 
-    fun argument(name: String?, init: (Argument.() -> Unit)? = null): Argument {
-        val argument = Argument(name)
+    fun argument(name: String?, value: String? = null, init: (Argument.() -> Unit)? = null):
+            Argument {
+        val argument = Argument(name, value)
         init?.invoke(argument)
         arguments.add(argument)
         return argument

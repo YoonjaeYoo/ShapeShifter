@@ -2,12 +2,18 @@ package me.yoonjae.shapeshifter.poet.declaration
 
 import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
+import me.yoonjae.shapeshifter.poet.expression.ExpressionDescriber
 import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifierDescriber
 import me.yoonjae.shapeshifter.poet.type.Type
 import java.io.Writer
 
-class Constant(val name: String, var value: String? = null, var type: Type? = null) : Declaration,
-        DeclarationModifierDescriber by DeclarationModifierDescriber.Delegate() {
+class Constant(val name: String, value: String? = null, var type: Type? = null) : Declaration,
+        DeclarationModifierDescriber by DeclarationModifierDescriber.Delegate(),
+        ExpressionDescriber by ExpressionDescriber.Delegate() {
+
+    init {
+        value?.let { generalExpression(value) }
+    }
 
     override fun render(writer: Writer, linePrefix: Element?) {
         accessLevelModifier?.let {
@@ -24,7 +30,10 @@ class Constant(val name: String, var value: String? = null, var type: Type? = nu
             writer.write(": ")
             it.render(writer)
         }
-        value?.let { writer.write(" = $it") }
+        if (expressions.isNotEmpty()) {
+            writer.write(" = ")
+            expressions.first().render(writer, linePrefix)
+        }
     }
 }
 
