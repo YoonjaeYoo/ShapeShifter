@@ -7,7 +7,7 @@ interface Expression : Statement
 
 interface ExpressionDescriber : Describer, GeneralExpressionDescriber,
         FunctionCallExpressionDescriber, InitializerExpressionDescriber,
-        ClosureExpressionDescriber {
+        ClosureExpressionDescriber, LiteralExpressionDescriber {
 
     val expressions: MutableList<Expression>
 
@@ -15,7 +15,8 @@ interface ExpressionDescriber : Describer, GeneralExpressionDescriber,
             GeneralExpressionDescriber by GeneralExpressionDescriber.Delegate(),
             FunctionCallExpressionDescriber by FunctionCallExpressionDescriber.Delegate(),
             InitializerExpressionDescriber by InitializerExpressionDescriber.Delegate(),
-            ClosureExpressionDescriber by ClosureExpressionDescriber.Delegate() {
+            ClosureExpressionDescriber by ClosureExpressionDescriber.Delegate(),
+            LiteralExpressionDescriber by LiteralExpressionDescriber.Delegate() {
 
         override val expressions = mutableListOf<Expression>()
 
@@ -53,6 +54,11 @@ interface ExpressionDescriber : Describer, GeneralExpressionDescriber,
 
         override fun closureExpression(init: (ClosureExpression.() -> Unit)?): ClosureExpression {
             return super<ExpressionDescriber>.closureExpression(init).also { expressions.add(it) }
+        }
+
+        override fun arrayLiteralExpression(init: (ArrayLiteralExpression.() -> Unit)?): ArrayLiteralExpression {
+            return super<ExpressionDescriber>.arrayLiteralExpression(init).
+                    also { expressions.add(it) }
         }
     }
 }

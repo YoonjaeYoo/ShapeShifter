@@ -22,14 +22,9 @@ fun Element.insets(): Map<String, String> {
     return params
 }
 
-fun Element.alignment(): Map<String, String> {
-    return mapOf("vertical" to verticalAlignment(), "horizontal" to horizontalAlignment())
-}
-
 fun Element.verticalAlignment(): String {
     return when (getAttribute("android:layout_height")) {
         "match_parent" -> ".fill"
-        "wrap_content" -> ".top"
         else -> {
             val gravity = getAttribute("android:layout_gravity").split("|")
             if (gravity.contains("top")) {
@@ -48,7 +43,6 @@ fun Element.verticalAlignment(): String {
 fun Element.horizontalAlignment(): String {
     return when (getAttribute("android:layout_width")) {
         "match_parent" -> ".fill"
-        "wrap_content" -> ".leading"
         else -> {
             val gravity = getAttribute("android:layout_gravity").split("|")
             if (gravity.contains("left") || gravity.contains("start")) {
@@ -61,5 +55,46 @@ fun Element.horizontalAlignment(): String {
                 ".leading"
             }
         }
+    }
+}
+
+fun Element.width(): String {
+    val width = getAttribute("android:layout_width")
+    return when (width) {
+        "match_parent" -> "nil"
+        "wrap_content" -> "nil"
+        else -> width.toDimen()
+    }
+}
+
+fun Element.height(): String {
+    val height = getAttribute("android:layout_height")
+    return when (height) {
+        "match_parent" -> "nil"
+        "wrap_content" -> "nil"
+        else -> height.toDimen()
+    }
+}
+
+fun Element.image(): String? {
+    val src = getAttribute("android:src")
+    return if (src.isNotEmpty() && src.startsWith("@drawable/")) {
+        "UIImage(named: \"${src.substring(10)}\")"
+    } else {
+        null
+    }
+}
+
+fun Element.text(): String? {
+    val text = getAttribute("android:text")
+    return if (text.isNotEmpty()) {
+        if (text.startsWith("@string/")) {
+            val key = "\"${text.substring(8)}\""
+            "NSLocalizedString($key, comment: $key)"
+        } else {
+            "\"$text\""
+        }
+    } else {
+        null
     }
 }

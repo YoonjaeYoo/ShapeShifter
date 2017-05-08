@@ -29,7 +29,7 @@ fun NodeList.elementIterator(): Iterator<Element> {
             (index until length).forEach {
                 val item = item(it)
                 if (item.isElement()) {
-                    index = it
+                    index = it + 1
                     return item as Element
                 }
             }
