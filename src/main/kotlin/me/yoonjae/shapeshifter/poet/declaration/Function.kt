@@ -26,7 +26,6 @@ class Function(val name: String, var result: Type? = null) : Declaration,
         }
         writer.write("func $name")
         genericParameters.render(writer, linePrefix)
-        writer.write(" ")
         parameters.render(writer, linePrefix)
         writer.write(" ")
         result?.let {

@@ -1,10 +1,12 @@
 package me.yoonjae.shapeshifter
 
-import me.yoonjae.shapeshifter.poet.toIosResourceName
+import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.translator.ColorsTranslator
 import me.yoonjae.shapeshifter.translator.DimensTranslator
 import me.yoonjae.shapeshifter.translator.LayoutTranslator
 import me.yoonjae.shapeshifter.translator.StringsTranslator
+import me.yoonjae.shapeshifter.translator.extensions.elementIterator
+import org.w3c.dom.Element
 import java.io.File
 import java.io.FileWriter
 
@@ -41,13 +43,42 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
     private fun shiftLayouts() {
         val translator = LayoutTranslator()
         val layoutDir = File(androidAppDir + "/src/main/res/layout/")
+        val frameLayoutChildren = mutableListOf<String>()
+
+        translator.requirements().forEach {
+            it.writeTo(iosAppDir + "/Layout/")
+        }
         layoutDir.listFiles { file ->
-            if (file.name == "activity_main.xml") {
-                val output = File(iosAppDir + "/Layout/${file.name.toIosResourceName()}Layout.swift")
-                output.createWithParent()
-                FileWriter(output).use { translator.translate(file).render(it) }
+            if (file.name == "activity_test.xml") {
+                val path = iosAppDir + "/Layout/"
+                translator.translate(file).writeTo(path)
             }
+
+//            val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)
+//            getFrameLayoutChildren(doc.documentElement, frameLayoutChildren)
+
             true
+        }
+        frameLayoutChildren.forEach { println(it) }
+    }
+
+    private fun SwiftFile.writeTo(path: String) {
+        val output = File("$path/$name")
+        output.createWithParent()
+        FileWriter(output).use { render(it) }
+    }
+
+    private fun getFrameLayoutChildren(element: Element, frameLayoutChildren: MutableList<String>) {
+        for (child in element.childNodes.elementIterator()) {
+            if (element.tagName == "FrameLayout") {
+                val width = child.getAttribute("android:layout_width")
+                val height = child.getAttribute("android:layout_height")
+                val info = "${child.tagName}($width, $height)"
+                if (!frameLayoutChildren.contains(info)) {
+                    frameLayoutChildren.add(info)
+                }
+            }
+            getFrameLayoutChildren(child, frameLayoutChildren)
         }
     }
 

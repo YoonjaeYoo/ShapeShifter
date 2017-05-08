@@ -8,6 +8,9 @@ class InitializerExpression(val target: Expression,
                             var trailingClosure: ClosureExpression? = null) : Expression,
         ArgumentDescriber by ArgumentDescriber.Delegate() {
 
+    constructor(target: String, trailingClosure: ClosureExpression? = null) :
+            this(GeneralExpression(target), trailingClosure)
+
     override fun render(writer: Writer, linePrefix: Element?) {
         target.render(writer, linePrefix)
         writer.write(".init")
@@ -26,7 +29,7 @@ interface InitializerExpressionDescriber : Describer {
     fun initializerExpression(target: String, trailingClosure: ClosureExpression? = null,
                               init: (InitializerExpression.() -> Unit)? = null):
             InitializerExpression {
-        val expression = InitializerExpression(GeneralExpression(target), trailingClosure)
+        val expression = InitializerExpression(target, trailingClosure)
         init?.invoke(expression)
         initializerExpressions.add(expression)
         return expression

@@ -1,4 +1,4 @@
-package me.yoonjae.shapeshifter.poet
+package me.yoonjae.shapeshifter.translator.extensions
 
 fun String.toIosResourceName(): String {
     val prefixBuilder = StringBuilder()
@@ -35,4 +35,12 @@ fun String.toCamelCase(): String {
         }
     }
     return builder.toString()
+}
+
+fun String.toDimen(): String {
+    return if (contains("@dimen/")) {
+        "Dimens.${substring(7).toCamelCase()}"
+    } else {
+        substring(0, length - 2)
+    }
 }

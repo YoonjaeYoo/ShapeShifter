@@ -63,13 +63,13 @@ interface StatementDescriber : ExpressionDescriber, DeclarationDescriber {
             return super<StatementDescriber>.import(name, init).also { statements.add(it) }
         }
 
-        override fun constant(name: String, value: String, type: String?,
+        override fun constant(name: String, value: String?, type: Type?,
                               init: (Constant.() -> Unit)?): Constant {
             return super<StatementDescriber>.constant(name, value, type, init).
                     also { statements.add(it) }
         }
 
-        override fun variable(name: String, value: String?, type: String?,
+        override fun variable(name: String, value: String?, type: Type?,
                               init: (Variable.() -> Unit)?): Variable {
             return super<StatementDescriber>.variable(name, value, type, init).
                     also { statements.add(it) }

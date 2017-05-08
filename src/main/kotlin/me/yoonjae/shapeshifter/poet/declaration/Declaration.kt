@@ -28,13 +28,13 @@ interface DeclarationDescriber : ImportDescriber, ConstantDescriber, VariableDes
             return super<DeclarationDescriber>.import(name, init).also { declarations.add(it) }
         }
 
-        override fun constant(name: String, value: String, type: String?,
+        override fun constant(name: String, value: String?, type: Type?,
                               init: (Constant.() -> Unit)?): Constant {
             return super<DeclarationDescriber>.constant(name, value, type, init).
                     also { declarations.add(it) }
         }
 
-        override fun variable(name: String, value: String?, type: String?,
+        override fun variable(name: String, value: String?, type: Type?,
                               init: (Variable.() -> Unit)?): Variable {
             return super<DeclarationDescriber>.variable(name, value, type, init).
                     also { declarations.add(it) }

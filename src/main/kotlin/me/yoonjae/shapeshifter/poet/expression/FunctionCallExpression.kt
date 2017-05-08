@@ -10,6 +10,9 @@ class FunctionCallExpression(val target: Expression,
 
     override val arguments = mutableListOf<Argument>()
 
+    constructor(target: String, trailingClosure: ClosureExpression? = null) :
+            this(GeneralExpression(target), trailingClosure)
+
     override fun render(writer: Writer, linePrefix: Element?) {
         target.render(writer, linePrefix)
         arguments.render(writer, linePrefix)
@@ -28,8 +31,7 @@ interface FunctionCallExpressionDescriber : Describer {
                                trailingClosure: ClosureExpression? = null,
                                init: (FunctionCallExpression.() -> Unit)? = null):
             FunctionCallExpression {
-        val functionCallExpression = FunctionCallExpression(GeneralExpression(target),
-                trailingClosure)
+        val functionCallExpression = FunctionCallExpression(target, trailingClosure)
         init?.invoke(functionCallExpression)
         functionCallExpressions.add(functionCallExpression)
         return functionCallExpression

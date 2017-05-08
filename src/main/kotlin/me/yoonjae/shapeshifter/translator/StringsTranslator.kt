@@ -1,6 +1,7 @@
 package me.yoonjae.shapeshifter.translator
 
 import me.yoonjae.shapeshifter.poet.file.StringsFile
+import me.yoonjae.shapeshifter.translator.extensions.iterator
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 

@@ -4,21 +4,15 @@ import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import java.io.Writer
 
-class GenericParameter(val name: String) : Element {
-
-    val superTypeNames = mutableListOf<String>()
-
-    fun superType(name: String) {
-        superTypeNames.add(name)
-    }
+class GenericParameter(val name: String) : Element, Inheritable by Inheritable.Delegate() {
 
     override fun render(writer: Writer, linePrefix: Element?) {
         writer.write(name)
-        if (superTypeNames.isNotEmpty()) {
-            writer.write(": ")
-            superTypeNames.forEachIndexed { index, superType ->
+        if (superTypes.isNotEmpty()) {
+            writer.write(":")
+            superTypes.forEachIndexed { index, superType ->
                 if (index > 0) writer.write(" & ")
-                writer.write(superType)
+                writer.write(superType.name)
             }
         }
     }

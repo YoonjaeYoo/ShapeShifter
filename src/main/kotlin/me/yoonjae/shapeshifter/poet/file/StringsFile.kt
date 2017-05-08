@@ -13,6 +13,7 @@ class StringsFile : File {
         }
     }
 
+    override var name: String = "Localizable.strings"
     private val strings = LinkedHashMap<String, String>()
 
     fun string(key: String, value: String) {

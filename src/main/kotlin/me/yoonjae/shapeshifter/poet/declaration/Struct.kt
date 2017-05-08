@@ -4,13 +4,13 @@ import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import me.yoonjae.shapeshifter.poet.Indent
 import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifierDescriber
-import me.yoonjae.shapeshifter.poet.type.Type
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Struct(val name: String, var superClass: Type? = null) : Declaration,
+class Struct(val name: String) : Declaration,
         AccessLevelModifierDescriber by AccessLevelModifierDescriber.Delegate(),
         GenericParameterDescriber by GenericParameterDescriber.Delegate(),
+        Inheritable by Inheritable.Delegate(),
         DeclarationDescriber by DeclarationDescriber.Delegate() {
 
     override fun render(writer: Writer, linePrefix: Element?) {
@@ -20,9 +20,12 @@ class Struct(val name: String, var superClass: Type? = null) : Declaration,
         }
         writer.write("struct $name")
         genericParameters.render(writer, linePrefix)
-        superClass?.let {
+        if (superTypes.isNotEmpty()) {
             writer.write(": ")
-            it.render(writer, linePrefix)
+            superTypes.forEachIndexed { index, type ->
+                if (index > 0) writer.write(", ")
+                type.render(writer, linePrefix)
+            }
         }
         writer.writeln(" {")
         writer.writeln()
@@ -41,8 +44,8 @@ class Struct(val name: String, var superClass: Type? = null) : Declaration,
 
     private fun List<Declaration>.render(writer: Writer, linePrefix: Element? = null) {
         if (isNotEmpty()) {
-            val prefix = (Indent(1) + linePrefix).apply { render(writer) }
             forEach {
+                val prefix = (Indent(1) + linePrefix).apply { render(writer) }
                 it.render(writer, prefix)
                 writer.writeln()
             }

@@ -1,31 +1,17 @@
 package me.yoonjae.shapeshifter.poet.file
 
 import me.yoonjae.shapeshifter.poet.Element
-import me.yoonjae.shapeshifter.poet.declaration.*
-import me.yoonjae.shapeshifter.poet.declaration.Enum
-import me.yoonjae.shapeshifter.poet.declaration.Function
+import me.yoonjae.shapeshifter.poet.declaration.Declaration
+import me.yoonjae.shapeshifter.poet.declaration.DeclarationDescriber
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class SwiftFile : File, ImportDescriber, ConstantDescriber, VariableDescriber,
-        TypeAliasDescriber, FunctionDescriber, EnumDescriber, StructDescriber, ClassDescriber {
+class SwiftFile(override var name: String) :
+        File, DeclarationDescriber by DeclarationDescriber.Delegate() {
 
-    companion object {
-        fun create(init: SwiftFile.() -> Unit): SwiftFile {
-            val file = SwiftFile()
-            file.init()
-            return file
-        }
+    constructor(name: String, init: (SwiftFile.() -> Unit)? = null) : this(name) {
+        init?.invoke(this)
     }
-
-    override val imports = mutableListOf<Import>()
-    override val typeAliases = mutableListOf<TypeAlias>()
-    override val constants = mutableListOf<Constant>()
-    override val variables = mutableListOf<Variable>()
-    override val functions = mutableListOf<Function>()
-    override val enums = mutableListOf<Enum>()
-    override val structs = mutableListOf<Struct>()
-    override val classes = mutableListOf<Class>()
 
     override fun render(writer: Writer, linePrefix: Element?) {
         imports.render(writer)

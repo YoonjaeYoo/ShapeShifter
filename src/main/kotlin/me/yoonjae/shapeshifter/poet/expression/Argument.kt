@@ -2,13 +2,15 @@ package me.yoonjae.shapeshifter.poet.expression
 
 import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
+import me.yoonjae.shapeshifter.poet.Indent
+import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Argument(val name: String?, var value: Expression) : Element {
+class Argument(val name: String?) : Element, ExpressionDescriber by ExpressionDescriber.Delegate() {
 
     override fun render(writer: Writer, linePrefix: Element?) {
         name?.let { writer.write("$name: ") }
-        value.render(writer, linePrefix)
+        expressions.first().render(writer, linePrefix)
     }
 }
 
@@ -16,12 +18,9 @@ interface ArgumentDescriber : Describer {
 
     val arguments: MutableList<Argument>
 
-    fun argument(name: String?, value: String): Argument {
-        return argument(name, GeneralExpression(value))
-    }
-
-    fun argument(name: String?, value: Expression): Argument {
-        val argument = Argument(name, value)
+    fun argument(name: String?, init: (Argument.() -> Unit)? = null): Argument {
+        val argument = Argument(name)
+        init?.invoke(argument)
         arguments.add(argument)
         return argument
     }
@@ -32,12 +31,16 @@ interface ArgumentDescriber : Describer {
 }
 
 fun List<Argument>.render(writer: Writer, linePrefix: Element? = null) {
+    writer.write("(")
     if (isNotEmpty()) {
-        writer.write("(")
         forEachIndexed { index, argument ->
             if (index > 0) writer.write(", ")
-            argument.render(writer, linePrefix)
+            writer.writeln()
+            (Indent(2) + linePrefix).render(writer)
+            argument.render(writer, (Indent(2) + linePrefix))
         }
-        writer.write(")")
+        writer.writeln()
+        linePrefix?.render(writer)
     }
+    writer.write(")")
 }
