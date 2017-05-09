@@ -2,6 +2,10 @@ package me.yoonjae.shapeshifter.translator.extensions
 
 import org.w3c.dom.Element
 
+fun Element.id(): String? {
+    return if (hasAttribute("android:id")) getAttribute("android:id").substring(5) else null
+}
+
 fun Element.insets(): Map<String, String> {
     val params = mutableMapOf("top" to "0", "left" to "0", "bottom" to "0", "right" to "0")
     params.keys.forEach { key ->

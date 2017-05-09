@@ -1,7 +1,9 @@
 package me.yoonjae.shapeshifter.translator.extensions
 
 import me.yoonjae.shapeshifter.poet.expression.ArgumentDescriber
+import me.yoonjae.shapeshifter.poet.expression.ClosureExpression
 import me.yoonjae.shapeshifter.poet.expression.ExpressionDescriber
+import me.yoonjae.shapeshifter.poet.expression.TrailingClosureDescriber
 import org.w3c.dom.Element
 
 fun ExpressionDescriber.layoutExpression(element: Element) {
@@ -24,6 +26,7 @@ fun ExpressionDescriber.frameLayoutExpression(element: Element) {
                     }
                 }
             }
+            config(element, "view")
         }
     }
 }
@@ -33,8 +36,7 @@ fun ExpressionDescriber.imageViewExpression(element: Element) {
         initializerExpression("SizeLayout<UIImageView>") {
             sizeArguments(element)
             alignmentArgument(element)
-            trailingClosure {
-                closureParameter("imageView")
+            config(element, "imageView") {
                 element.image()?.let {
                     generalExpression("imageView.image = $it")
                 }
@@ -45,16 +47,30 @@ fun ExpressionDescriber.imageViewExpression(element: Element) {
 
 fun ExpressionDescriber.buttonExpression(element: Element) {
     marginLayoutExpression(element) {
-        initializerExpression("ButtonLayout<UIButton>") {
-            argument("type", ".system")
+        functionCallExpression("ButtonLayout<UIButton>.normal") {
             argument("title", element.text())
             alignmentArgument(element)
+            config(element, "button")
         }
     }
 }
 
-fun ExpressionDescriber.marginLayoutExpression(element: Element,
-                                               sublayout: (ExpressionDescriber.() -> Unit)) {
+private fun TrailingClosureDescriber.config(element: Element, parameterName: String,
+                                            init: (ClosureExpression.() -> Unit)? = null) {
+    val id = element.id()
+    if (id != null || init != null) {
+        trailingClosure {
+            closureParameter(parameterName)
+            init?.invoke(this)
+            element.id()?.let {
+                generalExpression("${it.toConfigParameterName()}?($parameterName)")
+            }
+        }
+    }
+}
+
+private fun ExpressionDescriber.marginLayoutExpression(element: Element,
+                                                       sublayout: (ExpressionDescriber.() -> Unit)) {
     initializerExpression("InsetLayout") {
         argument("insets") {
             initializerExpression("EdgeInsets") {
@@ -67,7 +83,7 @@ fun ExpressionDescriber.marginLayoutExpression(element: Element,
     }
 }
 
-fun ArgumentDescriber.alignmentArgument(element: Element) {
+private fun ArgumentDescriber.alignmentArgument(element: Element) {
     argument("alignment") {
         initializerExpression("Alignment") {
             argument("vertical", element.verticalAlignment())
@@ -76,7 +92,7 @@ fun ArgumentDescriber.alignmentArgument(element: Element) {
     }
 }
 
-fun ArgumentDescriber.sizeArguments(element: Element) {
+private fun ArgumentDescriber.sizeArguments(element: Element) {
     argument("width", element.width())
     argument("height", element.height())
 }

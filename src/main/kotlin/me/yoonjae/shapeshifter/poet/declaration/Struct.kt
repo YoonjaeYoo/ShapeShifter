@@ -28,28 +28,28 @@ class Struct(val name: String) : Declaration,
             }
         }
         writer.writeln(" {")
-        writer.writeln()
         imports.render(writer, linePrefix)
         typeAliases.render(writer, linePrefix)
         constants.render(writer, linePrefix)
         variables.render(writer, linePrefix)
-        initializers.render(writer, linePrefix)
-        functions.render(writer, linePrefix)
-        enums.render(writer, linePrefix)
-        structs.render(writer, linePrefix)
-        classes.render(writer, linePrefix)
+        initializers.render(writer, linePrefix, true)
+        functions.render(writer, linePrefix, true)
+        enums.render(writer, linePrefix, true)
+        structs.render(writer, linePrefix, true)
+        classes.render(writer, linePrefix, true)
         linePrefix?.render(writer)
         writer.write("}")
     }
 
-    private fun List<Declaration>.render(writer: Writer, linePrefix: Element? = null) {
+    private fun List<Declaration>.render(writer: Writer, linePrefix: Element? = null,
+                                         newline: Boolean = false) {
         if (isNotEmpty()) {
             forEach {
+                if (newline) writer.writeln()
                 val prefix = (Indent(1) + linePrefix).apply { render(writer) }
                 it.render(writer, prefix)
                 writer.writeln()
             }
-            writer.writeln()
         }
     }
 }

@@ -6,10 +6,10 @@ import me.yoonjae.shapeshifter.poet.declaration.DeclarationDescriber
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class SwiftFile(override var name: String) :
-        File, DeclarationDescriber by DeclarationDescriber.Delegate() {
+class SwiftFile(override var name: String, init: (SwiftFile.() -> Unit)? = null) : File,
+        DeclarationDescriber by DeclarationDescriber.Delegate() {
 
-    constructor(name: String, init: (SwiftFile.() -> Unit)? = null) : this(name) {
+    init {
         init?.invoke(this)
     }
 

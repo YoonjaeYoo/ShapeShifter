@@ -26,7 +26,9 @@ class Initializer : Declaration,
         writer.write("init")
         parameters.render(writer, linePrefix)
         writer.writeln(" {")
+        (Indent(1) + linePrefix).render(writer)
         statements.render(writer, Indent(1) + linePrefix)
+        writer.writeln()
         linePrefix?.render(writer)
         writer.write("}")
     }

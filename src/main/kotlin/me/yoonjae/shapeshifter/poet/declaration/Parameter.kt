@@ -8,12 +8,12 @@ import me.yoonjae.shapeshifter.poet.type.Type
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Parameter(val name: String?, var type: Type, value: String? = null,
+class Parameter(val name: String?, var type: Type, defaultValue: String? = null,
                 var label: String? = null, var variadic: Boolean = false) : Element,
         ExpressionDescriber by ExpressionDescriber.Delegate() {
 
     init {
-        value?.let { generalExpression(value) }
+        defaultValue?.let { generalExpression(defaultValue) }
     }
 
     override fun render(writer: Writer, linePrefix: Element?) {
@@ -33,10 +33,10 @@ interface ParameterDescriber : Describer {
 
     val parameters: MutableList<Parameter>
 
-    fun parameter(name: String?, type: Type, value: String? = null,
+    fun parameter(name: String?, type: Type, defaultValue: String? = null,
                   label: String? = null, variadic: Boolean = false,
                   init: (Parameter.() -> Unit)? = null): Parameter {
-        val parameter = Parameter(name, type, value, label, variadic)
+        val parameter = Parameter(name, type, defaultValue, label, variadic)
         init?.invoke(parameter)
         parameters.add(parameter)
         return parameter
@@ -50,14 +50,18 @@ interface ParameterDescriber : Describer {
 fun List<Parameter>.render(writer: Writer, linePrefix: Element? = null) {
     writer.write("(")
     if (isNotEmpty()) {
-        forEachIndexed { index, parameter ->
-            if (index > 0) writer.write(", ")
+        if (size == 1) {
+            get(0).render(writer, (Indent(2) + linePrefix))
+        } else {
+            forEachIndexed { index, parameter ->
+                if (index > 0) writer.write(", ")
+                writer.writeln()
+                (Indent(2) + linePrefix).render(writer)
+                parameter.render(writer, (Indent(2) + linePrefix))
+            }
             writer.writeln()
-            (Indent(2) + linePrefix).render(writer)
-            parameter.render(writer, (Indent(2) + linePrefix))
+            linePrefix?.render(writer)
         }
-        writer.writeln()
-        linePrefix?.render(writer)
     }
     writer.write(")")
 }

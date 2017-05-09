@@ -26,9 +26,20 @@ interface DeclarationModifierDescriber : Describer, AccessLevelModifierDescriber
 
     val declarationModifiers: MutableList<DeclarationModifier>
 
-    fun declarationModifier(modifier: DeclarationModifier) {
-        declarationModifiers.add(modifier)
-    }
+    fun clazz() = declarationModifiers.add(DeclarationModifier.CLASS)
+    fun convenience() = declarationModifiers.add(DeclarationModifier.CONVENIENCE)
+    fun dynamic() = declarationModifiers.add(DeclarationModifier.DYNAMIC)
+    fun final() = declarationModifiers.add(DeclarationModifier.FINAL)
+    fun infix() = declarationModifiers.add(DeclarationModifier.INFIX)
+    fun lazy() = declarationModifiers.add(DeclarationModifier.LAZY)
+    fun optional() = declarationModifiers.add(DeclarationModifier.OPTIONAL)
+    fun override() = declarationModifiers.add(DeclarationModifier.OVERRIDE)
+    fun postfix() = declarationModifiers.add(DeclarationModifier.POSTFIX)
+    fun prefix() = declarationModifiers.add(DeclarationModifier.PREFIX)
+    fun required() = declarationModifiers.add(DeclarationModifier.REQUIRED)
+    fun static() = declarationModifiers.add(DeclarationModifier.STATIC)
+    fun unowned() = declarationModifiers.add(DeclarationModifier.UNOWNED)
+    fun weak() = declarationModifiers.add(DeclarationModifier.WEAK)
 
     class Delegate : DeclarationModifierDescriber,
             AccessLevelModifierDescriber by AccessLevelModifierDescriber.Delegate() {

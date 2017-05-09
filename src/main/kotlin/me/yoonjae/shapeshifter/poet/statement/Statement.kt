@@ -11,14 +11,16 @@ import java.io.Writer
 
 interface Statement : Element
 
-interface StatementDescriber : ExpressionDescriber, DeclarationDescriber, ReturnStatementDescriber {
+interface StatementDescriber : ExpressionDescriber, DeclarationDescriber,
+        ReturnStatementDescriber, IfStatementDescriber {
 
     val statements: MutableList<Statement>
 
     class Delegate : StatementDescriber,
             ExpressionDescriber by ExpressionDescriber.Delegate(),
             DeclarationDescriber by DeclarationDescriber.Delegate(),
-            ReturnStatementDescriber by ReturnStatementDescriber.Delegate() {
+            ReturnStatementDescriber by ReturnStatementDescriber.Delegate(),
+            IfStatementDescriber by IfStatementDescriber.Delegate() {
 
         override val statements = mutableListOf<Statement>()
 
@@ -103,13 +105,26 @@ interface StatementDescriber : ExpressionDescriber, DeclarationDescriber, Return
         override fun returnStatement(init: (ReturnStatement.() -> Unit)?): ReturnStatement {
             return super<StatementDescriber>.returnStatement(init).also { statements.add(it) }
         }
+
+        override fun ifStatement(condition: String, init: (IfStatement.() -> Unit)?): IfStatement {
+            return super<StatementDescriber>.ifStatement(condition, init).
+                    also { statements.add(it) }
+        }
+
+        override fun ifStatement(condition: Expression, init: (IfStatement.() -> Unit)?):
+                IfStatement {
+            return super<StatementDescriber>.ifStatement(condition, init).
+                    also { statements.add(it) }
+        }
     }
 }
 
 fun List<Statement>.render(writer: Writer, linePrefix: Element? = null) {
-    forEach {
-        linePrefix?.render(writer)
-        it.render(writer, linePrefix)
-        writer.writeln()
+    forEachIndexed { index, statement ->
+        if (index > 0) {
+            writer.writeln()
+            linePrefix?.render(writer)
+        }
+        statement.render(writer, linePrefix)
     }
 }

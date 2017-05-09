@@ -1,6 +1,8 @@
 package me.yoonjae.shapeshifter.translator.extensions
 
-fun String.toIosResourceName(): String {
+fun String.toConfigParameterName() = "config${toResourceName().capitalize()}"
+
+fun String.toResourceName(): String {
     val prefixBuilder = StringBuilder()
     val builder = StringBuilder()
     var prefix = true
@@ -39,7 +41,7 @@ fun String.toCamelCase(): String {
 
 fun String.toDimen(): String {
     return if (contains("@dimen/")) {
-        "Dimens.${substring(7).toCamelCase()}"
+        "Dimen.${substring(7).toCamelCase()}"
     } else {
         substring(0, length - 2)
     }

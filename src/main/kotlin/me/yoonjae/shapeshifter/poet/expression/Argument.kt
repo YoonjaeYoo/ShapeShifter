@@ -39,14 +39,18 @@ interface ArgumentDescriber : Describer {
 fun List<Argument>.render(writer: Writer, linePrefix: Element? = null) {
     writer.write("(")
     if (isNotEmpty()) {
-        forEachIndexed { index, argument ->
-            if (index > 0) writer.write(", ")
+        if (size == 1) {
+            get(0).render(writer, (Indent(2) + linePrefix))
+        } else {
+            forEachIndexed { index, argument ->
+                if (index > 0) writer.write(", ")
+                writer.writeln()
+                (Indent(2) + linePrefix).render(writer)
+                argument.render(writer, (Indent(2) + linePrefix))
+            }
             writer.writeln()
-            (Indent(2) + linePrefix).render(writer)
-            argument.render(writer, (Indent(2) + linePrefix))
+            linePrefix?.render(writer)
         }
-        writer.writeln()
-        linePrefix?.render(writer)
     }
     writer.write(")")
 }

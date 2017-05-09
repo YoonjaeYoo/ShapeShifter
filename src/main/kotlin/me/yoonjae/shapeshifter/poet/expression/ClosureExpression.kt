@@ -16,7 +16,9 @@ class ClosureExpression : Expression,
         writer.write("{ ")
         closureParameters.render(writer, linePrefix)
         writer.writeln(" in")
+        (Indent(1) + linePrefix).render(writer)
         statements.render(writer, Indent(1) + linePrefix)
+        writer.writeln()
         linePrefix?.render(writer)
         writer.write("}")
     }

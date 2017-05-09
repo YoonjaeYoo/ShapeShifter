@@ -9,7 +9,7 @@ class StringsTranslator : Translator<StringsFile>() {
 
     override fun translate(file: File): StringsFile {
         val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)
-        return StringsFile.create {
+        return StringsFile {
             for (string in doc.getElementsByTagName("string").iterator()) {
                 if (string != null) {
                     val name = string.attributes.getNamedItem("name").textContent

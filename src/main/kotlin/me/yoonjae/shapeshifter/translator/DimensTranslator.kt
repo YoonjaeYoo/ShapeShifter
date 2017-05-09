@@ -1,7 +1,6 @@
 package me.yoonjae.shapeshifter.translator
 
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
-import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifier
 import me.yoonjae.shapeshifter.poet.type.Type
 import me.yoonjae.shapeshifter.translator.extensions.iterator
 import me.yoonjae.shapeshifter.translator.extensions.toCamelCase
@@ -13,12 +12,12 @@ class DimensTranslator : Translator<SwiftFile>() {
 
     override fun translate(file: File): SwiftFile {
         val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)
-        return SwiftFile("Dimens.swift") {
+        return SwiftFile("Dimen.swift") {
             import("UIKit")
-            struct("Dimens") {
+            struct("Dimen") {
                 createDimenMap(doc.getElementsByTagName("dimen")).forEach { name, value ->
                     constant(name, value, Type("CGFloat")) {
-                        declarationModifier(DeclarationModifier.STATIC)
+                        static()
                     }
                 }
             }
