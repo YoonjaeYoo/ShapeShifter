@@ -6,6 +6,10 @@ fun Element.id(): String? {
     return if (hasAttribute("android:id")) getAttribute("android:id").substring(5) else null
 }
 
+fun Element.style(): String? {
+    return if (hasAttribute("style")) getAttribute("style").substring(7) else null
+}
+
 fun Element.insets(): Map<String, String> {
     val params = mutableMapOf("top" to "0", "left" to "0", "bottom" to "0", "right" to "0")
     params.keys.forEach { key ->
@@ -93,8 +97,7 @@ fun Element.text(): String? {
     val text = getAttribute("android:text")
     return if (text.isNotEmpty()) {
         if (text.startsWith("@string/")) {
-            val key = "\"${text.substring(8)}\""
-            "NSLocalizedString($key, comment: $key)"
+            "\"${text.substring(8)}\".localized()"
         } else {
             "\"$text\""
         }

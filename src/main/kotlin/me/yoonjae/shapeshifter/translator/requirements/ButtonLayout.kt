@@ -40,6 +40,8 @@ val buttonLayout = me.yoonjae.shapeshifter.poet.file.SwiftFile("ButtonLayout.swi
                 argument("title", "title")
                 argument("image", "image")
                 argument("contentEdgeInsets", "contentEdgeInsets")
+                argument("alignment", "alignment")
+                argument("flexibility", "flexibility")
                 argument("viewReuseId", "viewReuseId")
                 argument("config") {
                     closureExpression {
@@ -76,6 +78,86 @@ val buttonLayout = me.yoonjae.shapeshifter.poet.file.SwiftFile("ButtonLayout.swi
                     argument("backgroundColor", "Color.primary")
                     argument("alignment", "alignment")
                     argument("flexibility", "flexibility")
+                    argument("viewReuseId", "viewReuseId")
+                    argument("config", "config")
+                }
+            }
+        }
+
+        function("inverse", Type("ButtonLayout")) {
+            clazz()
+            parameter("title", Type("String"))
+            parameter("image", Type("ButtonLayoutImage"), ".defaultImage")
+            parameter("alignment", Type("Alignment"), "defaultAlignment")
+            parameter("flexibility", Type("Flexibility"), "defaultFlexibility")
+            parameter("viewReuseId", Type("String?"), "nil")
+            parameter("config", Type("((UIButton) -> Void)?"), "nil")
+
+            returnStatement {
+                functionCallExpression("ButtonLayout") {
+                    argument("title", "title")
+                    argument("image", "image")
+                    argument("font", "System.Font.button")
+                    argument("textColor", "Color.primary")
+                    argument("backgroundColor", "Color.white")
+                    argument("alignment", "alignment")
+                    argument("flexibility", "flexibility")
+                    argument("viewReuseId", "viewReuseId")
+                    argument("config", "config")
+                }
+            }
+        }
+
+        function("transparent", Type("ButtonLayout")) {
+            clazz()
+            parameter("title", Type("String"))
+            parameter("image", Type("ButtonLayoutImage"), ".defaultImage")
+            parameter("alignment", Type("Alignment"), "defaultAlignment")
+            parameter("flexibility", Type("Flexibility"), "defaultFlexibility")
+            parameter("viewReuseId", Type("String?"), "nil")
+            parameter("config", Type("((UIButton) -> Void)?"), "nil")
+
+            returnStatement {
+                functionCallExpression("ButtonLayout") {
+                    argument("title", "title")
+                    argument("image", "image")
+                    argument("font", "System.Font.button")
+                    argument("textColor", "Color.primary")
+                    argument("backgroundColor", "Color.transparent")
+                    argument("alignment", "alignment")
+                    argument("flexibility", "flexibility")
+                    argument("viewReuseId", "viewReuseId")
+                    argument("config", "config")
+                }
+            }
+        }
+
+        function("modify", Type("ButtonLayout")) {
+            clazz()
+            parameter("title", Type("String"), "\"modify\".localized()")
+            parameter("image", Type("ButtonLayoutImage"), ".defaultImage")
+            parameter("alignment", Type("Alignment"), "defaultAlignment")
+            parameter("flexibility", Type("Flexibility"), "defaultFlexibility")
+            parameter("viewReuseId", Type("String?"), "nil")
+            parameter("config", Type("((UIButton) -> Void)?"), "nil")
+
+            returnStatement {
+                functionCallExpression("ButtonLayout") {
+                    argument("title", "title")
+                    argument("image", "image")
+                    argument("font", "System.Font.body1")
+                    argument("textColor", "Color.blue")
+                    argument("backgroundColor", "Color.transparent")
+                    argument("contentEdgeInsets") {
+                        initializerExpression("EdgeInsets") {
+                            argument("top", "Dimen.spacingNormal")
+                            argument("left", "Dimen.spacingNormal")
+                            argument("bottom", "Dimen.spacingNormal")
+                            argument("right", "Dimen.spacingNormal")
+                        }
+                    }
+                    argument("alignment", ".topTrailing")
+                    argument("flexibility", ".inflexible")
                     argument("viewReuseId", "viewReuseId")
                     argument("config", "config")
                 }

@@ -13,6 +13,7 @@ class ColorsTranslator : Translator<SwiftFile>() {
         return SwiftFile("Color.swift") {
             val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)
             import("UIKit")
+            import("UIColor_Hex_Swift")
             struct("Color") {
                 createColorMap(doc.getElementsByTagName("color")).forEach { name, value ->
                     constant(name, value) {

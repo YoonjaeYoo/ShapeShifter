@@ -47,7 +47,10 @@ fun ExpressionDescriber.imageViewExpression(element: Element) {
 
 fun ExpressionDescriber.buttonExpression(element: Element) {
     marginLayoutExpression(element) {
-        functionCallExpression("ButtonLayout<UIButton>.normal") {
+        val style = element.style()?.let {
+            if (it.startsWith("Button.")) it.substring(7).decapitalize() else null
+        } ?: "normal"
+        functionCallExpression("ButtonLayout.$style") {
             argument("title", element.text())
             alignmentArgument(element)
             config(element, "button")
@@ -93,6 +96,12 @@ private fun ArgumentDescriber.alignmentArgument(element: Element) {
 }
 
 private fun ArgumentDescriber.sizeArguments(element: Element) {
-    argument("width", element.width())
-    argument("height", element.height())
+    element.width().let {
+        argument("minWidth", it)
+        argument("maxWidth", it)
+    }
+    element.height().let {
+        argument("minHeight", it)
+        argument("maxHeight", it)
+    }
 }
