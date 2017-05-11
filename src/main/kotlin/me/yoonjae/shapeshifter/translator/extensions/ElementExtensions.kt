@@ -2,26 +2,41 @@ package me.yoonjae.shapeshifter.translator.extensions
 
 import org.w3c.dom.Element
 
+fun Element.attr(name: String): String? {
+    if (hasAttribute(name)) {
+        val attr = getAttribute(name)
+        if (attr.isNotEmpty()) {
+            return attr
+        }
+    }
+    return null
+}
+
 fun Element.id(): String? {
-    return if (hasAttribute("android:id")) getAttribute("android:id").substring(5) else null
+    return attr("android:id")?.let {
+        listOf("@android:id/", "@+id/", "@id/").forEach { prefix ->
+            if (it.startsWith(prefix)) {
+                return@let it.substring(prefix.length)
+            }
+        }
+        null
+    }
 }
 
 fun Element.style(): String? {
-    return if (hasAttribute("style")) getAttribute("style").substring(7) else null
+    return attr("style")?.substring(7)
 }
 
-fun Element.insets(): Map<String, String> {
+fun Element.margin(): Map<String, String> {
     val params = mutableMapOf("top" to "0", "left" to "0", "bottom" to "0", "right" to "0")
     params.keys.forEach { key ->
-        getAttribute("android:layout_margin${key.capitalize()}").let {
-            if (it.isNotEmpty()) params[key] = it.toDimen()
+        attr("android:layout_margin${key.capitalize()}")?.let {
+            params[key] = it.toDimen()
         }
     }
-    getAttribute("android:layout_margin").let {
-        if (it.isNotEmpty()) {
-            params.keys.forEach { key ->
-                params[key] = it.toDimen()
-            }
+    attr("android:layout_margin")?.let {
+        params.keys.forEach { key ->
+            params[key] = it.toDimen()
         }
     }
     if (params.values.all { it == "0" }) {
@@ -85,23 +100,27 @@ fun Element.height(): String {
 }
 
 fun Element.image(): String? {
-    val src = getAttribute("android:src")
-    return if (src.isNotEmpty() && src.startsWith("@drawable/")) {
-        "UIImage(named: \"${src.substring(10)}\")"
-    } else {
-        null
+    return attr("android:src")?.let {
+        if (it.startsWith("@drawable/")) "UIImage(named: \"${it.substring(10)}\")" else null
     }
 }
 
-fun Element.text(): String? {
-    val text = getAttribute("android:text")
-    return if (text.isNotEmpty()) {
-        if (text.startsWith("@string/")) {
-            "\"${text.substring(8)}\".localized()"
+fun Element.text(): String {
+    return attr("android:text")?.let {
+        if (it.startsWith("@string/")) {
+            "\"${it.substring(8)}\".localized()"
         } else {
-            "\"$text\""
+            "\"$it\""
         }
-    } else {
-        null
+    } ?: "\"\""
+}
+
+fun Element.alpha(): String? {
+    return attr("android:alpha")
+}
+
+fun Element.backgroundColor(): String? {
+    return attr("android:background")?.let {
+        if (it.startsWith("@color/")) "Color.${it.substring(7).toResourceName()}" else null
     }
 }

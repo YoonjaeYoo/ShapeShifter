@@ -7,19 +7,20 @@ import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifierDescriber
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Class(val name: String) : Declaration,
+class Protocol(val name: String) : Declaration,
         AccessLevelModifierDescriber by AccessLevelModifierDescriber.Delegate(),
-        GenericParameterDescriber by GenericParameterDescriber.Delegate(),
         TypeInheritanceDescriber by TypeInheritanceDescriber.Delegate(),
-        DeclarationDescriber by DeclarationDescriber.Delegate() {
+        TypeAliasDescriber by TypeAliasDescriber.Delegate(),
+        ProtocolPropertyDescriber by ProtocolPropertyDescriber.Delegate(),
+        ProtocolMethodDescriber by ProtocolMethodDescriber.Delegate(),
+        ProtocolInitializerDescriber by ProtocolInitializerDescriber.Delegate() {
 
     override fun render(writer: Writer, linePrefix: Element?) {
         accessLevelModifier?.let {
             it.render(writer, linePrefix)
             writer.write(" ")
         }
-        writer.write("class $name")
-        genericParameters.render(writer, linePrefix)
+        writer.write("protocol $name")
         if (superTypes.isNotEmpty()) {
             writer.write(": ")
             superTypes.forEachIndexed { index, type ->
@@ -28,17 +29,10 @@ class Class(val name: String) : Declaration,
             }
         }
         writer.writeln(" {")
-        imports.render(writer, linePrefix)
         typeAliases.render(writer, linePrefix)
-        constants.render(writer, linePrefix)
-        variables.render(writer, linePrefix)
-        initializers.render(writer, linePrefix, true)
-        functions.render(writer, linePrefix, true)
-        enums.render(writer, linePrefix, true)
-        structs.render(writer, linePrefix, true)
-        classes.render(writer, linePrefix, true)
-        protocols.render(writer, linePrefix, true)
-        extensions.render(writer, linePrefix, true)
+        protocolProperties.render(writer, linePrefix)
+        protocolMethods.render(writer, linePrefix)
+        protocolInitializers.render(writer, linePrefix)
         linePrefix?.render(writer)
         writer.write("}")
     }
@@ -56,18 +50,18 @@ class Class(val name: String) : Declaration,
     }
 }
 
-interface ClassDescriber : Describer {
+interface ProtocolDescriber : Describer {
 
-    val classes: MutableList<Class>
+    val protocols: MutableList<Protocol>
 
-    fun clazz(name: String, init: (Class.() -> Unit)? = null): Class {
-        val clazz = Class(name)
+    fun protocol(name: String, init: (Protocol.() -> Unit)? = null): Protocol {
+        val clazz = Protocol(name)
         init?.invoke(clazz)
-        classes.add(clazz)
+        protocols.add(clazz)
         return clazz
     }
 
-    class Delegate : ClassDescriber {
-        override val classes = mutableListOf<Class>()
+    class Delegate : ProtocolDescriber {
+        override val protocols = mutableListOf<Protocol>()
     }
 }

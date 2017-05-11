@@ -7,12 +7,12 @@ import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifierDescriber
 import me.yoonjae.shapeshifter.poet.type.Type
 import java.io.Writer
 
-class Variable(val name: String, value: String? = null, var type: Type? = null) : Declaration,
+class Variable(val name: String, var type: Type? = null, value: String? = null) : Declaration,
         DeclarationModifierDescriber by DeclarationModifierDescriber.Delegate(),
         ExpressionDescriber by ExpressionDescriber.Delegate() {
 
     init {
-        value?.let { generalExpression(value) }
+        value?.let { generalExpression(it) }
     }
 
     override fun render(writer: Writer, linePrefix: Element?) {
@@ -41,9 +41,9 @@ interface VariableDescriber : Describer {
 
     val variables: MutableList<Variable>
 
-    fun variable(name: String, value: String? = null, type: Type? = null,
+    fun variable(name: String, type: Type? = null, value: String? = null,
                  init: (Variable.() -> Unit)? = null): Variable {
-        val variable = Variable(name, value, type)
+        val variable = Variable(name, type, value)
         init?.invoke(variable)
         variables.add(variable)
         return variable

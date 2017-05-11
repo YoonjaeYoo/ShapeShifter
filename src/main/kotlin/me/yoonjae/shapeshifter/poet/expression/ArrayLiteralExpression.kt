@@ -3,6 +3,7 @@ package me.yoonjae.shapeshifter.poet.expression
 import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import me.yoonjae.shapeshifter.poet.Indent
+import me.yoonjae.shapeshifter.poet.Indent.Companion.size
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
@@ -11,13 +12,17 @@ class ArrayLiteralExpression : LiteralExpression,
 
     override fun render(writer: Writer, linePrefix: Element?) {
         writer.writeln("[")
-        expressions.forEachIndexed { index, expression ->
-            if (index > 0) writer.writeln(", ")
-            (Indent(2) + linePrefix).render(writer)
-            expression.render(writer, (Indent(2) + linePrefix))
+        if (size == 1) {
+            expressions[0].render(writer, linePrefix)
+        } else {
+            expressions.forEachIndexed { index, expression ->
+                if (index > 0) writer.writeln(", ")
+                (Indent(2) + linePrefix).render(writer)
+                expression.render(writer, (Indent(2) + linePrefix))
+            }
+            writer.writeln()
+            linePrefix?.render(writer)
         }
-        writer.writeln()
-        linePrefix?.render(writer)
         writer.write("]")
     }
 }

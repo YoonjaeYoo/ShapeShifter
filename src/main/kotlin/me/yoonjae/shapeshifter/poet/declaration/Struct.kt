@@ -10,7 +10,7 @@ import java.io.Writer
 class Struct(val name: String) : Declaration,
         AccessLevelModifierDescriber by AccessLevelModifierDescriber.Delegate(),
         GenericParameterDescriber by GenericParameterDescriber.Delegate(),
-        Inheritable by Inheritable.Delegate(),
+        TypeInheritanceDescriber by TypeInheritanceDescriber.Delegate(),
         DeclarationDescriber by DeclarationDescriber.Delegate() {
 
     override fun render(writer: Writer, linePrefix: Element?) {
@@ -37,6 +37,8 @@ class Struct(val name: String) : Declaration,
         enums.render(writer, linePrefix, true)
         structs.render(writer, linePrefix, true)
         classes.render(writer, linePrefix, true)
+        protocols.render(writer, linePrefix, true)
+        extensions.render(writer, linePrefix, true)
         linePrefix?.render(writer)
         writer.write("}")
     }

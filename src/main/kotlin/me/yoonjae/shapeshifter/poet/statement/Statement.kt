@@ -60,19 +60,39 @@ interface StatementDescriber : ExpressionDescriber, DeclarationDescriber,
             return super<StatementDescriber>.closureExpression(init).also { statements.add(it) }
         }
 
+        override fun arrayLiteralExpression(init: (ArrayLiteralExpression.() -> Unit)?):
+                ArrayLiteralExpression {
+            return super<StatementDescriber>.arrayLiteralExpression(init).
+                    also { statements.add(it) }
+        }
+
+        override fun assignmentExpression(target: String, value: String?,
+                                          init: (AssignmentExpression.() -> Unit)?):
+                AssignmentExpression {
+            return super<StatementDescriber>.assignmentExpression(target, value, init).
+                    also { statements.add(it) }
+        }
+
+        override fun assignmentExpression(target: Expression, value: String?,
+                                          init: (AssignmentExpression.() -> Unit)?):
+                AssignmentExpression {
+            return super<StatementDescriber>.assignmentExpression(target, value, init).
+                    also { statements.add(it) }
+        }
+
         override fun import(name: String, init: (Import.() -> Unit)?): Import {
             return super<StatementDescriber>.import(name, init).also { statements.add(it) }
         }
 
-        override fun constant(name: String, value: String?, type: Type?,
+        override fun constant(name: String, type: Type?, value: String?,
                               init: (Constant.() -> Unit)?): Constant {
-            return super<StatementDescriber>.constant(name, value, type, init).
+            return super<StatementDescriber>.constant(name, type, value, init).
                     also { statements.add(it) }
         }
 
-        override fun variable(name: String, value: String?, type: Type?,
+        override fun variable(name: String, type: Type?, value: String?,
                               init: (Variable.() -> Unit)?): Variable {
-            return super<StatementDescriber>.variable(name, value, type, init).
+            return super<StatementDescriber>.variable(name, type, value, init).
                     also { statements.add(it) }
         }
 
@@ -99,6 +119,16 @@ interface StatementDescriber : ExpressionDescriber, DeclarationDescriber,
 
         override fun struct(name: String, init: (Struct.() -> Unit)?): Struct {
             return super<StatementDescriber>.struct(name, init).
+                    also { statements.add(it) }
+        }
+
+        override fun clazz(name: String, init: (Class.() -> Unit)?): Class {
+            return super<StatementDescriber>.clazz(name, init).
+                    also { statements.add(it) }
+        }
+
+        override fun protocol(name: String, init: (Protocol.() -> Unit)?): Protocol {
+            return super<StatementDescriber>.protocol(name, init).
                     also { statements.add(it) }
         }
 

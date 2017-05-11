@@ -7,7 +7,7 @@ interface Expression : Statement
 
 interface ExpressionDescriber : Describer, GeneralExpressionDescriber,
         FunctionCallExpressionDescriber, InitializerExpressionDescriber,
-        ClosureExpressionDescriber, LiteralExpressionDescriber {
+        ClosureExpressionDescriber, LiteralExpressionDescriber, AssignmentExpressionDescriber {
 
     val expressions: MutableList<Expression>
 
@@ -16,7 +16,8 @@ interface ExpressionDescriber : Describer, GeneralExpressionDescriber,
             FunctionCallExpressionDescriber by FunctionCallExpressionDescriber.Delegate(),
             InitializerExpressionDescriber by InitializerExpressionDescriber.Delegate(),
             ClosureExpressionDescriber by ClosureExpressionDescriber.Delegate(),
-            LiteralExpressionDescriber by LiteralExpressionDescriber.Delegate() {
+            LiteralExpressionDescriber by LiteralExpressionDescriber.Delegate(),
+            AssignmentExpressionDescriber by AssignmentExpressionDescriber.Delegate() {
 
         override val expressions = mutableListOf<Expression>()
 
@@ -56,8 +57,23 @@ interface ExpressionDescriber : Describer, GeneralExpressionDescriber,
             return super<ExpressionDescriber>.closureExpression(init).also { expressions.add(it) }
         }
 
-        override fun arrayLiteralExpression(init: (ArrayLiteralExpression.() -> Unit)?): ArrayLiteralExpression {
+        override fun arrayLiteralExpression(init: (ArrayLiteralExpression.() -> Unit)?):
+                ArrayLiteralExpression {
             return super<ExpressionDescriber>.arrayLiteralExpression(init).
+                    also { expressions.add(it) }
+        }
+
+        override fun assignmentExpression(target: String, value: String?,
+                                          init: (AssignmentExpression.() -> Unit)?):
+                AssignmentExpression {
+            return super<ExpressionDescriber>.assignmentExpression(target, value, init).
+                    also { expressions.add(it) }
+        }
+
+        override fun assignmentExpression(target: Expression, value: String?,
+                                          init: (AssignmentExpression.() -> Unit)?):
+                AssignmentExpression {
+            return super<ExpressionDescriber>.assignmentExpression(target, value, init).
                     also { expressions.add(it) }
         }
     }

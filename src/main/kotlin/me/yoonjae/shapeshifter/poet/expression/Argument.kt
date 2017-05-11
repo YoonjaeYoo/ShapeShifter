@@ -6,7 +6,7 @@ import me.yoonjae.shapeshifter.poet.Indent
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Argument(val name: String?, value: String? = null) : Element,
+class Argument(val name: String? = null, value: String? = null) : Element,
         ExpressionDescriber by ExpressionDescriber.Delegate() {
 
     init {
@@ -23,7 +23,7 @@ interface ArgumentDescriber : Describer {
 
     val arguments: MutableList<Argument>
 
-    fun argument(name: String?, value: String? = null, init: (Argument.() -> Unit)? = null):
+    fun argument(name: String? = null, value: String? = null, init: (Argument.() -> Unit)? = null):
             Argument {
         val argument = Argument(name, value)
         init?.invoke(argument)
@@ -40,7 +40,7 @@ fun List<Argument>.render(writer: Writer, linePrefix: Element? = null) {
     writer.write("(")
     if (isNotEmpty()) {
         if (size == 1) {
-            get(0).render(writer, (Indent(2) + linePrefix))
+            get(0).render(writer, linePrefix)
         } else {
             forEachIndexed { index, argument ->
                 if (index > 0) writer.write(", ")

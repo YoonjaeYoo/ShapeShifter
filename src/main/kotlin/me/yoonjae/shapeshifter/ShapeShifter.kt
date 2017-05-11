@@ -4,12 +4,17 @@ import me.yoonjae.shapeshifter.translator.ColorsTranslator
 import me.yoonjae.shapeshifter.translator.DimensTranslator
 import me.yoonjae.shapeshifter.translator.LayoutTranslator
 import me.yoonjae.shapeshifter.translator.StringsTranslator
+import me.yoonjae.shapeshifter.translator.system.*
 import java.io.File
 import java.io.FileWriter
 
 class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
 
+    val system = listOf(theme, font, cgSizeExtension, textAppearance, standardLayout, pileLayout,
+            frameLayout, linearLayout, buttonLayout)
+
     fun shift() {
+        system.forEach { it.writeTo(iosAppDir + "/System/") }
         shiftStrings()
         shiftColors()
         shiftDimens()
@@ -33,31 +38,24 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
 
     private fun shiftLayouts() {
         val translator = LayoutTranslator()
-        val layoutDir = File(androidAppDir + "/src/main/res/layout/")
-        val frameLayoutChildren = mutableListOf<String>()
-
-        translator.requirements().forEach {
-            it.writeTo(iosAppDir + "/Layout/")
-        }
-        layoutDir.listFiles { file ->
+        File(androidAppDir + "/src/main/res/layout/").listFiles { file ->
+            println(file.name)
             if (file.name == "activity_test.xml") {
                 translator.translate(file).writeTo(iosAppDir + "/Layout/")
             }
             true
         }
-        frameLayoutChildren.forEach { println(it) }
     }
 
     private fun me.yoonjae.shapeshifter.poet.file.File.writeTo(path: String) {
-        val output = File("$path/$name")
-        output.createWithParent()
-        FileWriter(output).use { render(it) }
+        FileWriter(File("$path/$name").createWithParent()).use { render(it) }
     }
 
-    private fun File.createWithParent() {
+    private fun File.createWithParent(): File {
         if (!exists()) {
             if (!parentFile.exists()) parentFile.mkdirs()
             createNewFile()
         }
+        return this
     }
 }

@@ -4,7 +4,7 @@ import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import java.io.Writer
 
-class GenericParameter(val name: String) : Element, Inheritable by Inheritable.Delegate() {
+class GenericParameter(val name: String) : Element, TypeInheritanceDescriber by TypeInheritanceDescriber.Delegate() {
 
     override fun render(writer: Writer, linePrefix: Element?) {
         writer.write(name)

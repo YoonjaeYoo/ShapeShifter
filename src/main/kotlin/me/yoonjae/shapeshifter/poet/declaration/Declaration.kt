@@ -7,7 +7,7 @@ interface Declaration : Statement
 
 interface DeclarationDescriber : ImportDescriber, ConstantDescriber, VariableDescriber,
         TypeAliasDescriber, FunctionDescriber, InitializerDescriber, EnumDescriber,
-        StructDescriber, ClassDescriber {
+        StructDescriber, ClassDescriber, ProtocolDescriber, ExtensionDescriber {
 
     val declarations: MutableList<Declaration>
 
@@ -20,7 +20,10 @@ interface DeclarationDescriber : ImportDescriber, ConstantDescriber, VariableDes
             InitializerDescriber by InitializerDescriber.Delegate(),
             EnumDescriber by EnumDescriber.Delegate(),
             StructDescriber by StructDescriber.Delegate(),
-            ClassDescriber by ClassDescriber.Delegate() {
+            ClassDescriber by ClassDescriber.Delegate(),
+            ProtocolPropertyDescriber by ProtocolPropertyDescriber.Delegate(),
+            ProtocolDescriber by ProtocolDescriber.Delegate(),
+            ExtensionDescriber by ExtensionDescriber.Delegate() {
 
         override val declarations = mutableListOf<Declaration>()
 
@@ -28,15 +31,15 @@ interface DeclarationDescriber : ImportDescriber, ConstantDescriber, VariableDes
             return super<DeclarationDescriber>.import(name, init).also { declarations.add(it) }
         }
 
-        override fun constant(name: String, value: String?, type: Type?,
+        override fun constant(name: String, type: Type?, value: String?,
                               init: (Constant.() -> Unit)?): Constant {
-            return super<DeclarationDescriber>.constant(name, value, type, init).
+            return super<DeclarationDescriber>.constant(name, type, value, init).
                     also { declarations.add(it) }
         }
 
-        override fun variable(name: String, value: String?, type: Type?,
+        override fun variable(name: String, type: Type?, value: String?,
                               init: (Variable.() -> Unit)?): Variable {
-            return super<DeclarationDescriber>.variable(name, value, type, init).
+            return super<DeclarationDescriber>.variable(name, type, value, init).
                     also { declarations.add(it) }
         }
 
@@ -63,6 +66,20 @@ interface DeclarationDescriber : ImportDescriber, ConstantDescriber, VariableDes
             return super<DeclarationDescriber>.struct(name, init).
                     also { declarations.add(it) }
         }
+
+        override fun clazz(name: String, init: (Class.() -> Unit)?): Class {
+            return super<DeclarationDescriber>.clazz(name, init).
+                    also { declarations.add(it) }
+        }
+
+        override fun protocol(name: String, init: (Protocol.() -> Unit)?): Protocol {
+            return super<DeclarationDescriber>.protocol(name, init).
+                    also { declarations.add(it) }
+        }
+
+        override fun extension(name: String, init: (Extension.() -> Unit)?): Extension {
+            return super<DeclarationDescriber>.extension(name, init).
+                    also { declarations.add(it) }
+        }
     }
 }
-

@@ -16,7 +16,7 @@ class ColorsTranslator : Translator<SwiftFile>() {
             import("UIColor_Hex_Swift")
             struct("Color") {
                 createColorMap(doc.getElementsByTagName("color")).forEach { name, value ->
-                    constant(name, value) {
+                    constant(name, value = value) {
                         static()
                     }
                 }

@@ -22,7 +22,8 @@ class DeclarationModifier constructor(name: String) : Modifier(name) {
     }
 }
 
-interface DeclarationModifierDescriber : Describer, AccessLevelModifierDescriber {
+interface DeclarationModifierDescriber : Describer, AccessLevelModifierDescriber,
+        MutationModifierDescriber {
 
     val declarationModifiers: MutableList<DeclarationModifier>
 
@@ -42,7 +43,8 @@ interface DeclarationModifierDescriber : Describer, AccessLevelModifierDescriber
     fun weak() = declarationModifiers.add(DeclarationModifier.WEAK)
 
     class Delegate : DeclarationModifierDescriber,
-            AccessLevelModifierDescriber by AccessLevelModifierDescriber.Delegate() {
+            AccessLevelModifierDescriber by AccessLevelModifierDescriber.Delegate(),
+            MutationModifierDescriber by MutationModifierDescriber.Delegate() {
         override val declarationModifiers = mutableListOf<DeclarationModifier>()
     }
 }

@@ -51,7 +51,7 @@ fun List<Parameter>.render(writer: Writer, linePrefix: Element? = null) {
     writer.write("(")
     if (isNotEmpty()) {
         if (size == 1) {
-            get(0).render(writer, (Indent(2) + linePrefix))
+            get(0).render(writer, linePrefix)
         } else {
             forEachIndexed { index, parameter ->
                 if (index > 0) writer.write(", ")

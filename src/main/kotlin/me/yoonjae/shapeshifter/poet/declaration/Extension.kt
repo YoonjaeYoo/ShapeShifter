@@ -7,7 +7,7 @@ import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifierDescriber
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Class(val name: String) : Declaration,
+class Extension(val name: String) : Declaration,
         AccessLevelModifierDescriber by AccessLevelModifierDescriber.Delegate(),
         GenericParameterDescriber by GenericParameterDescriber.Delegate(),
         TypeInheritanceDescriber by TypeInheritanceDescriber.Delegate(),
@@ -18,7 +18,7 @@ class Class(val name: String) : Declaration,
             it.render(writer, linePrefix)
             writer.write(" ")
         }
-        writer.write("class $name")
+        writer.write("extension $name")
         genericParameters.render(writer, linePrefix)
         if (superTypes.isNotEmpty()) {
             writer.write(": ")
@@ -38,7 +38,6 @@ class Class(val name: String) : Declaration,
         structs.render(writer, linePrefix, true)
         classes.render(writer, linePrefix, true)
         protocols.render(writer, linePrefix, true)
-        extensions.render(writer, linePrefix, true)
         linePrefix?.render(writer)
         writer.write("}")
     }
@@ -56,18 +55,18 @@ class Class(val name: String) : Declaration,
     }
 }
 
-interface ClassDescriber : Describer {
+interface ExtensionDescriber : Describer {
 
-    val classes: MutableList<Class>
+    val extensions: MutableList<Extension>
 
-    fun clazz(name: String, init: (Class.() -> Unit)? = null): Class {
-        val clazz = Class(name)
-        init?.invoke(clazz)
-        classes.add(clazz)
-        return clazz
+    fun extension(name: String, init: (Extension.() -> Unit)? = null): Extension {
+        val extension = Extension(name)
+        init?.invoke(extension)
+        extensions.add(extension)
+        return extension
     }
 
-    class Delegate : ClassDescriber {
-        override val classes = mutableListOf<Class>()
+    class Delegate : ExtensionDescriber {
+        override val extensions = mutableListOf<Extension>()
     }
 }

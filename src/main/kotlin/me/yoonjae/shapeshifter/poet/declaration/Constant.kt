@@ -7,12 +7,12 @@ import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifierDescriber
 import me.yoonjae.shapeshifter.poet.type.Type
 import java.io.Writer
 
-class Constant(val name: String, value: String? = null, var type: Type? = null) : Declaration,
+class Constant(val name: String, var type: Type? = null, value: String? = null) : Declaration,
         DeclarationModifierDescriber by DeclarationModifierDescriber.Delegate(),
         ExpressionDescriber by ExpressionDescriber.Delegate() {
 
     init {
-        value?.let { generalExpression(value) }
+        value?.let { generalExpression(it) }
     }
 
     override fun render(writer: Writer, linePrefix: Element?) {
@@ -41,9 +41,9 @@ interface ConstantDescriber : Describer {
 
     val constants: MutableList<Constant>
 
-    fun constant(name: String, value: String? = null, type: Type? = null,
+    fun constant(name: String, type: Type? = null, value: String? = null,
                  init: (Constant.() -> Unit)? = null): Constant {
-        val constant = Constant(name, value, type)
+        val constant = Constant(name, type, value)
         init?.invoke(constant)
         constants.add(constant)
         return constant

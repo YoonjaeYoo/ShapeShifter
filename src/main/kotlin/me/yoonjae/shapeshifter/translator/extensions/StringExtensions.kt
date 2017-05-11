@@ -1,8 +1,8 @@
 package me.yoonjae.shapeshifter.translator.extensions
 
-fun String.toConfigParameterName() = "config${toResourceName().capitalize()}"
+fun String.toConfigParameterName() = "config${toResourceName(true)}"
 
-fun String.toResourceName(): String {
+fun String.toResourceName(capital: Boolean = false): String {
     val prefixBuilder = StringBuilder()
     val builder = StringBuilder()
     var prefix = true
@@ -19,11 +19,12 @@ fun String.toResourceName(): String {
             initial = false
         }
     }
-    return (if (builder.isEmpty()) "" else builder.toString()) +
+    val name = (if (builder.isEmpty()) "" else builder.toString()) +
             (if (prefixBuilder.isEmpty()) "" else prefixBuilder.toString())
+    return if (capital) name.capitalize() else name.decapitalize()
 }
 
-fun String.toCamelCase(): String {
+fun String.toCamelCase(capital: Boolean = false): String {
     val builder = StringBuilder()
     var underscore = false
     for (c in toCharArray()) {
@@ -36,13 +37,16 @@ fun String.toCamelCase(): String {
             builder.append(c)
         }
     }
-    return builder.toString()
+    val camelCase = builder.toString()
+    return if (capital) camelCase.capitalize() else camelCase.decapitalize()
 }
 
 fun String.toDimen(): String {
     return if (contains("@dimen/")) {
         "Dimen.${substring(7).toCamelCase()}"
-    } else {
+    } else if (isNotEmpty()) {
         substring(0, length - 2)
+    } else {
+        this
     }
 }

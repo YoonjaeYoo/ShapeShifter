@@ -2,7 +2,7 @@ package me.yoonjae.shapeshifter.poet.declaration
 
 import me.yoonjae.shapeshifter.poet.type.Type
 
-interface Inheritable {
+interface TypeInheritanceDescriber {
 
     val superTypes: MutableList<Type>
 
@@ -13,7 +13,7 @@ interface Inheritable {
         return superType
     }
 
-    class Delegate : Inheritable {
+    class Delegate : TypeInheritanceDescriber {
         override val superTypes = mutableListOf<Type>()
     }
 }

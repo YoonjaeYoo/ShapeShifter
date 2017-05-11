@@ -1,4 +1,4 @@
-package me.yoonjae.shapeshifter.translator.requirements
+package me.yoonjae.shapeshifter.translator.system
 
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
@@ -35,7 +35,7 @@ val pileLayout = SwiftFile("PileLayout.swift") {
             open()
             parameter("maxSize", Type("CGSize"), label = "within")
 
-            constant("size", "maxSize")
+            constant("size", value = "maxSize")
             returnStatement {
                 initializerExpression("LayoutMeasurement") {
                     argument("layout", "self")

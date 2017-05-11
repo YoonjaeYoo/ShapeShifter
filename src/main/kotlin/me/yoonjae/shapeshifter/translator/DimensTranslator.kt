@@ -16,7 +16,7 @@ class DimensTranslator : Translator<SwiftFile>() {
             import("UIKit")
             struct("Dimen") {
                 createDimenMap(doc.getElementsByTagName("dimen")).forEach { name, value ->
-                    constant(name, value, Type("CGFloat")) {
+                    constant(name, Type("CGFloat"), value) {
                         static()
                     }
                 }

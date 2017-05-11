@@ -1,87 +1,148 @@
 package me.yoonjae.shapeshifter.translator.extensions
 
-import me.yoonjae.shapeshifter.poet.expression.ArgumentDescriber
-import me.yoonjae.shapeshifter.poet.expression.ClosureExpression
-import me.yoonjae.shapeshifter.poet.expression.ExpressionDescriber
-import me.yoonjae.shapeshifter.poet.expression.TrailingClosureDescriber
+import me.yoonjae.shapeshifter.poet.expression.*
 import org.w3c.dom.Element
 
 fun ExpressionDescriber.layoutExpression(element: Element) {
     when (element.tagName) {
         "FrameLayout" -> frameLayoutExpression(element)
-        "ImageView" -> imageViewExpression(element)
+        "LinearLayout" -> linearLayoutExpression(element)
+        "View" -> viewExpression(element)
         "Button" -> buttonExpression(element)
-        else -> generalExpression("nil")
+        "TextView" -> textViewExpression(element)
+        "ImageView" -> imageViewExpression(element)
+        "com.flaviofaria.kenburnsview.KenBurnsView" -> imageViewExpression(element)
+        else -> {
+            generalExpression("nil")
+            println("  ${element.tagName}")
+        }
     }
 }
 
 fun ExpressionDescriber.frameLayoutExpression(element: Element) {
-    marginLayoutExpression(element) {
-        initializerExpression("PileLayout") {
-            alignmentArgument(element)
-            argument("sublayouts") {
-                arrayLiteralExpression {
-                    element.childNodes.elementIterator().forEach {
-                        layoutExpression(it)
-                    }
+    initializerExpression("FrameLayout<UIView>") {
+        sizeArguments(element)
+        marginArgument(element)
+        alignmentArgument(element)
+        argument("sublayouts") {
+            arrayLiteralExpression {
+                element.childNodes.elementIterator().forEach {
+                    layoutExpression(it)
                 }
             }
-            config(element, "view")
+        }
+        config(element, "view")
+    }
+}
+
+fun ExpressionDescriber.linearLayoutExpression(element: Element) {
+    initializerExpression("LinearLayout<UIView>") {
+        argument("axis") {
+            generalExpression(when (element.attr("android:orientation")) {
+                "vertical" -> ".vertical"
+                else -> ".horizontal"
+            })
+        }
+        sizeArguments(element)
+        marginArgument(element)
+        alignmentArgument(element)
+        argument("sublayouts") {
+            arrayLiteralExpression {
+                element.childNodes.elementIterator().forEach {
+                    layoutExpression(it)
+                }
+            }
+        }
+        config(element, "view")
+    }
+}
+
+fun ExpressionDescriber.viewExpression(element: Element) {
+    standardLayoutExpression(element, "UIView") {
+        config(element, "view")
+    }
+}
+
+fun ExpressionDescriber.buttonExpression(element: Element) {
+    standardLayoutExpression(element, "UIView") {
+        sublayoutArgument {
+            val style = element.style()?.let {
+                if (it.startsWith("Button.")) it.substring(7).decapitalize() else null
+            } ?: "normal"
+            functionCallExpression("ButtonLayout.$style") {
+                argument("title", element.text())
+                config(element, "button")
+            }
+        }
+    }
+}
+
+fun ExpressionDescriber.textViewExpression(element: Element) {
+    standardLayoutExpression(element, "UIView") {
+        sublayoutArgument {
+            val style = element.style()?.let {
+                if (it.startsWith("Button.")) it.substring(7).decapitalize() else null
+            } ?: "normal"
+            functionCallExpression("ButtonLayout.$style") {
+                argument("title", element.text())
+                config(element, "button")
+            }
         }
     }
 }
 
 fun ExpressionDescriber.imageViewExpression(element: Element) {
-    marginLayoutExpression(element) {
-        initializerExpression("SizeLayout<UIImageView>") {
-            sizeArguments(element)
-            alignmentArgument(element)
-            config(element, "imageView") {
-                element.image()?.let {
-                    generalExpression("imageView.image = $it")
-                }
+    standardLayoutExpression(element, "UIImageView") {
+        config(element, "imageView") {
+            element.image()?.let {
+                generalExpression("imageView.image = $it")
             }
-        }
-    }
-}
-
-fun ExpressionDescriber.buttonExpression(element: Element) {
-    marginLayoutExpression(element) {
-        val style = element.style()?.let {
-            if (it.startsWith("Button.")) it.substring(7).decapitalize() else null
-        } ?: "normal"
-        functionCallExpression("ButtonLayout.$style") {
-            argument("title", element.text())
-            alignmentArgument(element)
-            config(element, "button")
         }
     }
 }
 
 private fun TrailingClosureDescriber.config(element: Element, parameterName: String,
                                             init: (ClosureExpression.() -> Unit)? = null) {
-    val id = element.id()
-    if (id != null || init != null) {
-        trailingClosure {
-            closureParameter(parameterName)
-            init?.invoke(this)
-            element.id()?.let {
-                generalExpression("${it.toConfigParameterName()}?($parameterName)")
-            }
+    trailingClosure {
+        closureParameter(parameterName)
+        element.alpha()?.let {
+            generalExpression("$parameterName.alpha = $it")
+        }
+        element.backgroundColor()?.let {
+            generalExpression("$parameterName.backgroundColor = $it")
+        }
+        init?.invoke(this)
+        element.id()?.let {
+            generalExpression("${it.toConfigParameterName()}?($parameterName)")
         }
     }
 }
 
-private fun ExpressionDescriber.marginLayoutExpression(element: Element,
-                                                       sublayout: (ExpressionDescriber.() -> Unit)) {
-    initializerExpression("InsetLayout") {
-        argument("insets") {
-            initializerExpression("EdgeInsets") {
-                element.insets().forEach { k, v -> argument(k, v) }
-            }
-        }
-        argument("sublayout") {
-            sublayout.invoke(this)
+private fun ExpressionDescriber.standardLayoutExpression(element: Element, view: String,
+                                                         init: (InitializerExpression.() -> Unit)? = null) {
+    initializerExpression("StandardLayout<$view>") {
+        sizeArguments(element)
+        marginArgument(element)
+        alignmentArgument(element)
+        init?.invoke(this)
+    }
+}
+
+private fun ArgumentDescriber.sublayoutArgument(init: Argument.() -> Unit) {
+    argument("sublayout") {
+        init.invoke(this)
+    }
+}
+
+private fun ArgumentDescriber.sizeArguments(element: Element) {
+    argument("width", element.width())
+    argument("height", element.height())
+}
+
+private fun ArgumentDescriber.marginArgument(element: Element) {
+    argument("margin") {
+        initializerExpression("EdgeInsets") {
+            element.margin().forEach { k, v -> argument(k, v) }
         }
     }
 }
@@ -92,16 +153,5 @@ private fun ArgumentDescriber.alignmentArgument(element: Element) {
             argument("vertical", element.verticalAlignment())
             argument("horizontal", element.horizontalAlignment())
         }
-    }
-}
-
-private fun ArgumentDescriber.sizeArguments(element: Element) {
-    element.width().let {
-        argument("minWidth", it)
-        argument("maxWidth", it)
-    }
-    element.height().let {
-        argument("minHeight", it)
-        argument("maxHeight", it)
     }
 }

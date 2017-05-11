@@ -1,4 +1,4 @@
-package me.yoonjae.shapeshifter.translator.requirements
+package me.yoonjae.shapeshifter.translator.system
 
 import me.yoonjae.shapeshifter.poet.type.Type
 
@@ -7,8 +7,8 @@ val buttonLayout = me.yoonjae.shapeshifter.poet.file.SwiftFile("ButtonLayout.swi
     import("UIKit")
     import("LayoutKit")
 
-    constant("defaultAlignment", "Alignment.topLeading") { private() }
-    constant("defaultFlexibility", "Flexibility.flexible") { private() }
+    constant("defaultAlignment", value = "Alignment.fill") { private() }
+    constant("defaultFlexibility", value = "Flexibility.inflexible") { private() }
 
     clazz("ButtonLayout") {
         superType("LayoutKit.ButtonLayout") {
@@ -19,7 +19,7 @@ val buttonLayout = me.yoonjae.shapeshifter.poet.file.SwiftFile("ButtonLayout.swi
             parameter("type", Type("ButtonLayoutType"), ".custom")
             parameter("title", Type("String"))
             parameter("image", Type("ButtonLayoutImage"), ".defaultImage")
-            parameter("font", Type("UIFont?"), "System.Font.button")
+            parameter("font", Type("UIFont?"), "Font.button")
             parameter("textColor", Type("UIColor?"))
             parameter("backgroundColor", Type("UIColor?"))
             parameter("contentEdgeInsets", Type("EdgeInsets")) {
@@ -73,7 +73,7 @@ val buttonLayout = me.yoonjae.shapeshifter.poet.file.SwiftFile("ButtonLayout.swi
                 functionCallExpression("ButtonLayout") {
                     argument("title", "title")
                     argument("image", "image")
-                    argument("font", "System.Font.button")
+                    argument("font", "Font.button")
                     argument("textColor", "Color.white")
                     argument("backgroundColor", "Color.primary")
                     argument("alignment", "alignment")
@@ -97,7 +97,7 @@ val buttonLayout = me.yoonjae.shapeshifter.poet.file.SwiftFile("ButtonLayout.swi
                 functionCallExpression("ButtonLayout") {
                     argument("title", "title")
                     argument("image", "image")
-                    argument("font", "System.Font.button")
+                    argument("font", "Font.button")
                     argument("textColor", "Color.primary")
                     argument("backgroundColor", "Color.white")
                     argument("alignment", "alignment")
@@ -121,7 +121,7 @@ val buttonLayout = me.yoonjae.shapeshifter.poet.file.SwiftFile("ButtonLayout.swi
                 functionCallExpression("ButtonLayout") {
                     argument("title", "title")
                     argument("image", "image")
-                    argument("font", "System.Font.button")
+                    argument("font", "Font.button")
                     argument("textColor", "Color.primary")
                     argument("backgroundColor", "Color.transparent")
                     argument("alignment", "alignment")
@@ -145,7 +145,7 @@ val buttonLayout = me.yoonjae.shapeshifter.poet.file.SwiftFile("ButtonLayout.swi
                 functionCallExpression("ButtonLayout") {
                     argument("title", "title")
                     argument("image", "image")
-                    argument("font", "System.Font.body1")
+                    argument("font", "Font.body1")
                     argument("textColor", "Color.blue")
                     argument("backgroundColor", "Color.transparent")
                     argument("contentEdgeInsets") {

@@ -20,18 +20,19 @@ class SwiftFile(override var name: String, init: (SwiftFile.() -> Unit)? = null)
         variables.render(writer)
         functions.render(writer)
         enums.render(writer)
-        structs.render(writer)
-        classes.render(writer)
+        structs.render(writer, true)
+        classes.render(writer, true)
+        protocols.render(writer, true)
+        extensions.render(writer, true)
     }
 
-    private fun List<Declaration>.render(writer: Writer, linePrefix: Element? = null) {
+    private fun List<Declaration>.render(writer: Writer, newline: Boolean = false) {
         if (isNotEmpty()) {
-            linePrefix?.render(writer)
             forEach {
-                it.render(writer, linePrefix)
+                if (newline) writer.writeln()
+                it.render(writer)
                 writer.writeln()
             }
-            writer.writeln()
         }
     }
 }
