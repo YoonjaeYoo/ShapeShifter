@@ -132,17 +132,12 @@ interface StatementDescriber : ExpressionDescriber, DeclarationDescriber,
                     also { statements.add(it) }
         }
 
-        override fun returnStatement(init: (ReturnStatement.() -> Unit)?): ReturnStatement {
-            return super<StatementDescriber>.returnStatement(init).also { statements.add(it) }
-        }
-
-        override fun ifStatement(condition: String, init: (IfStatement.() -> Unit)?): IfStatement {
-            return super<StatementDescriber>.ifStatement(condition, init).
+        override fun returnStatement(value: String?, init: (ReturnStatement.() -> Unit)?): ReturnStatement {
+            return super<StatementDescriber>.returnStatement(value, init).
                     also { statements.add(it) }
         }
 
-        override fun ifStatement(condition: Expression, init: (IfStatement.() -> Unit)?):
-                IfStatement {
+        override fun ifStatement(condition: String?, init: (IfStatement.() -> Unit)?): IfStatement {
             return super<StatementDescriber>.ifStatement(condition, init).
                     also { statements.add(it) }
         }

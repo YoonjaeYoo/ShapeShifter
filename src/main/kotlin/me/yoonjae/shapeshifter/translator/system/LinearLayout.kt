@@ -12,17 +12,20 @@ val linearLayout = SwiftFile("LinearLayout.swift") {
         genericParameter("V") {
             superType("View")
         }
-        superType("StandardLayout") {
+        superType("AndroidLayout") {
             genericParameter("UIView")
         }
 
         initializer {
             public()
             parameter("axis", Type("Axis"))
-            parameter("width", Type("CGFloat?"), "nil")
-            parameter("height", Type("CGFloat?"), "nil")
-            parameter("margin", Type("EdgeInsets")) {
-                initializerExpression("EdgeInsets")
+            parameter("width", Type("CGFloat"))
+            parameter("height", Type("CGFloat"))
+            parameter("margin", Type("UIEdgeInsets")) {
+                initializerExpression("UIEdgeInsets")
+            }
+            parameter("padding", Type("UIEdgeInsets")) {
+                initializerExpression("UIEdgeInsets")
             }
             parameter("alignment", Type("Alignment"), ".fill")
             parameter("flexibility", Type("Flexibility"), ".flexible")
@@ -34,6 +37,7 @@ val linearLayout = SwiftFile("LinearLayout.swift") {
                 argument("width", "width")
                 argument("height", "height")
                 argument("margin", "margin")
+                argument("padding", "padding")
                 argument("alignment", "alignment")
                 argument("flexibility", "flexibility")
                 argument("viewReuseId", "viewReuseId")

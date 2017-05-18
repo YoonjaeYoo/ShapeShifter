@@ -19,19 +19,13 @@ class LayoutTranslator : Translator<SwiftFile>() {
             import("LayoutKit")
 
             clazz("${resourceName}Layout") {
-                superType("StandardLayout") {
-                    genericParameter("View")
-                }
+                superType(doc.documentElement.layoutType)
                 initializer {
                     public()
                     idTypeMap.forEach { id, type ->
                         parameter(id.toConfigParameterName(), Type("(($type) -> Void)? = nil"))
                     }
-                    initializerExpression("super") {
-                        argument("sublayout") {
-                            layoutExpression(doc.documentElement)
-                        }
-                    }
+                    layoutExpression(doc.documentElement)
                 }
             }
         }
@@ -39,16 +33,8 @@ class LayoutTranslator : Translator<SwiftFile>() {
 
     private fun extractIdTypeMap(ids: MutableMap<String, String>, element: Element) {
         element.id()?.let {
-            ids.put(it, getType(element))
+            ids.put(it, element.viewType)
         }
         element.childNodes.elementIterator().forEach { extractIdTypeMap(ids, it) }
-    }
-
-    private fun getType(element: Element): String {
-        return when (element.tagName) {
-            "ImageView" -> "UIImageView"
-            "Button" -> "UIButton"
-            else -> "UIView"
-        }
     }
 }

@@ -35,11 +35,15 @@ interface ClosureParameterDescriber : Describer {
 
 fun List<ClosureParameter>.render(writer: Writer, linePrefix: Element? = null) {
     if (isNotEmpty()) {
-        writer.write("(")
-        forEachIndexed { index, closureParameter ->
-            if (index > 0) writer.write(", ")
-            closureParameter.render(writer, linePrefix)
+        if (size == 1) {
+            get(0).render(writer, linePrefix)
+        } else {
+            writer.write("(")
+            forEachIndexed { index, closureParameter ->
+                if (index > 0) writer.write(", ")
+                closureParameter.render(writer, linePrefix)
+            }
+            writer.write(")")
         }
-        writer.write(")")
     }
 }

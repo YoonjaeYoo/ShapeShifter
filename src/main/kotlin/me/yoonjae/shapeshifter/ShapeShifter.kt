@@ -10,8 +10,9 @@ import java.io.FileWriter
 
 class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
 
-    val system = listOf(theme, font, cgSizeExtension, textAppearance, standardLayout, pileLayout,
-            frameLayout, linearLayout, buttonLayout)
+    val system = listOf(theme, textAppearance, textStyle, cgSizeExtension, uiFontExtension,
+            gravity, view, viewGroup, frameLayout, textView, button)
+
 
     fun shift() {
         system.forEach { it.writeTo(iosAppDir + "/System/") }

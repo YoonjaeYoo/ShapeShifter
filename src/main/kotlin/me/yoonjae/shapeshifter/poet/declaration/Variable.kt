@@ -9,7 +9,8 @@ import java.io.Writer
 
 class Variable(val name: String, var type: Type? = null, value: String? = null) : Declaration,
         DeclarationModifierDescriber by DeclarationModifierDescriber.Delegate(),
-        ExpressionDescriber by ExpressionDescriber.Delegate() {
+        ExpressionDescriber by ExpressionDescriber.Delegate(),
+        CodeBlockDescriber by CodeBlockDescriber.Delegate() {
 
     init {
         value?.let { generalExpression(it) }
@@ -30,7 +31,10 @@ class Variable(val name: String, var type: Type? = null, value: String? = null) 
             writer.write(": ")
             it.render(writer)
         }
-        if (expressions.isNotEmpty()) {
+        if (codeBlock != null) {
+            writer.write(" ")
+            codeBlock!!.render(writer, linePrefix)
+        } else if (expressions.isNotEmpty()) {
             writer.write(" = ")
             expressions.first().render(writer, linePrefix)
         }

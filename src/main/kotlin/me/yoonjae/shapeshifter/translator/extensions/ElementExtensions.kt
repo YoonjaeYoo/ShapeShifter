@@ -2,6 +2,26 @@ package me.yoonjae.shapeshifter.translator.extensions
 
 import org.w3c.dom.Element
 
+val Element.layoutType: String
+    get() {
+        return when (tagName) {
+            "LinearLayout" -> "LinearLayout"
+            "TextView" -> "TextView"
+            "Button" -> "Button"
+            else -> "FrameLayout"
+        }
+    }
+
+val Element.viewType: String
+    get() {
+        return when (tagName) {
+            "ImageView" -> "UIImageView"
+            "TextView" -> "UILabel"
+            "Button" -> "UIButton"
+            else -> "UIView"
+        }
+    }
+
 fun Element.attr(name: String): String? {
     if (hasAttribute(name)) {
         val attr = getAttribute(name)
@@ -35,6 +55,24 @@ fun Element.margin(): Map<String, String> {
         }
     }
     attr("android:layout_margin")?.let {
+        params.keys.forEach { key ->
+            params[key] = it.toDimen()
+        }
+    }
+    if (params.values.all { it == "0" }) {
+        params.clear()
+    }
+    return params
+}
+
+fun Element.padding(): Map<String, String> {
+    val params = mutableMapOf("top" to "0", "left" to "0", "bottom" to "0", "right" to "0")
+    params.keys.forEach { key ->
+        attr("android:padding${key.capitalize()}")?.let {
+            params[key] = it.toDimen()
+        }
+    }
+    attr("android:padding")?.let {
         params.keys.forEach { key ->
             params[key] = it.toDimen()
         }
@@ -84,8 +122,8 @@ fun Element.horizontalAlignment(): String {
 fun Element.width(): String {
     val width = getAttribute("android:layout_width")
     return when (width) {
-        "match_parent" -> "nil"
-        "wrap_content" -> "nil"
+        "match_parent" -> "MATCH_PARENT"
+        "wrap_content" -> "WRAP_CONTENT"
         else -> width.toDimen()
     }
 }
@@ -93,8 +131,8 @@ fun Element.width(): String {
 fun Element.height(): String {
     val height = getAttribute("android:layout_height")
     return when (height) {
-        "match_parent" -> "nil"
-        "wrap_content" -> "nil"
+        "match_parent" -> "MATCH_PARENT"
+        "wrap_content" -> "WRAP_CONTENT"
         else -> height.toDimen()
     }
 }
