@@ -8,67 +8,166 @@ val button = me.yoonjae.shapeshifter.poet.file.SwiftFile("Button.swift") {
     import("LayoutKit")
 
     clazz("Button") {
-        superType("View") {
-            genericParameter("UIButton")
-        }
+        open()
+        superType("ViewGroup")
 
         initializer {
+            public()
+            parameter("theme", Type("Theme"), "AppTheme()")
+            parameter("id", Type("String", true), "nil")
             parameter("layoutParams", Type("LayoutParams"))
-            parameter("id", Type("String?"), "nil")
             parameter("padding", Type("UIEdgeInsets")) {
                 initializerExpression("UIEdgeInsets")
             }
-            parameter("minWidth", Type("CGFloat?"), "nil")
-            parameter("minHeight", Type("CGFloat?"), "nil")
+            parameter("minWidth", Type("CGFloat", true), "nil")
+            parameter("minHeight", Type("CGFloat", true), "nil")
             parameter("alpha", Type("CGFloat"), "1.0")
-            parameter("background", Type("UIColor?"), "nil")
-            parameter("gravity", Type("Gravity"), "[]")
-            parameter("lines", Type("Int"))
-            parameter("singleLine", Type("Bool"))
-            parameter("text", Type("String?"), "nil")
-            parameter("textAppearance", Type("TextAppearance?"), "nil")
-            parameter("textColor", Type("UIColor?"), "nil")
-            parameter("textSize", Type("CGFloat"), "15")
-            parameter("textStyle", Type("TextStyle"), ".normal")
-            parameter("config", Type("((V) -> Void)?"), "nil")
+            parameter("background", Type("UIColor", true), "nil")
+            parameter("gravity", Type("Gravity"), "[.center]")
+            parameter("text", Type("String", true), "nil")
+            parameter("textAppearance", Type("TextAppearance", true), "nil")
+            parameter("textColor", Type("UIColor", true), "nil")
+            parameter("textSize", Type("CGFloat", true), "nil")
+            parameter("textStyle", Type("TextStyle", true), "nil")
+            parameter("config", Type("(UIButton) -> Void", true), "nil")
 
+            constant("defaultTextAppearance", value = "TextAppearance.Subhead(theme)")
             initializerExpression("super") {
+                argument("theme", "theme")
                 argument("layoutParams", "layoutParams")
-                argument("id", "id")
                 argument("padding", "padding")
-                argument("minWidth", "minWidth")
-                argument("minHeight", "minHeight")
+                argument("minWidth", "minWidth ?? 88")
+                argument("minHeight", "minHeight ?? 44")
                 argument("alpha", "alpha")
-                argument("background", "background")
+                argument("background", "background ?? Color.primary")
                 argument("sublayouts") {
                     arrayLiteralExpression {
-                        initializerExpression("LabelLayout<UILabel>") {
-                            argument("text", ".unattributed(text == nil ? \"\" : text)")
-                            argument("font", "UIFont.font(ofSize: textSize, style: textStyle)")
-                            argument("numberOfLines", "singleLine ? 1 : lines")
-                            argument("alignment", ".fill")
+                        initializerExpression("ButtonLayout<UIButton>") {
+                            argument("type", ".system")
+                            argument("title", "text == nil ? \"\" : text!")
+                            argument("font") {
+                                functionCallExpression("UIFont.font") {
+                                    argument("ofSize", "textSize ?? textAppearance?.textSize ?? " +
+                                            "defaultTextAppearance.textSize ?? 15")
+                                    argument("style",
+                                            "textStyle ?? textAppearance?.textStyle ?? " +
+                                                    "defaultTextAppearance.textStyle ??" +
+                                                    " .normal")
+                                }
+                            }
+                            argument("alignment", "gravity.alignment")
                             argument("flexibility", ".inflexible")
-                            argument("viewReuseId", "viewReuseId")
+                            argument("viewReuseId", "id")
                             trailingClosure {
-                                closureParameter("textView")
-                                ifStatement("let background = background") {
+                                closureParameter("button")
+                                ifStatement("let text = text") {
                                     codeBlock {
-                                        generalExpression("textView.backgroundColor = background")
+                                        functionCallExpression("button.setTitle") {
+                                            argument(null, "text")
+                                            argument("for", ".normal")
+                                        }
                                     }
                                 }
-                                ifStatement("let textColor = textColor") {
-                                    codeBlock {
-                                        generalExpression("button.setTitleColor(textColor, for: .normal)")
-                                    }
+                                functionCallExpression("button.setTitleColor") {
+                                    argument(null, "textColor ?? textAppearance?.textColor ?? " +
+                                            "UIColor.white")
+                                    argument("for", ".normal")
                                 }
                                 functionCallExpression("config?") {
-                                    argument(null, "textView")
+                                    argument(null, "button")
                                 }
                             }
                         }
                     }
                 }
+                trailingClosure {
+                    closureParameter("view")
+                    ifStatement("let background = background") {
+                        codeBlock {
+                            generalExpression("view.backgroundColor = background")
+                        }
+                    }
+                }
+            }
+        }
+
+        function("measurement", Type("LayoutMeasurement")) {
+            override()
+            public()
+            parameter("maxSize", Type("CGSize"), label = "within")
+
+            constant("measurement") {
+                functionCallExpression("sublayouts[0].measurement") {
+                    argument("within", "maxSize.decreasedByInsets(layoutParams.margin)")
+                }
+            }
+            variable("size", value = "measurement.size.increasedByInsets(layoutParams.margin)")
+            assignmentExpression("size.width",
+                    "layoutParams.width == MATCH_PARENT ? maxSize.width : " +
+                            "(layoutParams.width == WRAP_CONTENT ? size.width : layoutParams.width)")
+            ifStatement("let minWidth = minWidth") {
+                codeBlock {
+                    assignmentExpression("size.width", "max(minWidth, size.width);")
+                }
+            }
+            assignmentExpression("size.height",
+                    "layoutParams.height == MATCH_PARENT ? maxSize.height : " +
+                            "(layoutParams.height == WRAP_CONTENT ? size.height : layoutParams.height)")
+            ifStatement("let minHeight = minHeight") {
+                codeBlock {
+                    assignmentExpression("size.height", "max(minHeight, size.height);")
+                }
+            }
+            returnStatement {
+                functionCallExpression("LayoutMeasurement") {
+                    argument("layout", "self")
+                    argument("size", "size")
+                    argument("maxSize", "maxSize")
+                    argument("sublayouts", "[measurement]")
+                }
+            }
+        }
+
+        function("arrangement", Type("LayoutArrangement")) {
+            override()
+            public()
+            parameter("rect", Type("CGRect"), label = "within")
+            parameter("measurement", Type("LayoutMeasurement"))
+
+            constant("frame") {
+                functionCallExpression("layoutParams.arrangement") {
+                    argument("size", "measurement.size")
+                    argument("in", "rect")
+                }
+            }
+            constant("sublayoutRect") {
+                initializerExpression("CGRect") {
+                    argument("origin") {
+                        initializerExpression("CGPoint") {
+                            argument("x", "padding.left")
+                            argument("y", "padding.top")
+                        }
+                    }
+                    argument("size", "frame.size.decreasedByInsets(padding)")
+                }
+            }
+            constant("arrangements", Type("[LayoutArrangement]")) {
+                functionCallExpression("measurement.sublayouts.map") {
+                    trailingClosure {
+                        closureParameter("measurement") {
+                            returnStatement("measurement.arrangement(within: sublayoutRect)")
+                        }
+                    }
+                }
+            }
+            returnStatement {
+                functionCallExpression("LayoutArrangement") {
+                    argument("layout", "self")
+                    argument("frame", "frame")
+                    argument("sublayouts", "arrangements")
+                }
             }
         }
     }
- }
+}
+

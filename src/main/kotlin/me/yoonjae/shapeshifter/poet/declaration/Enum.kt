@@ -4,25 +4,37 @@ import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import me.yoonjae.shapeshifter.poet.Indent
 import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifierDescriber
+import me.yoonjae.shapeshifter.poet.type.TypeDescriber
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
 class Enum(val name: String) : Declaration,
         AccessLevelModifierDescriber by AccessLevelModifierDescriber.Delegate() {
 
-    class Case(val name: String) : Element {
+    class Case(val name: String) : Element, TypeDescriber by TypeDescriber.Delegate() {
 
         override fun render(writer: Writer, linePrefix: Element?) {
             writer.write("case ")
             writer.write(name)
+            if (types.isNotEmpty()) {
+                writer.write("(")
+                types.forEachIndexed { index, type ->
+                    if (index > 0) {
+                        writer.write(", ")
+                    }
+                    type.render(writer, Indent(2) + linePrefix)
+                }
+                writer.write(")")
+            }
         }
     }
 
     val cases = mutableListOf<Case>()
 
-    fun case(name: String) {
-        val enumCase = Case(name)
-        cases.add(enumCase)
+    fun case(name: String, init: (Case.() -> Unit)? = null) {
+        val case = Case(name)
+        init?.invoke(case)
+        cases.add(case)
     }
 
     override fun render(writer: Writer, linePrefix: Element?) {

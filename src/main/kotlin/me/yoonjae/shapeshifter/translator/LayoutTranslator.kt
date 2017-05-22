@@ -23,7 +23,7 @@ class LayoutTranslator : Translator<SwiftFile>() {
                 initializer {
                     public()
                     idTypeMap.forEach { id, type ->
-                        parameter(id.toConfigParameterName(), Type("(($type) -> Void)? = nil"))
+                        parameter(id.toConfigParameterName(), Type("($type) -> Void", true), "nil")
                     }
                     layoutExpression(doc.documentElement)
                 }
@@ -35,6 +35,6 @@ class LayoutTranslator : Translator<SwiftFile>() {
         element.id()?.let {
             ids.put(it, element.viewType)
         }
-        element.childNodes.elementIterator().forEach { extractIdTypeMap(ids, it) }
+        element.childNodes.elements().forEach { extractIdTypeMap(ids, it) }
     }
 }

@@ -14,13 +14,13 @@ val view = SwiftFile("View.swift") {
         }
         superType("ConfigurableLayout")
 
-//        constant("theme", Type("Theme")) { open() }
-        constant("layoutParams", Type("ViewGroup.LayoutParams")) { open() }
-        constant("viewReuseId", Type("String?")) { open() }
+        constant("theme", Type("Theme")) { open() }
+        constant("layoutParams", Type("LayoutParams")) { open() }
+        constant("viewReuseId", Type("String", true)) { open() }
         constant("padding", Type("UIEdgeInsets")) { open() }
-        constant("minWidth", Type("CGFloat?")) { open() }
-        constant("minHeight", Type("CGFloat?")) { open() }
-        constant("config", Type("((V) -> Void)?")) { open() }
+        constant("minWidth", Type("CGFloat", true)) { open() }
+        constant("minHeight", Type("CGFloat", true)) { open() }
+        constant("config", Type("(V) -> Void", true)) { open() }
         constant("flexibility", value = "Flexibility.inflexible") { open() }
         variable("needsView", Type("Bool")) {
             open()
@@ -31,18 +31,19 @@ val view = SwiftFile("View.swift") {
 
         initializer {
             public()
-//            parameter("theme", Type("Theme"), "Theme.light()")
-            parameter("layoutParams", Type("ViewGroup.LayoutParams"))
-            parameter("id", Type("String?"), "nil")
+            parameter("theme", Type("Theme"), "AppTheme()")
+            parameter("id", Type("String", true), "nil")
+            parameter("layoutParams", Type("LayoutParams"))
             parameter("padding", Type("UIEdgeInsets")) {
                 initializerExpression("UIEdgeInsets")
             }
-            parameter("minWidth", Type("CGFloat?"), "nil")
-            parameter("minHeight", Type("CGFloat?"), "nil")
+            parameter("minWidth", Type("CGFloat", true), "nil")
+            parameter("minHeight", Type("CGFloat", true), "nil")
             parameter("alpha", Type("CGFloat"), "1.0")
-            parameter("background", Type("UIColor?"), "nil")
-            parameter("config", Type("((V) -> Void)?"), "nil")
+            parameter("background", Type("UIColor", true), "nil")
+            parameter("config", Type("(V) -> Void", true), "nil")
 
+            assignmentExpression("self.theme", "theme")
             assignmentExpression("self.layoutParams", "layoutParams")
             assignmentExpression("self.viewReuseId", "id")
             assignmentExpression("self.padding", "padding")

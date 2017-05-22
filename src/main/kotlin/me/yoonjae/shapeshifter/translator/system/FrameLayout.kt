@@ -14,21 +14,23 @@ val frameLayout = SwiftFile("FrameLayout.swift") {
         initializer {
             override()
             public()
-            parameter("layoutParams", Type("ViewGroup.LayoutParams"))
-            parameter("id", Type("String?"), "nil")
+            parameter("theme", Type("Theme"), "AppTheme()")
+            parameter("id", Type("String", true), "nil")
+            parameter("layoutParams", Type("LayoutParams"))
             parameter("padding", Type("UIEdgeInsets")) {
                 initializerExpression("UIEdgeInsets")
             }
-            parameter("minWidth", Type("CGFloat?"), "nil")
-            parameter("minHeight", Type("CGFloat?"), "nil")
+            parameter("minWidth", Type("CGFloat", true), "nil")
+            parameter("minHeight", Type("CGFloat", true), "nil")
             parameter("alpha", Type("CGFloat"), "1.0")
-            parameter("background", Type("UIColor?"), "nil")
+            parameter("background", Type("UIColor", true), "nil")
             parameter("sublayouts", Type("[Layout]"), "[]")
-            parameter("config", Type("((UIView) -> Void)?"), "nil")
+            parameter("config", Type("(UIView) -> Void", true), "nil")
 
             initializerExpression("super") {
-                argument("layoutParams", "layoutParams")
+                argument("theme", "theme")
                 argument("id", "id")
+                argument("layoutParams", "layoutParams")
                 argument("padding", "padding")
                 argument("minWidth", "minWidth")
                 argument("minHeight", "minHeight")
@@ -148,31 +150,31 @@ val frameLayout = SwiftFile("FrameLayout.swift") {
                 }
             }
         }
+    }
 
-        clazz("LayoutParams") {
-            superType("ViewGroup.LayoutParams")
+    clazz("FrameLayoutParams") {
+        superType("LayoutParams")
 
-            public()
-            constant("gravity", Type("Gravity"))
+        public()
+        constant("gravity", Type("Gravity"))
 
-            initializer {
-                parameter("width", Type("CGFloat"))
-                parameter("height", Type("CGFloat"))
-                parameter("margin", Type("UIEdgeInsets"), "UIEdgeInsets()")
-                parameter("gravity", Type("Gravity"), "[]")
+        initializer {
+            parameter("width", Type("CGFloat"))
+            parameter("height", Type("CGFloat"))
+            parameter("margin", Type("UIEdgeInsets"), "UIEdgeInsets()")
+            parameter("gravity", Type("Gravity"), "[]")
 
-                assignmentExpression("self.gravity", "gravity")
-                initializerExpression("super") {
-                    argument("width", "width")
-                    argument("height", "height")
-                    argument("margin", "margin")
-                }
+            assignmentExpression("self.gravity", "gravity")
+            initializerExpression("super") {
+                argument("width", "width")
+                argument("height", "height")
+                argument("margin", "margin")
             }
+        }
 
-            function("alignment", Type("Alignment")) {
-                override()
-                returnStatement("gravity.alignment")
-            }
+        function("alignment", Type("Alignment")) {
+            override()
+            returnStatement("gravity.alignment")
         }
     }
 }

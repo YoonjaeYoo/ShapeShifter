@@ -1,22 +1,20 @@
 package me.yoonjae.shapeshifter
 
-import me.yoonjae.shapeshifter.translator.ColorsTranslator
-import me.yoonjae.shapeshifter.translator.DimensTranslator
-import me.yoonjae.shapeshifter.translator.LayoutTranslator
-import me.yoonjae.shapeshifter.translator.StringsTranslator
+import me.yoonjae.shapeshifter.translator.*
 import me.yoonjae.shapeshifter.translator.system.*
 import java.io.File
 import java.io.FileWriter
 
 class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
 
-    val system = listOf(theme, textAppearance, textStyle, cgSizeExtension, uiFontExtension,
-            gravity, view, viewGroup, frameLayout, textView, button)
+    val system = listOf(drawable, theme, textAppearance, textStyle, cgSizeExtension,
+            uiFontExtension, gravity, view, viewGroup, frameLayout, textView, button)
 
 
     fun shift() {
         system.forEach { it.writeTo(iosAppDir + "/System/") }
         shiftStrings()
+        shiftAppThemes()
         shiftColors()
         shiftDimens()
         shiftLayouts()
@@ -25,6 +23,11 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
     private fun shiftStrings() {
         val input = File(androidAppDir + "/src/main/res/values/strings.xml")
         StringsTranslator().translate(input).writeTo(iosAppDir + "/ko.lproj/")
+    }
+
+    private fun shiftAppThemes() {
+        val input = File(androidAppDir + "/src/main/res/values/styles.xml")
+        AppThemesTranslator().translate(input).writeTo(iosAppDir + "/Values/")
     }
 
     private fun shiftColors() {

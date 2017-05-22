@@ -45,8 +45,28 @@ fun String.toDimen(): String {
     return if (contains("@dimen/")) {
         "Dimen.${substring(7).toCamelCase()}"
     } else if (isNotEmpty()) {
-        substring(0, length - 2)
+        substring(0, length - 2) // for trimming dp
     } else {
-        this
+        "0"
+    }
+}
+
+fun String.toColor(): String {
+    return if (contains("@color/")) {
+        "Color.${substring(7).toCamelCase()}"
+    } else if (isNotEmpty()) {
+        "UIColor(\"$this\")"
+    } else {
+        "UIColor.clear"
+    }
+}
+
+fun String.toDrawable(): String {
+    return if (contains("@color/")) {
+        "Drawable.color(Color.${substring(7)})"
+    } else if (startsWith("#")) {
+        "Drawable.color(UIColor(\"$this\"))"
+    } else {
+        "Drawable.image(UIImage(named: \"${substring(10)}\"))"
     }
 }

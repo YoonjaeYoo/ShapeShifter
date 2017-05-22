@@ -29,9 +29,9 @@ val linearLayout = SwiftFile("LinearLayout.swift") {
             }
             parameter("alignment", Type("Alignment"), ".fill")
             parameter("flexibility", Type("Flexibility"), ".flexible")
-            parameter("viewReuseId", Type("String?"), "nil")
+            parameter("viewReuseId", Type("String", true), "nil")
             parameter("sublayouts", Type("[Layout]"))
-            parameter("config", Type("((V) -> Void)?"), "nil")
+            parameter("config", Type("(V) -> Void", true), "nil")
 
             initializerExpression("super") {
                 argument("width", "width")

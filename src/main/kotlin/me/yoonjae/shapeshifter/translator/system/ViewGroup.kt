@@ -19,22 +19,24 @@ val viewGroup = SwiftFile("ViewGroup.swift") {
         constant("sublayouts", Type("[Layout]")) { open() }
         initializer {
             public()
+            parameter("theme", Type("Theme"), "AppTheme()")
+            parameter("id", Type("String", true), "nil")
             parameter("layoutParams", Type("LayoutParams"))
-            parameter("id", Type("String?"), "nil")
             parameter("padding", Type("UIEdgeInsets")) {
                 initializerExpression("UIEdgeInsets")
             }
-            parameter("minWidth", Type("CGFloat?"), "nil")
-            parameter("minHeight", Type("CGFloat?"), "nil")
+            parameter("minWidth", Type("CGFloat", true), "nil")
+            parameter("minHeight", Type("CGFloat", true), "nil")
             parameter("alpha", Type("CGFloat"), "1.0")
-            parameter("background", Type("UIColor?"), "nil")
+            parameter("background", Type("UIColor", true), "nil")
             parameter("sublayouts", Type("[Layout]"), "[]")
-            parameter("config", Type("((UIView) -> Void)?"), "nil")
+            parameter("config", Type("(UIView) -> Void", true), "nil")
 
             assignmentExpression("self.sublayouts", "sublayouts")
             initializerExpression("super") {
-                argument("layoutParams", "layoutParams")
+                argument("theme", "theme")
                 argument("id", "id")
+                argument("layoutParams", "layoutParams")
                 argument("padding", "padding")
                 argument("minWidth", "minWidth")
                 argument("minHeight", "minHeight")
@@ -64,50 +66,50 @@ val viewGroup = SwiftFile("ViewGroup.swift") {
                 argument(value = "\"not implemented\"")
             }
         }
+    }
 
-        clazz("LayoutParams") {
-            public()
-            constant("width", Type("CGFloat"))
-            constant("height", Type("CGFloat"))
-            constant("margin", Type("UIEdgeInsets"))
+    clazz("LayoutParams") {
+        public()
+        constant("width", Type("CGFloat"))
+        constant("height", Type("CGFloat"))
+        constant("margin", Type("UIEdgeInsets"))
 
-            initializer {
-                parameter("width", Type("CGFloat"))
-                parameter("height", Type("CGFloat"))
-                parameter("margin", Type("UIEdgeInsets")) {
-                    initializerExpression("UIEdgeInsets")
-                }
-
-                assignmentExpression("self.width", "width")
-                assignmentExpression("self.height", "height")
-                assignmentExpression("self.margin", "margin")
+        initializer {
+            parameter("width", Type("CGFloat"))
+            parameter("height", Type("CGFloat"))
+            parameter("margin", Type("UIEdgeInsets")) {
+                initializerExpression("UIEdgeInsets")
             }
 
-            function("arrangement", Type("CGRect")) {
-                parameter("size", Type("CGSize"))
-                parameter("rect", Type("CGRect"), label = "in")
+            assignmentExpression("self.width", "width")
+            assignmentExpression("self.height", "height")
+            assignmentExpression("self.margin", "margin")
+        }
 
-                returnStatement {
-                    functionCallExpression("alignment().position") {
-                        argument("size", "size.decreasedByInsets(margin)")
-                        argument("in") {
-                            initializerExpression("CGRect") {
-                                argument("origin") {
-                                    initializerExpression("CGPoint") {
-                                        argument("x", "rect.origin.x + margin.left")
-                                        argument("y", "rect.origin.y + margin.top")
-                                    }
+        function("arrangement", Type("CGRect")) {
+            parameter("size", Type("CGSize"))
+            parameter("rect", Type("CGRect"), label = "in")
+
+            returnStatement {
+                functionCallExpression("alignment().position") {
+                    argument("size", "size.decreasedByInsets(margin)")
+                    argument("in") {
+                        initializerExpression("CGRect") {
+                            argument("origin") {
+                                initializerExpression("CGPoint") {
+                                    argument("x", "rect.origin.x + margin.left")
+                                    argument("y", "rect.origin.y + margin.top")
                                 }
-                                argument("size", "rect.size.decreasedByInsets(margin)")
                             }
+                            argument("size", "rect.size.decreasedByInsets(margin)")
                         }
                     }
                 }
             }
+        }
 
-            function("alignment", Type("Alignment")) {
-                returnStatement(".fill")
-            }
+        function("alignment", Type("Alignment")) {
+            returnStatement(".fill")
         }
     }
 }

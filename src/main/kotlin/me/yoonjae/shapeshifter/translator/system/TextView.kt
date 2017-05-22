@@ -8,29 +8,34 @@ val textView = me.yoonjae.shapeshifter.poet.file.SwiftFile("TextView.swift") {
     import("LayoutKit")
 
     clazz("TextView") {
+        open()
         superType("ViewGroup")
 
         initializer {
+            public()
+            parameter("theme", Type("Theme"), "AppTheme()")
+            parameter("id", Type("String", true), "nil")
             parameter("layoutParams", Type("LayoutParams"))
-            parameter("id", Type("String?"), "nil")
             parameter("padding", Type("UIEdgeInsets")) {
                 initializerExpression("UIEdgeInsets")
             }
-            parameter("minWidth", Type("CGFloat?"), "nil")
-            parameter("minHeight", Type("CGFloat?"), "nil")
+            parameter("minWidth", Type("CGFloat", true), "nil")
+            parameter("minHeight", Type("CGFloat", true), "nil")
             parameter("alpha", Type("CGFloat"), "1.0")
-            parameter("background", Type("UIColor?"), "nil")
+            parameter("background", Type("UIColor", true), "nil")
             parameter("gravity", Type("Gravity"), "[]")
             parameter("lines", Type("Int"), "0")
             parameter("singleLine", Type("Bool"), "false")
-            parameter("text", Type("String?"), "nil")
-            parameter("textAppearance", Type("TextAppearance?"), "nil")
-            parameter("textColor", Type("UIColor"), "Theme.light().textColorPrimary")
-            parameter("textSize", Type("CGFloat"), "15")
-            parameter("textStyle", Type("TextStyle"), ".normal")
-            parameter("config", Type("((UILabel) -> Void)?"), "nil")
+            parameter("text", Type("String", true), "nil")
+            parameter("textAppearance", Type("TextAppearance", true), "nil")
+            parameter("textColor", Type("UIColor", true), "nil")
+            parameter("textSize", Type("CGFloat", true), "nil")
+            parameter("textStyle", Type("TextStyle", true), "nil")
+            parameter("config", Type("(UILabel) -> Void", true), "nil")
 
+            constant("defaultTextAppearance", value = "TextAppearance.Subhead(theme)")
             initializerExpression("super") {
+                argument("theme", "theme")
                 argument("layoutParams", "layoutParams")
                 argument("padding", "padding")
                 argument("minWidth", "minWidth")
@@ -41,7 +46,16 @@ val textView = me.yoonjae.shapeshifter.poet.file.SwiftFile("TextView.swift") {
                     arrayLiteralExpression {
                         initializerExpression("LabelLayout<UILabel>") {
                             argument("text", ".unattributed(text == nil ? \"\" : text!)")
-                            argument("font", "UIFont.font(ofSize: textSize, style: textStyle)")
+                            argument("font") {
+                                functionCallExpression("UIFont.font") {
+                                    argument("ofSize", "textSize ?? textAppearance?.textSize ?? " +
+                                            "defaultTextAppearance.textSize ?? 15")
+                                    argument("style",
+                                            "textStyle ?? textAppearance?.textStyle ?? " +
+                                                    "defaultTextAppearance.textStyle ??" +
+                                                    " .normal")
+                                }
+                            }
                             argument("numberOfLines", "singleLine ? 1 : lines")
                             argument("alignment", "gravity.alignment")
                             argument("flexibility", ".inflexible")
@@ -53,7 +67,11 @@ val textView = me.yoonjae.shapeshifter.poet.file.SwiftFile("TextView.swift") {
                                         assignmentExpression("label.text", "text")
                                     }
                                 }
-                                assignmentExpression("label.textColor", "textColor")
+                                assignmentExpression("label.textColor") {
+                                    generalExpression("textColor ?? textAppearance?.textColor ?? " +
+                                            "defaultTextAppearance.textColor ?? " +
+                                            "UIColor.white")
+                                }
                                 functionCallExpression("config?") {
                                     argument(null, "label")
                                 }
@@ -86,9 +104,19 @@ val textView = me.yoonjae.shapeshifter.poet.file.SwiftFile("TextView.swift") {
             assignmentExpression("size.width",
                     "layoutParams.width == MATCH_PARENT ? maxSize.width : " +
                             "(layoutParams.width == WRAP_CONTENT ? size.width : layoutParams.width)")
+            ifStatement("let minWidth = minWidth") {
+                codeBlock {
+                    assignmentExpression("size.width", "max(minWidth, size.width);")
+                }
+            }
             assignmentExpression("size.height",
                     "layoutParams.height == MATCH_PARENT ? maxSize.height : " +
                             "(layoutParams.height == WRAP_CONTENT ? size.height : layoutParams.height)")
+            ifStatement("let minHeight = minHeight") {
+                codeBlock {
+                    assignmentExpression("size.height", "max(minHeight, size.height);")
+                }
+            }
             returnStatement {
                 functionCallExpression("LayoutMeasurement") {
                     argument("layout", "self")

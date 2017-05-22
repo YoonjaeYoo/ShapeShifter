@@ -1,53 +1,35 @@
 package me.yoonjae.shapeshifter.translator.system
 
-import me.yoonjae.shapeshifter.poet.expression.ArgumentDescriber
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
 
+val themeFields = mapOf(
+        "colorBackground" to Type("UIColor", true),
+        "colorPrimary" to Type("UIColor", true),
+        "colorPrimaryDark" to Type("UIColor", true),
+        "colorSecondary" to Type("UIColor", true),
+        "colorAccent" to Type("UIColor", true),
+        "colorControlActivated" to Type("UIColor", true),
+        "colorControlNormal" to Type("UIColor", true),
+        "colorControlHighlight" to Type("UIColor", true),
+        "colorButtonNormal" to Type("UIColor", true),
+        "textColorPrimary" to Type("UIColor", true),
+        "textColorSecondary" to Type("UIColor", true),
+        "textColorTertiary" to Type("UIColor", true),
+        "textColorHint" to Type("UIColor", true),
+        "windowBackground" to Type("Drawable", true)
+)
+
 val theme = SwiftFile("Theme.swift") {
     import("UIKit")
-    struct("Theme") {
-        constant("colorPrimary", Type("UIColor"))
-        constant("colorPrimaryDark", Type("UIColor"))
-        constant("colorAccent", Type("UIColor"))
-        constant("textColorPrimary", Type("UIColor"))
-        constant("textColorSecondary", Type("UIColor"))
-        constant("textColorTertiary", Type("UIColor"))
-        constant("textColorHint", Type("UIColor"))
-        function("light", Type("Theme")) {
-            static()
-            returnStatement {
-                initializerExpression("Theme") {
-                    argument("colorPrimary", "Color.primary")
-                    argument("colorPrimaryDark", "Color.primaryDark")
-                    argument("colorAccent", "Color.accent")
-                    colorArgument("textColorPrimary", "#000")
-                    colorArgument("textColorSecondary", "#999")
-                    colorArgument("textColorTertiary", "#999")
-                    colorArgument("textColorHint", "#d3d4d4")
-                }
-            }
-        }
+    clazz("Theme") {
+        open()
+        themeFields.forEach { name, type -> constant(name, type) }
 
-        function("dark", Type("Theme")) {
-            static()
-            returnStatement {
-                initializerExpression("Theme") {
-                    argument("colorPrimary", "Color.primary")
-                    argument("colorPrimaryDark", "Color.primaryDark")
-                    argument("colorAccent", "Color.accent")
-                    colorArgument("textColorPrimary", "#fff")
-                    colorArgument("textColorSecondary", "#b3ffffff")
-                    colorArgument("textColorTertiary", "#b3ffffff")
-                    colorArgument("textColorHint", "#b3ffffff")
-                }
-            }
-        }
-    }
-}
+        initializer {
+            themeFields.forEach { name, type -> parameter(name, type, "nil") }
 
-private fun ArgumentDescriber.colorArgument(name: String, value: String) {
-    argument(name) {
-        generalExpression("UIColor(\"$value\")")
+            themeFields.forEach { name, _ -> assignmentExpression("self.$name", name) }
+        }
     }
 }

@@ -1,12 +1,30 @@
 package me.yoonjae.shapeshifter.translator.system
 
-import me.yoonjae.shapeshifter.poet.declaration.FunctionDescriber
+import me.yoonjae.shapeshifter.poet.declaration.ClassDescriber
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
 
 val textAppearance = SwiftFile("TextAppearance.swift") {
     import("UIKit")
-    struct("TextAppearance") {
+    clazz("TextAppearance") {
+        public()
+        initializer {
+            public()
+            parameter("theme", Type("Theme"), label = "_")
+            parameter("textColor", Type("UIColor", true))
+            parameter("textSize", Type("CGFloat", true))
+            parameter("textStyle", Type("TextStyle", true))
+
+            assignmentExpression("self.theme", "theme")
+            assignmentExpression("self.textColor", "textColor")
+            assignmentExpression("self.textSize", "textSize")
+            assignmentExpression("self.textStyle", "textStyle")
+        }
+        variable("theme", Type("Theme"))
+        variable("textColor", Type("UIColor", true))
+        variable("textSize", Type("CGFloat", true))
+        variable("textStyle", Type("TextStyle", true))
+
         textAppearance("body1", "textColorPrimary", 14)
         textAppearance("body2", "textColorPrimary", 14)
         textAppearance("button", "textColorPrimary", 14)
@@ -21,19 +39,21 @@ val textAppearance = SwiftFile("TextAppearance.swift") {
         textAppearance("small", "textColorTertiary", 14)
         textAppearance("subhead", "textColorPrimary", 16)
         textAppearance("title", "textColorPrimary", 20)
-        variable("textColor", Type("UIColor"))
-        variable("textSize", Type("CGFloat"))
     }
 }
 
-private fun FunctionDescriber.textAppearance(name: String, textColor: String, textSize: Int) {
-    function(name, Type("TextAppearance")) {
-        static()
-        parameter("theme", Type("Theme"))
-        returnStatement {
-            initializerExpression("TextAppearance") {
+private fun ClassDescriber.textAppearance(name: String, textColor: String, textSize: Int) {
+    clazz(name.capitalize()) {
+        public()
+        superType("TextAppearance")
+        initializer {
+            public()
+            parameter("theme", Type("Theme"), label = "_")
+            initializerExpression("super") {
+                argument(null, "theme")
                 argument("textColor", "theme.$textColor")
                 argument("textSize", textSize.toString())
+                argument("textStyle", "nil")
             }
         }
     }

@@ -14,29 +14,13 @@ fun NodeList.iterator(): Iterator<Node?> {
     }
 }
 
-fun NodeList.elementIterator(): Iterator<Element> {
-    return object : Iterator<Element> {
-        private var index = 0
-
-        override fun hasNext(): Boolean {
-            (index until length).forEach {
-                if (item(it).isElement()) return true
-            }
-            return false
-        }
-
-        override fun next(): Element {
-            (index until length).forEach {
-                val item = item(it)
-                if (item.isElement()) {
-                    index = it + 1
-                    return item as Element
-                }
-            }
-            throw NoSuchElementException()
-        }
-
-        private fun Node?.isElement() = this?.nodeType == Node.ELEMENT_NODE
-    }
+fun NodeList.elements(): List<Element> {
+    return (0 until length)
+            .map { item(it) }
+            .filter { it.isElement() }
+            .map { it as Element }
+            .toList()
 }
+
+private fun Node?.isElement() = this?.nodeType == Node.ELEMENT_NODE
 

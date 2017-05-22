@@ -1,7 +1,22 @@
 package me.yoonjae.shapeshifter.translator.extensions
 
 import me.yoonjae.shapeshifter.poet.expression.ArgumentDescriber
+import me.yoonjae.shapeshifter.translator.system.themeFields
 import org.w3c.dom.Element
+
+fun ArgumentDescriber.themeArguments(element: Element) {
+    themeFields.forEach { name, type ->
+        element.childNodes.elements().asSequence().find {
+            it.tagName == "item" && it.attr("name")?.endsWith(name)!!
+        }?.textContent?.let {
+            argument(name, when (type.name) {
+                "UIColor" -> it.toColor()
+                "Drawable" -> it.toDrawable()
+                else -> it
+            })
+        }
+    }
+}
 
 fun ArgumentDescriber.layoutArguments(element: Element, parent: Element? = null) {
     when (element.tagName) {
@@ -22,7 +37,7 @@ fun ArgumentDescriber.frameLayoutArguments(element: Element, parent: Element? = 
     requiredArguments(element, parent)
     argument("sublayouts") {
         arrayLiteralExpression {
-            element.childNodes.elementIterator().forEach {
+            element.childNodes.elements().forEach {
                 layoutExpression(it, element)
             }
         }
@@ -43,7 +58,7 @@ fun ArgumentDescriber.linearLayoutArguments(element: Element, parent: Element? =
     requiredArguments(element, parent)
     argument("sublayouts") {
         arrayLiteralExpression {
-            element.childNodes.elementIterator().forEach {
+            element.childNodes.elements().forEach {
                 layoutExpression(it, element)
             }
         }
@@ -66,16 +81,16 @@ fun ArgumentDescriber.imageViewArguments(element: Element, parent: Element? = nu
 
 private fun ArgumentDescriber.requiredArguments(element: Element, parent: Element? = null,
                                                 layoutParamsInit: (ArgumentDescriber.() -> Unit)? = null) {
-    layoutParamsArgument(element, parent, layoutParamsInit)
     idArgument(element)
+    layoutParamsArgument(element, parent, layoutParamsInit)
     paddingArgument(element)
 }
 
 private fun ArgumentDescriber.layoutParamsArgument(element: Element, parent: Element? = null,
                                                    init: (ArgumentDescriber.() -> Unit)? = null) {
     argument("layoutParams") {
-        val prefix = if (parent == null) "" else "${parent.tagName}."
-        initializerExpression("${prefix}LayoutParams") {
+        val prefix = if (parent == null) "Layout" else parent.tagName
+        initializerExpression("${prefix}Params") {
             argument("width", element.width())
             argument("height", element.height())
             argument("margin") {

@@ -8,6 +8,7 @@ val gravity = SwiftFile("Gravity.swift") {
     import("LayoutKit")
 
     struct("Gravity") {
+        public()
         superType("OptionSet")
 
         constant("top", value = "Gravity(rawValue: 1 << 1)") { static() }
@@ -45,12 +46,12 @@ val gravity = SwiftFile("Gravity.swift") {
                         assignmentExpression("vertical", ".bottom")
                     }
                     elseClause {
-                        ifStatement("contains(.centerVertical)") {
+                        ifStatement("contains(.centerVertical) || contains(.center)") {
                             codeBlock {
                                 assignmentExpression("vertical", ".center")
                             }
                             elseClause {
-                                ifStatement("contains(.fillVertical)") {
+                                ifStatement("contains(.fillVertical) || contains(.fill)") {
                                     codeBlock {
                                         assignmentExpression("vertical", ".fill")
                                     }
@@ -70,12 +71,12 @@ val gravity = SwiftFile("Gravity.swift") {
                         assignmentExpression("horizontal", ".trailing")
                     }
                     elseClause {
-                        ifStatement("contains(.centerVertical)") {
+                        ifStatement("contains(.centerHorizontal) || contains(.center)") {
                             codeBlock {
                                 assignmentExpression("horizontal", ".center")
                             }
                             elseClause {
-                                ifStatement("contains(.fillVertical)") {
+                                ifStatement("contains(.fillHorizontal) || contains(.fill)") {
                                     codeBlock {
                                         assignmentExpression("horizontal", ".fill")
                                     }
