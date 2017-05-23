@@ -8,22 +8,22 @@ val view = SwiftFile("View.swift") {
     import("LayoutKit")
 
     clazz("View") {
-        open()
+        public()
         genericParameter("V") {
             superType("UIView")
         }
         superType("ConfigurableLayout")
 
-        constant("theme", Type("Theme")) { open() }
-        constant("layoutParams", Type("LayoutParams")) { open() }
-        constant("viewReuseId", Type("String", true)) { open() }
-        constant("padding", Type("UIEdgeInsets")) { open() }
-        constant("minWidth", Type("CGFloat", true)) { open() }
-        constant("minHeight", Type("CGFloat", true)) { open() }
-        constant("config", Type("(V) -> Void", true)) { open() }
-        constant("flexibility", value = "Flexibility.inflexible") { open() }
+        constant("theme", Type("Theme")) { public() }
+        constant("layoutParams", Type("LayoutParams")) { public() }
+        constant("viewReuseId", Type("String", true)) { public() }
+        constant("padding", Type("UIEdgeInsets")) { public() }
+        constant("minWidth", Type("CGFloat", true)) { public() }
+        constant("minHeight", Type("CGFloat", true)) { public() }
+        constant("config", Type("(V) -> Void", true)) { public() }
+        constant("flexibility", value = "Flexibility.inflexible") { public() }
         variable("needsView", Type("Bool")) {
-            open()
+            public()
             codeBlock {
                 returnStatement("config != nil")
             }
@@ -62,14 +62,14 @@ val view = SwiftFile("View.swift") {
         }
 
         function("configure") {
-            open()
+            public()
             parameter("view", Type("V"))
 
             generalExpression("config?(view)")
         }
 
         function("makeView", Type("UIView")) {
-            open()
+            public()
             returnStatement("V()")
         }
 

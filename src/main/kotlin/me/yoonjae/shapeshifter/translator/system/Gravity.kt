@@ -66,7 +66,7 @@ val gravity = SwiftFile("Gravity.swift") {
                     }
                 }
                 variable("horizontal", Type("Alignment.Horizontal"))
-                ifStatement("contains(.bottom)") {
+                ifStatement("contains(.end)") {
                     codeBlock {
                         assignmentExpression("horizontal", ".trailing")
                     }

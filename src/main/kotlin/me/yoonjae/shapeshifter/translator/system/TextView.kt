@@ -8,7 +8,7 @@ val textView = me.yoonjae.shapeshifter.poet.file.SwiftFile("TextView.swift") {
     import("LayoutKit")
 
     clazz("TextView") {
-        open()
+        public()
         superType("ViewGroup")
 
         initializer {

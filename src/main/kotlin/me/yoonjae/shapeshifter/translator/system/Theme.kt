@@ -23,7 +23,7 @@ val themeFields = mapOf(
 val theme = SwiftFile("Theme.swift") {
     import("UIKit")
     clazz("Theme") {
-        open()
+        public()
         themeFields.forEach { name, type -> constant(name, type) }
 
         initializer {

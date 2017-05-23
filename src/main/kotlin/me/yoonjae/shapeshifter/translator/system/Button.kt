@@ -8,7 +8,7 @@ val button = me.yoonjae.shapeshifter.poet.file.SwiftFile("Button.swift") {
     import("LayoutKit")
 
     clazz("Button") {
-        open()
+        public()
         superType("ViewGroup")
 
         initializer {

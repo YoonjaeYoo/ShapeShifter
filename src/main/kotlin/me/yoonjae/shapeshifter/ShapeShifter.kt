@@ -8,7 +8,7 @@ import java.io.FileWriter
 class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
 
     val system = listOf(drawable, theme, textAppearance, textStyle, cgSizeExtension,
-            uiFontExtension, gravity, view, viewGroup, frameLayout, textView, button)
+            uiFontExtension, gravity, view, viewGroup, frameLayout, linearLayout, textView, button)
 
 
     fun shift() {

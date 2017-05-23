@@ -8,7 +8,7 @@ val frameLayout = SwiftFile("FrameLayout.swift") {
     import("LayoutKit")
 
     clazz("FrameLayout") {
-        open()
+        public()
         superType("ViewGroup")
 
         initializer {
@@ -67,33 +67,24 @@ val frameLayout = SwiftFile("FrameLayout.swift") {
                         constant("measurement") {
                             functionCallExpression("sublayout.measurement") {
                                 argument("within",
-                                        "maxSize.decreasedByInsets(layoutParams.margin)" +
+                                        "size.decreasedByInsets(layoutParams.margin)" +
                                                 ".decreasedByInsets(padding)")
                             }
                         }
                         ifStatement("layoutParams.width == WRAP_CONTENT") {
                             codeBlock {
-                                assignmentExpression("size.width") {
-                                    functionCallExpression("max") {
-                                        argument(value = "size.width")
-                                        argument(value = "measurement.size.width + padding.left +" +
-                                                " padding.right + layoutParams.margin.left + " +
-                                                "layoutParams.margin.right")
-                                    }
-
-                                }
+                                assignmentExpression("size.width",
+                                        "max(size.width, measurement.size.width + padding.left + " +
+                                                "padding.right + layoutParams.margin.left + " +
+                                                "layoutParams.margin.right)")
                             }
                         }
                         ifStatement("layoutParams.height == WRAP_CONTENT") {
                             codeBlock {
-                                assignmentExpression("size.height") {
-                                    functionCallExpression("max") {
-                                        argument(value = "size.height")
-                                        argument(value = "measurement.size.height + padding.top +" +
-                                                " padding.bottom + layoutParams.margin.top + " +
-                                                "layoutParams.margin.bottom")
-                                    }
-                                }
+                                assignmentExpression("size.height",
+                                        "max(size.height, measurement.size.height + padding.top + " +
+                                                "padding.bottom + layoutParams.margin.top + " +
+                                                "layoutParams.margin.bottom)")
                             }
                         }
                         returnStatement("measurement")
@@ -172,9 +163,27 @@ val frameLayout = SwiftFile("FrameLayout.swift") {
             }
         }
 
-        function("alignment", Type("Alignment")) {
+        function("arrangement", Type("CGRect")) {
             override()
-            returnStatement("gravity.alignment")
+            parameter("size", Type("CGSize"))
+            parameter("rect", Type("CGRect"), label = "in")
+
+            returnStatement {
+                functionCallExpression("gravity.alignment.position") {
+                    argument("size", "size.decreasedByInsets(margin)")
+                    argument("in") {
+                        initializerExpression("CGRect") {
+                            argument("origin") {
+                                initializerExpression("CGPoint") {
+                                    argument("x", "rect.origin.x + margin.left")
+                                    argument("y", "rect.origin.y + margin.top")
+                                }
+                            }
+                            argument("size", "rect.size.decreasedByInsets(margin)")
+                        }
+                    }
+                }
+            }
         }
     }
 }

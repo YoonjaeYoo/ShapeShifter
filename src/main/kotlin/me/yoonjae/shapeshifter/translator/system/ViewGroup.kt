@@ -11,12 +11,12 @@ val viewGroup = SwiftFile("ViewGroup.swift") {
     constant("WRAP_CONTENT", Type("CGFloat"), "-2")
 
     clazz("ViewGroup") {
-        open()
+        public()
         superType("View") {
             genericParameter("UIView")
         }
 
-        constant("sublayouts", Type("[Layout]")) { open() }
+        constant("sublayouts", Type("[Layout]")) { public() }
         initializer {
             public()
             parameter("theme", Type("Theme"), "AppTheme()")
@@ -91,7 +91,7 @@ val viewGroup = SwiftFile("ViewGroup.swift") {
             parameter("rect", Type("CGRect"), label = "in")
 
             returnStatement {
-                functionCallExpression("alignment().position") {
+                functionCallExpression("Alignment.fill.position") {
                     argument("size", "size.decreasedByInsets(margin)")
                     argument("in") {
                         initializerExpression("CGRect") {
@@ -106,10 +106,6 @@ val viewGroup = SwiftFile("ViewGroup.swift") {
                     }
                 }
             }
-        }
-
-        function("alignment", Type("Alignment")) {
-            returnStatement(".fill")
         }
     }
 }

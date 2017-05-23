@@ -34,7 +34,28 @@ fun ArgumentDescriber.layoutArguments(element: Element, parent: Element? = null)
 }
 
 fun ArgumentDescriber.frameLayoutArguments(element: Element, parent: Element? = null) {
-    requiredArguments(element, parent)
+    idArgument(element)
+    layoutParamsArgument(element, parent)
+    paddingArgument(element)
+    argument("sublayouts") {
+        arrayLiteralExpression {
+            element.childNodes.elements().forEach {
+                layoutExpression(it, element)
+            }
+        }
+    }
+}
+
+fun ArgumentDescriber.linearLayoutArguments(element: Element, parent: Element? = null) {
+    idArgument(element)
+    layoutParamsArgument(element, parent)
+    argument("orientation") {
+        generalExpression(when (element.attr("android:orientation")) {
+            "vertical" -> ".vertical"
+            else -> ".horizontal"
+        })
+    }
+    paddingArgument(element)
     argument("sublayouts") {
         arrayLiteralExpression {
             element.childNodes.elements().forEach {
@@ -45,44 +66,28 @@ fun ArgumentDescriber.frameLayoutArguments(element: Element, parent: Element? = 
 }
 
 fun ArgumentDescriber.viewArguments(element: Element, parent: Element? = null) {
-    requiredArguments(element, parent)
-}
-
-fun ArgumentDescriber.linearLayoutArguments(element: Element, parent: Element? = null) {
-    argument("axis") {
-        generalExpression(when (element.attr("android:orientation")) {
-            "vertical" -> ".vertical"
-            else -> ".horizontal"
-        })
-    }
-    requiredArguments(element, parent)
-    argument("sublayouts") {
-        arrayLiteralExpression {
-            element.childNodes.elements().forEach {
-                layoutExpression(it, element)
-            }
-        }
-    }
+    idArgument(element)
+    layoutParamsArgument(element, parent)
+    paddingArgument(element)
 }
 
 fun ArgumentDescriber.buttonArguments(element: Element, parent: Element? = null) {
-    requiredArguments(element, parent)
+    idArgument(element)
+    layoutParamsArgument(element, parent)
+    paddingArgument(element)
     argument("text", element.text())
 }
 
 fun ArgumentDescriber.textViewArguments(element: Element, parent: Element? = null) {
-    requiredArguments(element, parent)
+    idArgument(element)
+    layoutParamsArgument(element, parent)
+    paddingArgument(element)
     argument("text", element.text())
 }
 
 fun ArgumentDescriber.imageViewArguments(element: Element, parent: Element? = null) {
-    requiredArguments(element, parent)
-}
-
-private fun ArgumentDescriber.requiredArguments(element: Element, parent: Element? = null,
-                                                layoutParamsInit: (ArgumentDescriber.() -> Unit)? = null) {
     idArgument(element)
-    layoutParamsArgument(element, parent, layoutParamsInit)
+    layoutParamsArgument(element, parent)
     paddingArgument(element)
 }
 
