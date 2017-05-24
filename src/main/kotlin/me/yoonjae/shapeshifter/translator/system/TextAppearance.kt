@@ -8,6 +8,7 @@ val textAppearance = SwiftFile("TextAppearance.swift") {
     import("UIKit")
     clazz("TextAppearance") {
         public()
+
         initializer {
             public()
             parameter("theme", Type("Theme"), label = "_")
@@ -25,27 +26,33 @@ val textAppearance = SwiftFile("TextAppearance.swift") {
         variable("textSize", Type("CGFloat", true))
         variable("textStyle", Type("TextStyle", true))
 
-        textAppearance("body1", "textColorPrimary", 14)
-        textAppearance("body2", "textColorPrimary", 14)
-        textAppearance("button", "textColorPrimary", 14)
-        textAppearance("caption", "textColorSecondary", 12)
-        textAppearance("display1", "textColorSecondary", 34)
-        textAppearance("display2", "textColorSecondary", 45)
-        textAppearance("display3", "textColorSecondary", 56)
-        textAppearance("display4", "textColorSecondary", 112)
-        textAppearance("headline", "textColorPrimary", 24)
-        textAppearance("large", "textColorPrimary", 22)
-        textAppearance("medium", "textColorSecondary", 18)
-        textAppearance("small", "textColorTertiary", 14)
-        textAppearance("subhead", "textColorPrimary", 16)
-        textAppearance("title", "textColorPrimary", 20)
+        clazz("AppCompat") {
+            public()
+            superType("TextAppearance")
+
+            textAppearance("Body1", "textColorPrimary", 14)
+            textAppearance("Body2", "textColorPrimary", 14)
+            textAppearance("Button", "textColorPrimary", 14)
+            textAppearance("Caption", "textColorSecondary", 12)
+            textAppearance("Display1", "textColorSecondary", 34)
+            textAppearance("Display2", "textColorSecondary", 45)
+            textAppearance("Display3", "textColorSecondary", 56)
+            textAppearance("Display4", "textColorSecondary", 112)
+            textAppearance("Headline", "textColorPrimary", 24)
+            textAppearance("Large", "textColorPrimary", 22)
+            textAppearance("Medium", "textColorSecondary", 18)
+            textAppearance("Small", "textColorTertiary", 14)
+            textAppearance("Subhead", "textColorPrimary", 16)
+            textAppearance("Title", "textColorPrimary", 20)
+        }
     }
 }
 
 private fun ClassDescriber.textAppearance(name: String, textColor: String, textSize: Int) {
-    clazz(name.capitalize()) {
+    clazz(name) {
         public()
         superType("TextAppearance")
+
         initializer {
             public()
             parameter("theme", Type("Theme"), label = "_")

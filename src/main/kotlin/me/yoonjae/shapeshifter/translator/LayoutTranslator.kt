@@ -22,6 +22,9 @@ class LayoutTranslator : Translator<SwiftFile>() {
                 superType(doc.documentElement.layoutType)
                 initializer {
                     public()
+                    parameter("theme", Type("Theme"), "AppTheme()")
+                    parameter("config", Type("(${doc.documentElement.viewType}) -> Void", true),
+                            "nil")
                     idTypeMap.forEach { id, type ->
                         parameter(id.toConfigParameterName(), Type("($type) -> Void", true), "nil")
                     }

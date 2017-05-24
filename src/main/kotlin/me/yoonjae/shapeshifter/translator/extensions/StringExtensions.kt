@@ -42,31 +42,50 @@ fun String.toCamelCase(capital: Boolean = false): String {
 }
 
 fun String.toDimen(): String {
-    return if (contains("@dimen/")) {
+    return if (startsWith("@dimen/")) {
         "Dimen.${substring(7).toCamelCase()}"
-    } else if (isNotEmpty()) {
-        substring(0, length - 2) // for trimming dp
+    } else if (endsWith("dp")) {
+        substring(0, length - 2)
     } else {
         "0"
     }
 }
 
 fun String.toColor(): String {
-    return if (contains("@color/")) {
+    return if (startsWith("@color/")) {
         "Color.${substring(7).toCamelCase()}"
-    } else if (isNotEmpty()) {
-        "UIColor(\"$this\")"
+    } else if (startsWith("@drawable/")) {
+        "UIColor(patternImage: UIImage(named: \"${substring(10)}\")!)"
+    } else if (startsWith("#")) {
+        val color = substring(1)
+        if (color.length == 4) {
+            "UIColor(\"#${color.substring(1)}${color[0]}\")"
+        } else if (color.length == 8) {
+            "UIColor(\"#${color.substring(2)}${color.substring(0, 2)}\")"
+        } else {
+            "UIColor(\"#$color\")"
+        }
     } else {
         "UIColor.clear"
     }
 }
 
-fun String.toDrawable(): String {
-    return if (contains("@color/")) {
-        "Drawable.color(Color.${substring(7)})"
-    } else if (startsWith("#")) {
-        "Drawable.color(UIColor(\"$this\"))"
+fun String.toImage(): String {
+    return if (startsWith("@drawable/")) {
+        "UIImage(named: \"${substring(10)}\")"
     } else {
-        "Drawable.image(UIImage(named: \"${substring(10)}\"))"
+        "UIImage()"
     }
+}
+
+fun String.toGravity(): String {
+    val builder = StringBuilder("[")
+    split("|").forEachIndexed { index, gravity ->
+        if (index > 0) {
+            builder.append(", ")
+        }
+        builder.append(".${gravity.toCamelCase()}")
+    }
+    builder.append("]")
+    return builder.toString()
 }

@@ -50,51 +50,64 @@ val frameLayout = SwiftFile("FrameLayout.swift") {
                 functionCallExpression("maxSize.decreasedToSize") {
                     argument {
                         functionCallExpression("CGSize") {
-                            argument("width",
-                                    "layoutParams.width == MATCH_PARENT ? .greatestFiniteMagnitude : " +
-                                            "(layoutParams.width == WRAP_CONTENT ? 0 : layoutParams.width)")
-                            argument("height",
-                                    "layoutParams.height == MATCH_PARENT ? .greatestFiniteMagnitude : " +
-                                            "(layoutParams.height == WRAP_CONTENT ? 0 : layoutParams.height)")
+                            argument("width", "layoutParams.width == MATCH_PARENT || " +
+                                    "layoutParams.width == WRAP_CONTENT ? " +
+                                    ".greatestFiniteMagnitude : " +
+                                    "layoutParams.width + layoutParams.margin.left + " +
+                                    "layoutParams.margin.right")
+                            argument("height", "layoutParams.height == MATCH_PARENT || " +
+                                    "layoutParams.height == WRAP_CONTENT ? " +
+                                    ".greatestFiniteMagnitude : " +
+                                    "layoutParams.height + layoutParams.margin.top + " +
+                                    "layoutParams.margin.bottom")
                         }
                     }
                 }
             }
+            variable("minSize", value = "CGSize()")
             constant("measurements", Type("[LayoutMeasurement]")) {
                 functionCallExpression("sublayouts.map") {
                     trailingClosure {
                         closureParameter("sublayout")
                         constant("measurement") {
                             functionCallExpression("sublayout.measurement") {
-                                argument("within",
-                                        "size.decreasedByInsets(layoutParams.margin)" +
-                                                ".decreasedByInsets(padding)")
+                                argument("within", "size.decreasedByInsets(layoutParams.margin)" +
+                                        ".decreasedByInsets(padding)")
                             }
                         }
-                        ifStatement("layoutParams.width == WRAP_CONTENT") {
-                            codeBlock {
-                                assignmentExpression("size.width",
-                                        "max(size.width, measurement.size.width + padding.left + " +
-                                                "padding.right + layoutParams.margin.left + " +
-                                                "layoutParams.margin.right)")
-                            }
-                        }
-                        ifStatement("layoutParams.height == WRAP_CONTENT") {
-                            codeBlock {
-                                assignmentExpression("size.height",
-                                        "max(size.height, measurement.size.height + padding.top + " +
-                                                "padding.bottom + layoutParams.margin.top + " +
-                                                "layoutParams.margin.bottom)")
-                            }
-                        }
+                        assignmentExpression("minSize.width", "max(minSize.width, " +
+                                "measurement.size.width + padding.left + padding.right + " +
+                                "layoutParams.margin.left + layoutParams.margin.right)")
+                        assignmentExpression("minSize.height", "max(minSize.height, " +
+                                "measurement.size.height + padding.top + padding.bottom + " +
+                                "layoutParams.margin.top + layoutParams.margin.bottom)")
                         returnStatement("measurement")
                     }
+                }
+            }
+            ifStatement("layoutParams.width == WRAP_CONTENT") {
+                codeBlock {
+                    assignmentExpression("size.width", "minSize.width")
+                }
+            }
+            ifStatement("layoutParams.height == WRAP_CONTENT") {
+                codeBlock {
+                    assignmentExpression("size.height", "minSize.height")
                 }
             }
             returnStatement {
                 functionCallExpression("LayoutMeasurement") {
                     argument("layout", "self")
-                    argument("size", "size")
+                    argument("size") {
+                        functionCallExpression("size.increasedToSize") {
+                            argument {
+                                initializerExpression("CGSize") {
+                                    argument("width", "minWidth ?? 0")
+                                    argument("height", "minHeight ?? 0")
+                                }
+                            }
+                        }
+                    }
                     argument("maxSize", "maxSize")
                     argument("sublayouts", "measurements")
                 }

@@ -6,8 +6,10 @@ val Element.layoutType: String
     get() {
         return when (tagName) {
             "LinearLayout" -> "LinearLayout"
+            "View" -> "View"
             "TextView" -> "TextView"
             "Button" -> "Button"
+            "ImageView" -> "ImageView"
             else -> "FrameLayout"
         }
     }
@@ -15,9 +17,9 @@ val Element.layoutType: String
 val Element.viewType: String
     get() {
         return when (tagName) {
-            "ImageView" -> "UIImageView"
             "TextView" -> "UILabel"
             "Button" -> "UIButton"
+            "ImageView" -> "UIImageView"
             else -> "UIView"
         }
     }
@@ -44,10 +46,16 @@ fun Element.id(): String? {
 }
 
 fun Element.style(): String? {
-    return attr("style")?.substring(7)
+    return attr("style")?.let {
+        if (it.startsWith("@style/")) {
+            it.substring(7)
+        } else {
+            null
+        }
+    }
 }
 
-fun Element.margin(): Map<String, String> {
+fun Element.layoutMargin(): Map<String, String>? {
     val params = mutableMapOf("top" to "0", "left" to "0", "bottom" to "0", "right" to "0")
     params.keys.forEach { key ->
         attr("android:layout_margin${key.capitalize()}")?.let {
@@ -60,12 +68,12 @@ fun Element.margin(): Map<String, String> {
         }
     }
     if (params.values.all { it == "0" }) {
-        params.clear()
+        return null
     }
     return params
 }
 
-fun Element.padding(): Map<String, String> {
+fun Element.padding(): Map<String, String>? {
     val params = mutableMapOf("top" to "0", "left" to "0", "bottom" to "0", "right" to "0")
     params.keys.forEach { key ->
         attr("android:padding${key.capitalize()}")?.let {
@@ -78,48 +86,12 @@ fun Element.padding(): Map<String, String> {
         }
     }
     if (params.values.all { it == "0" }) {
-        params.clear()
+        return null
     }
     return params
 }
 
-fun Element.verticalAlignment(): String {
-    return when (getAttribute("android:layout_height")) {
-        "match_parent" -> ".fill"
-        else -> {
-            val gravity = getAttribute("android:layout_gravity").split("|")
-            if (gravity.contains("top")) {
-                ".top"
-            } else if (gravity.contains("center") || gravity.contains("center_vertical")) {
-                ".center"
-            } else if (gravity.contains("bottom")) {
-                ".bottom"
-            } else {
-                ".top"
-            }
-        }
-    }
-}
-
-fun Element.horizontalAlignment(): String {
-    return when (getAttribute("android:layout_width")) {
-        "match_parent" -> ".fill"
-        else -> {
-            val gravity = getAttribute("android:layout_gravity").split("|")
-            if (gravity.contains("left") || gravity.contains("start")) {
-                ".leading"
-            } else if (gravity.contains("center") || gravity.contains("center_horizontal")) {
-                ".center"
-            } else if (gravity.contains("right") || gravity.contains("end")) {
-                ".trailing"
-            } else {
-                ".leading"
-            }
-        }
-    }
-}
-
-fun Element.width(): String {
+fun Element.layoutWidth(): String {
     val width = getAttribute("android:layout_width")
     return when (width) {
         "match_parent" -> "MATCH_PARENT"
@@ -128,37 +100,11 @@ fun Element.width(): String {
     }
 }
 
-fun Element.height(): String {
+fun Element.layoutHeight(): String {
     val height = getAttribute("android:layout_height")
     return when (height) {
         "match_parent" -> "MATCH_PARENT"
         "wrap_content" -> "WRAP_CONTENT"
         else -> height.toDimen()
-    }
-}
-
-fun Element.image(): String? {
-    return attr("android:src")?.let {
-        if (it.startsWith("@drawable/")) "UIImage(named: \"${it.substring(10)}\")" else null
-    }
-}
-
-fun Element.text(): String {
-    return attr("android:text")?.let {
-        if (it.startsWith("@string/")) {
-            "\"${it.substring(8)}\".localized()"
-        } else {
-            "\"$it\""
-        }
-    } ?: "\"\""
-}
-
-fun Element.alpha(): String? {
-    return attr("android:alpha")
-}
-
-fun Element.backgroundColor(): String? {
-    return attr("android:background")?.let {
-        if (it.startsWith("@color/")) "Color.${it.substring(7).toResourceName()}" else null
     }
 }

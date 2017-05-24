@@ -14,7 +14,9 @@ val gravity = SwiftFile("Gravity.swift") {
         constant("top", value = "Gravity(rawValue: 1 << 1)") { static() }
         constant("bottom", value = "Gravity(rawValue: 1 << 2)") { static() }
         constant("start", value = "Gravity(rawValue: 1 << 3)") { static() }
+        constant("left", value = "Gravity(rawValue: 1 << 3)") { static() }
         constant("end", value = "Gravity(rawValue: 1 << 4)") { static() }
+        constant("right", value = "Gravity(rawValue: 1 << 4)") { static() }
         constant("centerVertical", value = "Gravity(rawValue: 1 << 5)") { static() }
         constant("centerHorizontal", value = "Gravity(rawValue: 1 << 6)") { static() }
         constant("center", value = "Gravity(rawValue: 1 << 7)") { static() }
@@ -66,7 +68,7 @@ val gravity = SwiftFile("Gravity.swift") {
                     }
                 }
                 variable("horizontal", Type("Alignment.Horizontal"))
-                ifStatement("contains(.end)") {
+                ifStatement("contains(.end) || contains(.right)") {
                     codeBlock {
                         assignmentExpression("horizontal", ".trailing")
                     }

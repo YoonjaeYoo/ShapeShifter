@@ -132,7 +132,16 @@ val linearLayout = SwiftFile("LinearLayout.swift") {
             returnStatement {
                 functionCallExpression("LayoutMeasurement") {
                     argument("layout", "self")
-                    argument("size", "size")
+                    argument("size") {
+                        functionCallExpression("size.increasedToSize") {
+                            argument {
+                                initializerExpression("CGSize") {
+                                    argument("width", "minWidth ?? 0")
+                                    argument("height", "minHeight ?? 0")
+                                }
+                            }
+                        }
+                    }
                     argument("maxSize", "maxSize")
                     argument("sublayouts", "measurements")
                 }

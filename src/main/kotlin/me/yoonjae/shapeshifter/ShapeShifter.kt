@@ -7,8 +7,9 @@ import java.io.FileWriter
 
 class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
 
-    val system = listOf(drawable, theme, textAppearance, textStyle, cgSizeExtension,
-            uiFontExtension, gravity, view, viewGroup, frameLayout, linearLayout, textView, button)
+    val system = listOf(theme, textAppearance, textStyle, cgSizeExtension, uiEdgeInsetsExtension,
+            uiFontExtension, gravity, view, viewGroup, frameLayout, linearLayout, textView, button,
+            imageView)
 
 
     fun shift() {
@@ -43,10 +44,7 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
     private fun shiftLayouts() {
         val translator = LayoutTranslator()
         File(androidAppDir + "/src/main/res/layout/").listFiles { file ->
-            println(file.name)
-            if (file.name == "activity_test.xml") {
-                translator.translate(file).writeTo(iosAppDir + "/Layout/")
-            }
+            translator.translate(file).writeTo(iosAppDir + "/Layout/")
             true
         }
     }

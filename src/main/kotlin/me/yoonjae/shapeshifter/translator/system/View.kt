@@ -77,10 +77,20 @@ val view = SwiftFile("View.swift") {
             public()
             parameter("maxSize", Type("CGSize"), label = "within")
 
+            constant("size", value = "maxSize")
             returnStatement {
                 functionCallExpression("LayoutMeasurement") {
                     argument("layout", "self")
-                    argument("size", "maxSize")
+                    argument("size") {
+                        functionCallExpression("size.increasedToSize") {
+                            argument {
+                                initializerExpression("CGSize") {
+                                    argument("width", "minWidth ?? 0")
+                                    argument("height", "minHeight ?? 0")
+                                }
+                            }
+                        }
+                    }
                     argument("maxSize", "maxSize")
                     argument("sublayouts", "[]")
                 }

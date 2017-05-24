@@ -17,7 +17,7 @@ val themeFields = mapOf(
         "textColorSecondary" to Type("UIColor", true),
         "textColorTertiary" to Type("UIColor", true),
         "textColorHint" to Type("UIColor", true),
-        "windowBackground" to Type("Drawable", true)
+        "windowBackground" to Type("UIColor", true)
 )
 
 val theme = SwiftFile("Theme.swift") {

@@ -7,20 +7,26 @@ fun ExpressionDescriber.layoutExpression(element: Element, parent: Element? = nu
     if (parent == null) {
         initializerExpression("super") {
             layoutArguments(element, parent)
-            config(element, "view")
         }
     } else {
-        element.style().also { val layoutType = element.layoutType
-            if (it != null && it.startsWith("$layoutType.")) {
-                val style = it.substring(layoutType.length + 1).decapitalize()
-                functionCallExpression("$layoutType.$style") {
+        if (element.tagName == "include") {
+            element.attr("layout")?.let {
+                // @layout/progress_bar_circular -> ProgressBarCircularLayout
+                initializerExpression("${it.substring(8).toResourceName(true)}Layout") {
                     layoutArguments(element, parent)
-                    config(element, "view")
                 }
-            } else {
-                initializerExpression(layoutType) {
-                    layoutArguments(element, parent)
-                    config(element, "view")
+            }
+        } else {
+            element.style().also {
+                val layoutType = element.layoutType
+                if (it != null && it.startsWith("$layoutType.")) {
+                    functionCallExpression(it) {
+                        layoutArguments(element, parent)
+                    }
+                } else {
+                    initializerExpression(layoutType) {
+                        layoutArguments(element, parent)
+                    }
                 }
             }
         }

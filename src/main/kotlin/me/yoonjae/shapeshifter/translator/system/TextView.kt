@@ -33,7 +33,7 @@ val textView = me.yoonjae.shapeshifter.poet.file.SwiftFile("TextView.swift") {
             parameter("textStyle", Type("TextStyle", true), "nil")
             parameter("config", Type("(UILabel) -> Void", true), "nil")
 
-            constant("defaultTextAppearance", value = "TextAppearance.Subhead(theme)")
+            constant("defaultTextAppearance", value = "TextAppearance.AppCompat.Subhead(theme)")
             initializerExpression("super") {
                 argument("theme", "theme")
                 argument("layoutParams", "layoutParams")
@@ -104,23 +104,22 @@ val textView = me.yoonjae.shapeshifter.poet.file.SwiftFile("TextView.swift") {
             assignmentExpression("size.width",
                     "layoutParams.width == MATCH_PARENT ? maxSize.width : " +
                             "(layoutParams.width == WRAP_CONTENT ? size.width : layoutParams.width)")
-            ifStatement("let minWidth = minWidth") {
-                codeBlock {
-                    assignmentExpression("size.width", "max(minWidth, size.width);")
-                }
-            }
             assignmentExpression("size.height",
                     "layoutParams.height == MATCH_PARENT ? maxSize.height : " +
                             "(layoutParams.height == WRAP_CONTENT ? size.height : layoutParams.height)")
-            ifStatement("let minHeight = minHeight") {
-                codeBlock {
-                    assignmentExpression("size.height", "max(minHeight, size.height);")
-                }
-            }
             returnStatement {
                 functionCallExpression("LayoutMeasurement") {
                     argument("layout", "self")
-                    argument("size", "size")
+                    argument("size") {
+                        functionCallExpression("size.increasedToSize") {
+                            argument {
+                                initializerExpression("CGSize") {
+                                    argument("width", "minWidth ?? 0")
+                                    argument("height", "minHeight ?? 0")
+                                }
+                            }
+                        }
+                    }
                     argument("maxSize", "maxSize")
                     argument("sublayouts", "[measurement]")
                 }
