@@ -6,7 +6,7 @@ import me.yoonjae.shapeshifter.translator.extensions.themeArguments
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
-class AppThemesTranslator : Translator<SwiftFile>() {
+class AppThemeResourceTranslator : Translator<SwiftFile>() {
 
     override fun translate(file: File): SwiftFile {
         return SwiftFile("AppTheme.swift") {

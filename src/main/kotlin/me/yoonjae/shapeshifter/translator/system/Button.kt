@@ -1,6 +1,7 @@
 package me.yoonjae.shapeshifter.translator.system
 
 import me.yoonjae.shapeshifter.poet.type.Type
+import me.yoonjae.shapeshifter.translator.increasedToMinSize
 
 
 val button = me.yoonjae.shapeshifter.poet.file.SwiftFile("Button.swift") {
@@ -55,18 +56,22 @@ val button = me.yoonjae.shapeshifter.poet.file.SwiftFile("Button.swift") {
                                                     " .normal")
                                 }
                             }
-                            argument("alignment", "gravity.alignment")
+                            argument("alignment", ".fill")
                             argument("flexibility", ".inflexible")
                             argument("viewReuseId", "id")
                             trailingClosure {
                                 closureParameter("button")
-                                ifStatement("let text = text") {
-                                    codeBlock {
-                                        functionCallExpression("button.setTitle") {
-                                            argument(null, "text")
-                                            argument("for", ".normal")
-                                        }
-                                    }
+                                generalExpression("button.alpha = alpha")
+                                generalExpression("button.backgroundColor = background")
+                                assignmentExpression("button.contentEdgeInsets",
+                                        "padding")
+                                assignmentExpression("button.contentVerticalAlignment",
+                                        "gravity.contentVerticalAlignment")
+                                assignmentExpression("button.contentHorizontalAlignment",
+                                        "gravity.contentHorizontalAlignment")
+                                functionCallExpression("button.setTitle") {
+                                    argument(null, "text")
+                                    argument("for", ".normal")
                                 }
                                 functionCallExpression("button.setTitleColor") {
                                     argument(null, "textColor ?? textAppearance?.textColor ?? " +
@@ -77,14 +82,6 @@ val button = me.yoonjae.shapeshifter.poet.file.SwiftFile("Button.swift") {
                                     argument(null, "button")
                                 }
                             }
-                        }
-                    }
-                }
-                trailingClosure {
-                    closureParameter("view")
-                    ifStatement("let background = background") {
-                        codeBlock {
-                            generalExpression("view.backgroundColor = background")
                         }
                     }
                 }
@@ -104,22 +101,19 @@ val button = me.yoonjae.shapeshifter.poet.file.SwiftFile("Button.swift") {
             variable("size", value = "measurement.size.increasedByInsets(layoutParams.margin)")
             assignmentExpression("size.width",
                     "layoutParams.width == MATCH_PARENT ? maxSize.width : " +
-                            "(layoutParams.width == WRAP_CONTENT ? size.width : layoutParams.width)")
+                            "(layoutParams.width == WRAP_CONTENT ? size.width : " +
+                            "layoutParams.width + layoutParams.margin.left + " +
+                            "layoutParams.margin.right)")
             assignmentExpression("size.height",
                     "layoutParams.height == MATCH_PARENT ? maxSize.height : " +
-                            "(layoutParams.height == WRAP_CONTENT ? size.height : layoutParams.height)")
+                            "(layoutParams.height == WRAP_CONTENT ? size.height : " +
+                            "layoutParams.height + layoutParams.margin.top + " +
+                            "layoutParams.margin.bottom)")
             returnStatement {
                 functionCallExpression("LayoutMeasurement") {
                     argument("layout", "self")
                     argument("size") {
-                        functionCallExpression("size.increasedToSize") {
-                            argument {
-                                initializerExpression("CGSize") {
-                                    argument("width", "minWidth ?? 0")
-                                    argument("height", "minHeight ?? 0")
-                                }
-                            }
-                        }
+                        increasedToMinSize()
                     }
                     argument("maxSize", "maxSize")
                     argument("sublayouts", "[measurement]")
@@ -142,12 +136,9 @@ val button = me.yoonjae.shapeshifter.poet.file.SwiftFile("Button.swift") {
             constant("sublayoutRect") {
                 initializerExpression("CGRect") {
                     argument("origin") {
-                        initializerExpression("CGPoint") {
-                            argument("x", "padding.left")
-                            argument("y", "padding.top")
-                        }
+                        initializerExpression("CGPoint")
                     }
-                    argument("size", "frame.size.decreasedByInsets(padding)")
+                    argument("size", "frame.size")
                 }
             }
             constant("arrangements", Type("[LayoutArrangement]")) {

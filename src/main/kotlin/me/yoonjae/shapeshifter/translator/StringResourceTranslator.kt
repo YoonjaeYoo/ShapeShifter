@@ -5,7 +5,7 @@ import me.yoonjae.shapeshifter.translator.extensions.iterator
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
-class StringsTranslator : Translator<StringsFile>() {
+class StringResourceTranslator : Translator<StringsFile>() {
 
     override fun translate(file: File): StringsFile {
         val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)

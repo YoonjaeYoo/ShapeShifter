@@ -100,5 +100,63 @@ val gravity = SwiftFile("Gravity.swift") {
                 }
             }
         }
+
+        variable("contentVerticalAlignment", Type("UIControlContentVerticalAlignment")) {
+            codeBlock {
+                ifStatement("contains(.bottom)") {
+                    codeBlock {
+                        returnStatement(".bottom")
+                    }
+                    elseClause {
+                        ifStatement("contains(.centerVertical) || contains(.center)") {
+                            codeBlock {
+                                returnStatement(".center")
+                            }
+                            elseClause {
+                                ifStatement("contains(.fillVertical) || contains(.fill)") {
+                                    codeBlock {
+                                        returnStatement(".fill")
+                                    }
+                                    elseClause {
+                                        codeBlock {
+                                            returnStatement(".top")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        variable("contentHorizontalAlignment", Type("UIControlContentHorizontalAlignment")) {
+            codeBlock {
+                ifStatement("contains(.end) || contains(.right)") {
+                    codeBlock {
+                        returnStatement(".right")
+                    }
+                    elseClause {
+                        ifStatement("contains(.centerHorizontal) || contains(.center)") {
+                            codeBlock {
+                                returnStatement(".center")
+                            }
+                            elseClause {
+                                ifStatement("contains(.fillHorizontal) || contains(.fill)") {
+                                    codeBlock {
+                                        returnStatement(".fill")
+                                    }
+                                    elseClause {
+                                        codeBlock {
+                                            returnStatement(".left")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

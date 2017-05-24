@@ -14,43 +14,70 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
 
     fun shift() {
         system.forEach { it.writeTo(iosAppDir + "/System/") }
-        shiftStrings()
-        shiftAppThemes()
-        shiftColors()
-        shiftDimens()
+        shiftStringResource()
+        shiftAppThemeResource()
+        shiftColorResource()
+        shiftDimenResource()
         shiftLayouts()
+        shiftControllers()
     }
 
-    private fun shiftStrings() {
+    private fun shiftStringResource() {
         val input = File(androidAppDir + "/src/main/res/values/strings.xml")
-        StringsTranslator().translate(input).writeTo(iosAppDir + "/ko.lproj/")
+        StringResourceTranslator().translate(input).writeTo(iosAppDir + "/ko.lproj/")
     }
 
-    private fun shiftAppThemes() {
+    private fun shiftAppThemeResource() {
         val input = File(androidAppDir + "/src/main/res/values/styles.xml")
-        AppThemesTranslator().translate(input).writeTo(iosAppDir + "/Values/")
+        AppThemeResourceTranslator().translate(input).writeTo(iosAppDir + "/Values/")
     }
 
-    private fun shiftColors() {
+    private fun shiftColorResource() {
         val input = File(androidAppDir + "/src/main/res/values/colors.xml")
-        ColorsTranslator().translate(input).writeTo(iosAppDir + "/Values")
+        ColorResourceTranslator().translate(input).writeTo(iosAppDir + "/Values")
     }
 
-    private fun shiftDimens() {
+    private fun shiftDimenResource() {
         val input = File(androidAppDir + "/src/main/res/values/dimens.xml")
-        DimensTranslator().translate(input).writeTo(iosAppDir + "/Values")
+        DimenResourceTranslator().translate(input).writeTo(iosAppDir + "/Values")
     }
 
     private fun shiftLayouts() {
         val translator = LayoutTranslator()
         File(androidAppDir + "/src/main/res/layout/").listFiles { file ->
-            translator.translate(file).writeTo(iosAppDir + "/Layout/")
+            val swiftFile = translator.translate(file)
+            val outputFile = File("$iosAppDir/Layouts/${swiftFile.name}")
+            val modified = outputFile.exists() && outputFile.readLines().getOrNull(0)?.let {
+                it.contains("//") && it.contains("modified")
+            } ?: false
+            if (!modified) {
+                swiftFile.writeTo(iosAppDir + "/Layouts")
+            }
             true
         }
     }
 
-    private fun me.yoonjae.shapeshifter.poet.file.File.writeTo(path: String) {
-        FileWriter(File("$path/$name").createWithParent()).use { render(it) }
+    private fun shiftControllers() {
+        val translator = ControllerTranslator()
+        File(androidAppDir + "/src/main/java/com/soomgo/controller/").listFiles { file ->
+            if (file.isDirectory) {
+                file.listFiles().forEach {
+                    translator.translate(it)
+                            .writeTo(iosAppDir + "/Controllers/" + file.name.capitalize(), true)
+                }
+            } else if (file.name.contains("Activity") || file.name.contains("Fragment")) {
+                translator.translate(file).writeTo(iosAppDir + "/Controllers/", true)
+            }
+            true
+        }
+    }
+
+    private fun me.yoonjae.shapeshifter.poet.file.File.writeTo(path: String,
+                                                               preventOverlap: Boolean = false) {
+        val file = File("$path/$name")
+        if (!preventOverlap || !file.exists()) {
+            FileWriter(file.createWithParent()).use { render(it) }
+        }
     }
 
     private fun File.createWithParent(): File {

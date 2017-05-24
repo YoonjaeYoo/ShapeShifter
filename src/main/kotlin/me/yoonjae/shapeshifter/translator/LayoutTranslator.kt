@@ -17,6 +17,7 @@ class LayoutTranslator : Translator<SwiftFile>() {
         return SwiftFile("${resourceName}Layout.swift") {
             import("UIKit")
             import("LayoutKit")
+            import("Localize_Swift")
 
             clazz("${resourceName}Layout") {
                 superType(doc.documentElement.layoutType)

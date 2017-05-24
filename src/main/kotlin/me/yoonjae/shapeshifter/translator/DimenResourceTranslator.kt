@@ -8,7 +8,7 @@ import org.w3c.dom.NodeList
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
-class DimensTranslator : Translator<SwiftFile>() {
+class DimenResourceTranslator : Translator<SwiftFile>() {
 
     override fun translate(file: File): SwiftFile {
         val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)

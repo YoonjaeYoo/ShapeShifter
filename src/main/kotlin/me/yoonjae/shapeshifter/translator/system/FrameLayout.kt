@@ -2,6 +2,7 @@ package me.yoonjae.shapeshifter.translator.system
 
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
+import me.yoonjae.shapeshifter.translator.increasedToMinSize
 
 val frameLayout = SwiftFile("FrameLayout.swift") {
     import("UIKit")
@@ -99,14 +100,7 @@ val frameLayout = SwiftFile("FrameLayout.swift") {
                 functionCallExpression("LayoutMeasurement") {
                     argument("layout", "self")
                     argument("size") {
-                        functionCallExpression("size.increasedToSize") {
-                            argument {
-                                initializerExpression("CGSize") {
-                                    argument("width", "minWidth ?? 0")
-                                    argument("height", "minHeight ?? 0")
-                                }
-                            }
-                        }
+                        increasedToMinSize()
                     }
                     argument("maxSize", "maxSize")
                     argument("sublayouts", "measurements")

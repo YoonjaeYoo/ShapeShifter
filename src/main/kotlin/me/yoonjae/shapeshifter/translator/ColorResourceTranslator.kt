@@ -7,7 +7,7 @@ import me.yoonjae.shapeshifter.translator.extensions.toColor
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
-class ColorsTranslator : Translator<SwiftFile>() {
+class ColorResourceTranslator : Translator<SwiftFile>() {
 
     override fun translate(file: File): SwiftFile {
         return SwiftFile("Color.swift") {
