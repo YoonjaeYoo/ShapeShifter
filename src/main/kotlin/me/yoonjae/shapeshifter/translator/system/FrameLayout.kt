@@ -25,7 +25,7 @@ val frameLayout = SwiftFile("FrameLayout.swift") {
             parameter("minHeight", Type("CGFloat", true), "nil")
             parameter("alpha", Type("CGFloat"), "1.0")
             parameter("background", Type("UIColor", true), "nil")
-            parameter("sublayouts", Type("[Layout]"), "[]")
+            parameter("children", Type("[Layout]"), "[]")
             parameter("config", Type("(UIView) -> Void", true), "nil")
 
             initializerExpression("super") {
@@ -37,7 +37,7 @@ val frameLayout = SwiftFile("FrameLayout.swift") {
                 argument("minHeight", "minHeight")
                 argument("alpha", "alpha")
                 argument("background", "background")
-                argument("sublayouts", "sublayouts")
+                argument("children", "children")
                 argument("config", "config")
             }
         }
@@ -67,11 +67,11 @@ val frameLayout = SwiftFile("FrameLayout.swift") {
             }
             variable("minSize", value = "CGSize()")
             constant("measurements", Type("[LayoutMeasurement]")) {
-                functionCallExpression("sublayouts.map") {
+                functionCallExpression("children.map") {
                     trailingClosure {
-                        closureParameter("sublayout")
+                        closureParameter("child")
                         constant("measurement") {
-                            functionCallExpression("sublayout.measurement") {
+                            functionCallExpression("child.measurement") {
                                 argument("within", "size.decreasedByInsets(layoutParams.margin)" +
                                         ".decreasedByInsets(padding)")
                             }
@@ -120,7 +120,7 @@ val frameLayout = SwiftFile("FrameLayout.swift") {
                     argument("in", "rect")
                 }
             }
-            constant("sublayoutRect") {
+            constant("childRect") {
                 initializerExpression("CGRect") {
                     argument("origin") {
                         initializerExpression("CGPoint") {
@@ -135,7 +135,7 @@ val frameLayout = SwiftFile("FrameLayout.swift") {
                 functionCallExpression("measurement.sublayouts.map") {
                     trailingClosure {
                         closureParameter("measurement") {
-                            returnStatement("measurement.arrangement(within: sublayoutRect)")
+                            returnStatement("measurement.arrangement(within: childRect)")
                         }
                     }
                 }

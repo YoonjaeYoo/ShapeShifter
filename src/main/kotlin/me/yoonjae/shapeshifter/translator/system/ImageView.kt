@@ -41,7 +41,7 @@ val imageView = me.yoonjae.shapeshifter.poet.file.SwiftFile("ImageView.swift") {
                 argument("minHeight", "minHeight")
                 argument("alpha", "alpha")
                 argument("background", "background")
-                argument("sublayouts") {
+                argument("children") {
                     arrayLiteralExpression {
                         initializerExpression("View<UIImageView>") {
                             argument("theme", "theme")
@@ -112,7 +112,7 @@ val imageView = me.yoonjae.shapeshifter.poet.file.SwiftFile("ImageView.swift") {
                     }
                 }
             }
-            constant("measurement", value = "sublayouts[0].measurement(within: " +
+            constant("measurement", value = "children[0].measurement(within: " +
                     "size.decreasedByInsets(layoutParams.margin).decreasedByInsets(padding))")
             returnStatement {
                 functionCallExpression("LayoutMeasurement") {

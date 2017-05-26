@@ -16,7 +16,7 @@ val viewGroup = SwiftFile("ViewGroup.swift") {
             genericParameter("UIView")
         }
 
-        constant("sublayouts", Type("[Layout]")) { public() }
+        constant("children", Type("[Layout]")) { public() }
         initializer {
             public()
             parameter("theme", Type("Theme"), "AppTheme()")
@@ -29,10 +29,10 @@ val viewGroup = SwiftFile("ViewGroup.swift") {
             parameter("minHeight", Type("CGFloat", true), "nil")
             parameter("alpha", Type("CGFloat"), "1.0")
             parameter("background", Type("UIColor", true), "nil")
-            parameter("sublayouts", Type("[Layout]"), "[]")
+            parameter("children", Type("[Layout]"), "[]")
             parameter("config", Type("(UIView) -> Void", true), "nil")
 
-            assignmentExpression("self.sublayouts", "sublayouts")
+            assignmentExpression("self.children", "children")
             initializerExpression("super") {
                 argument("theme", "theme")
                 argument("id", "id")

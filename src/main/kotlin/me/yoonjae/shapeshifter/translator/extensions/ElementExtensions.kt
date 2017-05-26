@@ -2,14 +2,17 @@ package me.yoonjae.shapeshifter.translator.extensions
 
 import org.w3c.dom.Element
 
-val Element.layoutType: String
+val Element.layoutType: String?
     get() {
         return when (tagName) {
             "LinearLayout" -> "LinearLayout"
             "View" -> "View"
             "TextView" -> "TextView"
+            "EditText" -> "EditText"
             "Button" -> "Button"
             "ImageView" -> "ImageView"
+            "com.flaviofaria.kenburnsview.KenBurnsView" -> "ImageView"
+            "android.support.v7.widget.Toolbar" -> null
             else -> "FrameLayout"
         }
     }
@@ -18,6 +21,7 @@ val Element.viewType: String
     get() {
         return when (tagName) {
             "TextView" -> "UILabel"
+            "EditText" -> "UITextField"
             "Button" -> "UIButton"
             "ImageView" -> "UIImageView"
             else -> "UIView"

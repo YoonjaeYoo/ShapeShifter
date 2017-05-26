@@ -1,5 +1,7 @@
 package me.yoonjae.shapeshifter.translator
 
+import me.yoonjae.shapeshifter.poet.expression.ArgumentDescriber
+import me.yoonjae.shapeshifter.poet.expression.ExpressionDescriber
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
 import me.yoonjae.shapeshifter.translator.extensions.*
@@ -9,36 +11,338 @@ import javax.xml.parsers.DocumentBuilderFactory
 
 class LayoutTranslator : Translator<SwiftFile>() {
 
-    override fun translate(file: File): SwiftFile {
+    override fun translate(file: File): SwiftFile? {
         val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)
-        val resourceName = file.name.substring(0, file.name.lastIndexOf('.')).toResourceName(true)
-        val idTypeMap = mutableMapOf<String, String>()
-        extractIdTypeMap(idTypeMap, doc.documentElement)
-        return SwiftFile("${resourceName}Layout.swift") {
-            import("UIKit")
-            import("LayoutKit")
-            import("Localize_Swift")
+        return doc.documentElement.layoutType?.let { layoutType ->
+            val resourceName = file.name.substring(0, file.name.lastIndexOf('.')).toResourceName(true)
+            val map = mutableMapOf<String, String>()
+            extractIdTypeMap(file.parent, map, doc.documentElement)
+            return SwiftFile("${resourceName}Layout.swift") {
+                import("UIKit")
+                import("LayoutKit")
+                import("Localize_Swift")
 
-            clazz("${resourceName}Layout") {
-                superType(doc.documentElement.layoutType)
-                initializer {
-                    public()
-                    parameter("theme", Type("Theme"), "AppTheme()")
-                    parameter("config", Type("(${doc.documentElement.viewType}) -> Void", true),
-                            "nil")
-                    idTypeMap.forEach { id, type ->
-                        parameter(id.toConfigParameterName(), Type("($type) -> Void", true), "nil")
+                clazz("${resourceName}Layout") {
+                    superType(layoutType)
+                    initializer {
+                        public()
+                        parameter("theme", Type("Theme"), "AppTheme()")
+                        map.forEach { id, type ->
+                            parameter(id.toConfigParameterName(), Type("($type) -> Void", true), "nil")
+                        }
+                        parameter("config", Type("(${doc.documentElement.viewType}) -> Void", true),
+                                "nil")
+                        layoutExpression(file.parent, doc.documentElement)
                     }
-                    layoutExpression(doc.documentElement)
                 }
             }
         }
     }
 
-    private fun extractIdTypeMap(ids: MutableMap<String, String>, element: Element) {
-        element.id()?.let {
-            ids.put(it, element.viewType)
+    private fun extractIdTypeMap(path: String, map: MutableMap<String, String>, element: Element) {
+        element.layoutType?.let {
+            element.id()?.let {
+                map.put(it, element.viewType)
+            }
         }
-        element.childNodes.elements().forEach { extractIdTypeMap(ids, it) }
+        element.childNodes.elements().forEach { extractIdTypeMap(path, map, it) }
+        if (element.tagName == "include") {
+            element.attr("layout")?.let {
+                // @layout/progress_bar_circular -> ProgressBarCircularLayout
+                val file = File(path, "${it.substring(8)}.xml")
+                val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)
+                extractIdTypeMap(path, map, doc.documentElement)
+            }
+        }
+    }
+
+    private fun ExpressionDescriber.layoutExpression(path: String, element: Element,
+                                                     parent: Element? = null) {
+        if (parent == null) {
+            initializerExpression("super") {
+                layoutArguments(path, element, parent)
+            }
+        } else {
+            if (element.tagName == "include") {
+                element.attr("layout")?.let {
+                    // @layout/progress_bar_circular -> ProgressBarCircularLayout
+                    val file = File(path, "${it.substring(8)}.xml")
+                    val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)
+                    val map = mutableMapOf<String, String>()
+                    extractIdTypeMap(path, map, doc.documentElement)
+                    initializerExpression("${it.substring(8).toResourceName(true)}Layout") {
+                        layoutArguments(path, element, parent, map)
+                    }
+                }
+            } else {
+                element.style().let { style ->
+                    element.layoutType?.let {
+                        if (style != null && style.startsWith("$it.")) {
+                            @Suppress("IMPLICIT_CAST_TO_ANY")
+                            functionCallExpression(style) {
+                                layoutArguments(path, element, parent)
+                            }
+                        } else {
+                            @Suppress("IMPLICIT_CAST_TO_ANY")
+                            initializerExpression(it) {
+                                layoutArguments(path, element, parent)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun ArgumentDescriber.layoutArguments(path: String, element: Element, parent: Element? = null,
+                                                  idTypeMap: Map<String, String>? = null) {
+        argument("theme", "theme")
+        when (element.tagName) {
+            "FrameLayout" -> frameLayoutArguments(path, element, parent)
+            "LinearLayout" -> linearLayoutArguments(path, element, parent)
+            "View" -> viewArguments(path, element, parent)
+            "Button" -> buttonArguments(path, element, parent)
+            "TextView" -> textViewArguments(path, element, parent)
+            "ImageView" -> imageViewArguments(path, element, parent)
+            "com.flaviofaria.kenburnsview.KenBurnsView" -> imageViewArguments(path, element, parent)
+            "include" -> {
+            }
+            else -> {
+                idArgument(element)
+                layoutParamsArgument(element, parent)
+                println("  ${element.tagName}")
+            }
+        }
+        idTypeMap?.forEach { id, _ ->
+            val resouceName = id.toResourceName(true)
+            argument("config$resouceName", "config$resouceName")
+        }
+        if (parent == null) {
+            argument("config") {
+                closureExpression {
+                    closureParameter("view")
+
+                    element.id()?.let {
+                        functionCallExpression("${it.toConfigParameterName()}?") {
+                            argument(value = "view")
+                        }
+                    }
+                    functionCallExpression("config?") {
+                        argument(value = "view")
+                    }
+                }
+            }
+        } else {
+            element.id()?.let {
+                argument("config", it.toConfigParameterName())
+            }
+        }
+    }
+
+    private fun ArgumentDescriber.frameLayoutArguments(path: String, element: Element, parent: Element? = null) {
+        idArgument(element)
+        layoutParamsArgument(element, parent)
+        paddingArgument(element)
+        minWidthArgument(element)
+        minHeightArgument(element)
+        alphaArgument(element)
+        backgroundArgument(element)
+        argument("children") {
+            arrayLiteralExpression {
+                element.childNodes.elements().forEach {
+                    layoutExpression(path, it, element)
+                }
+            }
+        }
+    }
+
+    private fun ArgumentDescriber.linearLayoutArguments(path: String, element: Element, parent: Element? = null) {
+        idArgument(element)
+        layoutParamsArgument(element, parent)
+        argument("orientation") {
+            generalExpression(when (element.attr("android:orientation")) {
+                "vertical" -> ".vertical"
+                else -> ".horizontal"
+            })
+        }
+        paddingArgument(element)
+        minWidthArgument(element)
+        minHeightArgument(element)
+        alphaArgument(element)
+        backgroundArgument(element)
+        argument("children") {
+            arrayLiteralExpression {
+                element.childNodes.elements().forEach {
+                    layoutExpression(path, it, element)
+                }
+            }
+        }
+    }
+
+    private fun ArgumentDescriber.viewArguments(path: String, element: Element, parent: Element? = null) {
+        idArgument(element)
+        layoutParamsArgument(element, parent)
+        paddingArgument(element)
+        minWidthArgument(element)
+        minHeightArgument(element)
+        alphaArgument(element)
+        backgroundArgument(element)
+    }
+
+    private fun ArgumentDescriber.buttonArguments(path: String, element: Element, parent: Element? = null) {
+        idArgument(element)
+        layoutParamsArgument(element, parent)
+        paddingArgument(element)
+        minWidthArgument(element)
+        minHeightArgument(element)
+        alphaArgument(element)
+        backgroundArgument(element)
+        element.attr("android:gravity")?.let {
+            argument("gravity", it.toGravity())
+        }
+        textArgument(element)
+        textAppearanceArgument(element)
+        textColorArgument(element)
+        textSizeArgument(element)
+        textStyleArgument(element)
+    }
+
+    private fun ArgumentDescriber.textViewArguments(path: String, element: Element, parent: Element? = null) {
+        idArgument(element)
+        layoutParamsArgument(element, parent)
+        paddingArgument(element)
+        minWidthArgument(element)
+        minHeightArgument(element)
+        alphaArgument(element)
+        backgroundArgument(element)
+        listOf("android:lines", "android:singleLine").forEach { name ->
+            element.attr(name)?.let {
+                argument(name.substring(8), it)
+            }
+        }
+        textArgument(element)
+        textAppearanceArgument(element)
+        textColorArgument(element)
+        textSizeArgument(element)
+        textStyleArgument(element)
+    }
+
+    private fun ArgumentDescriber.imageViewArguments(path: String, element: Element, parent: Element? = null) {
+        idArgument(element)
+        layoutParamsArgument(element, parent)
+        paddingArgument(element)
+        minWidthArgument(element)
+        minHeightArgument(element)
+        alphaArgument(element)
+        backgroundArgument(element)
+        element.attr("android:scaleType")?.let {
+            argument("scaleType", ".$it")
+        }
+        element.attr("android:src")?.let {
+            argument("src", it.toImage())
+        }
+    }
+
+    private fun ArgumentDescriber.layoutParamsArgument(element: Element, parent: Element? = null,
+                                                       init: (ArgumentDescriber.() -> Unit)? = null) {
+        argument("layoutParams") {
+            val prefix = if (parent == null) "Layout" else parent.tagName
+            initializerExpression("${prefix}Params") {
+                argument("width", element.layoutWidth())
+                argument("height", element.layoutHeight())
+                element.layoutMargin()?.let {
+                    argument("margin") {
+                        initializerExpression("UIEdgeInsets") {
+                            it.forEach { k, v -> argument(k, v) }
+                        }
+                    }
+                }
+                element.attr("android:layout_gravity")?.let {
+                    argument("gravity", it.toGravity())
+                }
+                init?.invoke(this)
+            }
+        }
+    }
+
+    private fun ArgumentDescriber.idArgument(element: Element) {
+        element.id()?.let { argument("id", "\"$it\"") }
+    }
+
+    private fun ArgumentDescriber.paddingArgument(element: Element) {
+        element.padding()?.let {
+            argument("padding") {
+                initializerExpression("UIEdgeInsets") {
+                    it.forEach { k, v -> argument(k, v) }
+                }
+            }
+        }
+    }
+
+    private fun ArgumentDescriber.minWidthArgument(element: Element) {
+        element.attr("android:minWidth")?.let {
+            argument("minWidth", it.toDimen())
+        }
+    }
+
+    private fun ArgumentDescriber.minHeightArgument(element: Element) {
+        element.attr("android:minHeight")?.let {
+            argument("minHeight", it.toDimen())
+        }
+    }
+
+    private fun ArgumentDescriber.alphaArgument(element: Element) {
+        element.attr("android:alpha")?.let {
+            argument("alpha", it)
+        }
+    }
+
+    private fun ArgumentDescriber.backgroundArgument(element: Element) {
+        element.attr("android:background")?.let {
+            argument("background", it.toColor())
+        }
+    }
+
+    private fun ArgumentDescriber.textArgument(element: Element) {
+        element.attr("android:text")?.let {
+            val text = if (it.startsWith("@string/")) {
+                "\"${it.substring(8)}\".localized()"
+            } else {
+                "\"$it\""
+            }
+            argument("text", text)
+        }
+    }
+
+    private fun ArgumentDescriber.textAppearanceArgument(element: Element) {
+        element.attr("android:textAppearance")?.let {
+            if (it.startsWith("@style")) {
+                argument("textAppearance", "${it.substring(7)}(theme)")
+            } else {
+                null
+            }
+        }
+    }
+
+    private fun ArgumentDescriber.textColorArgument(element: Element) {
+        element.attr("android:textColor")?.let {
+            argument("textColor", it.toColor())
+        }
+    }
+
+    private fun ArgumentDescriber.textSizeArgument(element: Element) {
+        element.attr("android:textSize")?.let {
+            argument("textSize", it.toDimen())
+        }
+    }
+
+    private fun ArgumentDescriber.textStyleArgument(element: Element) {
+        element.attr("android:textStyle")?.let {
+            it.split("|").let {
+                if (it.isNotEmpty()) {
+                    argument("textStyle", ".${it[0]}")
+                }
+            }
+        }
     }
 }

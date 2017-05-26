@@ -32,7 +32,7 @@ val linearLayout = SwiftFile("LinearLayout.swift") {
             parameter("minHeight", Type("CGFloat", true), "nil")
             parameter("alpha", Type("CGFloat"), "1.0")
             parameter("background", Type("UIColor", true), "nil")
-            parameter("sublayouts", Type("[Layout]"), "[]")
+            parameter("children", Type("[Layout]"), "[]")
             parameter("config", Type("(UIView) -> Void", true), "nil")
 
             assignmentExpression("self.orientation", "orientation")
@@ -45,7 +45,7 @@ val linearLayout = SwiftFile("LinearLayout.swift") {
                 argument("minHeight", "minHeight")
                 argument("alpha", "alpha")
                 argument("background", "background")
-                argument("sublayouts", "sublayouts")
+                argument("children", "children")
                 argument("config", "config")
             }
         }
@@ -75,22 +75,22 @@ val linearLayout = SwiftFile("LinearLayout.swift") {
                     }
                 }
             }
-            variable("sublayoutSize") {
+            variable("childSize") {
                 generalExpression("maxSize.decreasedByInsets(layoutParams.margin)" +
                         ".decreasedByInsets(padding)")
             }
             constant("measurements", Type("[LayoutMeasurement]")) {
-                functionCallExpression("sublayouts.map") {
+                functionCallExpression("children.map") {
                     trailingClosure {
-                        closureParameter("sublayout")
+                        closureParameter("child")
                         constant("measurement") {
-                            functionCallExpression("sublayout.measurement") {
-                                argument("within", "sublayoutSize")
+                            functionCallExpression("child.measurement") {
+                                argument("within", "childSize")
                             }
                         }
                         ifStatement("orientation == .vertical") {
                             codeBlock {
-                                generalExpression("sublayoutSize.height -= " +
+                                generalExpression("childSize.height -= " +
                                         "measurement.size.height")
                                 ifStatement("layoutParams.width == WRAP_CONTENT") {
                                     codeBlock {
@@ -108,7 +108,7 @@ val linearLayout = SwiftFile("LinearLayout.swift") {
                             }
                             elseClause {
                                 codeBlock {
-                                    generalExpression("sublayoutSize.width -= " +
+                                    generalExpression("childSize.width -= " +
                                             "measurement.size.width")
                                     ifStatement("layoutParams.width == WRAP_CONTENT") {
                                         codeBlock {
@@ -154,7 +154,7 @@ val linearLayout = SwiftFile("LinearLayout.swift") {
                     argument("in", "rect")
                 }
             }
-            variable("sublayoutRect") {
+            variable("childRect") {
                 initializerExpression("CGRect") {
                     argument("origin") {
                         initializerExpression("CGPoint") {
@@ -170,16 +170,16 @@ val linearLayout = SwiftFile("LinearLayout.swift") {
                     trailingClosure {
                         closureParameter("measurement") {
                             constant("arrangement") {
-                                generalExpression("measurement.arrangement(within: sublayoutRect)")
+                                generalExpression("measurement.arrangement(within: childRect)")
                             }
                             ifStatement("orientation == .vertical") {
                                 codeBlock {
-                                    generalExpression("sublayoutRect.origin.y += " +
+                                    generalExpression("childRect.origin.y += " +
                                             "measurement.size.height")
                                 }
                                 elseClause {
                                     codeBlock {
-                                        generalExpression("sublayoutRect.origin.x += " +
+                                        generalExpression("childRect.origin.x += " +
                                                 "measurement.size.width")
                                     }
                                 }

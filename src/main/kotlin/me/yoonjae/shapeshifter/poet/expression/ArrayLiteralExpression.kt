@@ -16,7 +16,7 @@ class ArrayLiteralExpression : LiteralExpression,
             expressions[0].render(writer, linePrefix)
         } else {
             expressions.forEachIndexed { index, expression ->
-                if (index > 0) writer.writeln(", ")
+                if (index > 0) writer.writeln(",")
                 (Indent(2) + linePrefix).render(writer)
                 expression.render(writer, (Indent(2) + linePrefix))
             }

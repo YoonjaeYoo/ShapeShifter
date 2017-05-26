@@ -43,7 +43,7 @@ val textView = me.yoonjae.shapeshifter.poet.file.SwiftFile("TextView.swift") {
                 argument("minHeight", "minHeight")
                 argument("alpha", "alpha")
                 argument("background", "background")
-                argument("sublayouts") {
+                argument("children") {
                     arrayLiteralExpression {
                         initializerExpression("LabelLayout<UILabel>") {
                             argument("text", ".unattributed(text == nil ? \"\" : text!)")
@@ -90,7 +90,7 @@ val textView = me.yoonjae.shapeshifter.poet.file.SwiftFile("TextView.swift") {
             parameter("maxSize", Type("CGSize"), label = "within")
 
             constant("measurement") {
-                functionCallExpression("sublayouts[0].measurement") {
+                functionCallExpression("children[0].measurement") {
                     argument("within", "maxSize.decreasedByInsets(layoutParams.margin)")
                 }
             }
@@ -129,7 +129,7 @@ val textView = me.yoonjae.shapeshifter.poet.file.SwiftFile("TextView.swift") {
                     argument("in", "rect")
                 }
             }
-            constant("sublayoutRect") {
+            constant("childRect") {
                 initializerExpression("CGRect") {
                     argument("origin") {
                         initializerExpression("CGPoint") {
@@ -144,7 +144,7 @@ val textView = me.yoonjae.shapeshifter.poet.file.SwiftFile("TextView.swift") {
                 functionCallExpression("measurement.sublayouts.map") {
                     trailingClosure {
                         closureParameter("measurement") {
-                            returnStatement("measurement.arrangement(within: sublayoutRect)")
+                            returnStatement("measurement.arrangement(within: childRect)")
                         }
                     }
                 }

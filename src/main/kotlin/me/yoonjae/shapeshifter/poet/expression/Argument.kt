@@ -43,7 +43,7 @@ fun List<Argument>.render(writer: Writer, linePrefix: Element? = null) {
             get(0).render(writer, linePrefix)
         } else {
             forEachIndexed { index, argument ->
-                if (index > 0) writer.write(", ")
+                if (index > 0) writer.write(",")
                 writer.writeln()
                 (Indent(2) + linePrefix).render(writer)
                 argument.render(writer, (Indent(2) + linePrefix))

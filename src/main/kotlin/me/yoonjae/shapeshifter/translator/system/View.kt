@@ -17,13 +17,20 @@ val view = SwiftFile("View.swift") {
 
         constant("theme", Type("Theme")) { public() }
         constant("layoutParams", Type("LayoutParams")) { public() }
-        constant("viewReuseId", Type("String", true)) { public() }
+        constant("id", Type("String", true)) { public() }
         constant("padding", Type("UIEdgeInsets")) { public() }
         constant("minWidth", Type("CGFloat", true)) { public() }
         constant("minHeight", Type("CGFloat", true)) { public() }
         constant("config", Type("(V) -> Void", true)) { public() }
         constant("flexibility", value = "Flexibility.inflexible") { public() }
         variable("needsView", Type("Bool"), "true") { public() }
+        variable("viewReuseId", Type("String", true)) {
+            public()
+
+            codeBlock {
+                returnStatement("id")
+            }
+        }
 
         initializer {
             public()
@@ -41,7 +48,7 @@ val view = SwiftFile("View.swift") {
 
             assignmentExpression("self.theme", "theme")
             assignmentExpression("self.layoutParams", "layoutParams")
-            assignmentExpression("self.viewReuseId", "id")
+            assignmentExpression("self.id", "id")
             assignmentExpression("self.padding", "padding")
             assignmentExpression("self.minWidth", "minWidth")
             assignmentExpression("self.minHeight", "minHeight")
@@ -91,10 +98,16 @@ val view = SwiftFile("View.swift") {
             parameter("rect", Type("CGRect"), label = "within")
             parameter("measurement", Type("LayoutMeasurement"))
 
+            constant("frame") {
+                functionCallExpression("layoutParams.arrangement") {
+                    argument("size", "measurement.size")
+                    argument("in", "rect")
+                }
+            }
             returnStatement {
                 functionCallExpression("LayoutArrangement") {
                     argument("layout", "self")
-                    argument("frame", "rect")
+                    argument("frame", "frame")
                     argument("sublayouts", "[]")
                 }
             }

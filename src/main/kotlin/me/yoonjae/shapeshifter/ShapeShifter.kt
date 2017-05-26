@@ -7,9 +7,9 @@ import java.io.FileWriter
 
 class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
 
-    val system = listOf(theme, textAppearance, textStyle, cgSizeExtension, uiEdgeInsetsExtension,
-            uiFontExtension, gravity, view, viewGroup, frameLayout, linearLayout, textView, button,
-            imageView)
+    val system = listOf(theme, textAppearance, textStyle, cgSizeExtension, cgFloatExtension,
+            uiEdgeInsetsExtension, uiFontExtension, gravity, view, viewGroup, frameLayout,
+            linearLayout, textView, editText, button, imageView)
 
 
     fun shift() {
@@ -45,13 +45,14 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
     private fun shiftLayouts() {
         val translator = LayoutTranslator()
         File(androidAppDir + "/src/main/res/layout/").listFiles { file ->
-            val swiftFile = translator.translate(file)
-            val outputFile = File("$iosAppDir/Layouts/${swiftFile.name}")
-            val modified = outputFile.exists() && outputFile.readLines().getOrNull(0)?.let {
-                it.contains("//") && it.contains("modified")
-            } ?: false
-            if (!modified) {
-                swiftFile.writeTo(iosAppDir + "/Layouts")
+            translator.translate(file)?.let {
+                val outputFile = File("$iosAppDir/Layouts/${it.name}")
+                val modified = outputFile.exists() && outputFile.readLines().getOrNull(0)?.let {
+                    it.contains("//") && it.contains("modified")
+                } ?: false
+                if (!modified) {
+                    it.writeTo(iosAppDir + "/Layouts")
+                }
             }
             true
         }

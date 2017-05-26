@@ -41,7 +41,7 @@ val button = me.yoonjae.shapeshifter.poet.file.SwiftFile("Button.swift") {
                 argument("minHeight", "minHeight ?? 44")
                 argument("alpha", "alpha")
                 argument("background", "background ?? Color.primary")
-                argument("sublayouts") {
+                argument("children") {
                     arrayLiteralExpression {
                         initializerExpression("ButtonLayout<UIButton>") {
                             argument("type", ".system")
@@ -94,7 +94,7 @@ val button = me.yoonjae.shapeshifter.poet.file.SwiftFile("Button.swift") {
             parameter("maxSize", Type("CGSize"), label = "within")
 
             constant("measurement") {
-                functionCallExpression("sublayouts[0].measurement") {
+                functionCallExpression("children[0].measurement") {
                     argument("within", "maxSize.decreasedByInsets(layoutParams.margin)")
                 }
             }
@@ -133,7 +133,7 @@ val button = me.yoonjae.shapeshifter.poet.file.SwiftFile("Button.swift") {
                     argument("in", "rect")
                 }
             }
-            constant("sublayoutRect") {
+            constant("childRect") {
                 initializerExpression("CGRect") {
                     argument("origin") {
                         initializerExpression("CGPoint")
@@ -145,7 +145,7 @@ val button = me.yoonjae.shapeshifter.poet.file.SwiftFile("Button.swift") {
                 functionCallExpression("measurement.sublayouts.map") {
                     trailingClosure {
                         closureParameter("measurement") {
-                            returnStatement("measurement.arrangement(within: sublayoutRect)")
+                            returnStatement("measurement.arrangement(within: childRect)")
                         }
                     }
                 }
