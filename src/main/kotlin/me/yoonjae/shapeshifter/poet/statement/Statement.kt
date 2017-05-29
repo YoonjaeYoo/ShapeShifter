@@ -107,8 +107,8 @@ interface StatementDescriber : ExpressionDescriber, DeclarationDescriber,
                     also { statements.add(it) }
         }
 
-        override fun initializer(init: (Initializer.() -> Unit)?): Initializer {
-            return super<StatementDescriber>.initializer(init).also { statements.add(it) }
+        override fun initializer(optional: Boolean, init: (Initializer.() -> Unit)?): Initializer {
+            return super<StatementDescriber>.initializer(optional, init).also { statements.add(it) }
         }
 
         override fun enum(name: String, init: (Enum.() -> Unit)?):

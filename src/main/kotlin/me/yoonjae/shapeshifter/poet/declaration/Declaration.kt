@@ -53,8 +53,9 @@ interface DeclarationDescriber : ImportDescriber, ConstantDescriber, VariableDes
                     also { declarations.add(it) }
         }
 
-        override fun initializer(init: (Initializer.() -> Unit)?): Initializer {
-            return super<DeclarationDescriber>.initializer(init).also { declarations.add(it) }
+        override fun initializer(optional: Boolean, init: (Initializer.() -> Unit)?): Initializer {
+            return super<DeclarationDescriber>.initializer(optional, init).
+                    also {declarations.add (it) }
         }
 
         override fun enum(name: String, init: (Enum.() -> Unit)?): Enum {

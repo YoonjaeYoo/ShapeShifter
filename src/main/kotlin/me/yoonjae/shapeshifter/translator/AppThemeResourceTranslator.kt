@@ -2,10 +2,10 @@ package me.yoonjae.shapeshifter.translator
 
 import me.yoonjae.shapeshifter.poet.expression.ArgumentDescriber
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
+import me.yoonjae.shapeshifter.system.Theme
 import me.yoonjae.shapeshifter.translator.extensions.attr
 import me.yoonjae.shapeshifter.translator.extensions.elements
 import me.yoonjae.shapeshifter.translator.extensions.toColor
-import me.yoonjae.shapeshifter.translator.system.themeFields
 import org.w3c.dom.Element
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
@@ -46,7 +46,7 @@ class AppThemeResourceTranslator : Translator<SwiftFile>() {
     }
 
     private fun ArgumentDescriber.themeArguments(element: Element) {
-        themeFields.forEach { name, type ->
+        Theme.FIELDS.forEach { name, type ->
             element.childNodes.elements().asSequence().find {
                 it.tagName == "item" && it.attr("name")?.endsWith(name)!!
             }?.textContent?.let {

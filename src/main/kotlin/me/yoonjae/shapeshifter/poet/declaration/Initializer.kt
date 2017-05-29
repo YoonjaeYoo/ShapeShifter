@@ -9,10 +9,14 @@ import me.yoonjae.shapeshifter.poet.statement.render
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Initializer : Declaration,
+class Initializer(var optional: Boolean = false) : Declaration,
         DeclarationModifierDescriber by DeclarationModifierDescriber.Delegate(),
         ParameterDescriber by ParameterDescriber.Delegate(),
         StatementDescriber by StatementDescriber.Delegate() {
+
+    fun optional(optional: Boolean) {
+        this.optional = optional
+    }
 
     override fun render(writer: Writer, linePrefix: Element?) {
         accessLevelModifier?.let {
@@ -24,6 +28,9 @@ class Initializer : Declaration,
             writer.write(" ")
         }
         writer.write("init")
+        if (optional) {
+            writer.write("?")
+        }
         parameters.render(writer, linePrefix)
         writer.writeln(" {")
         (Indent(1) + linePrefix).render(writer)
@@ -38,7 +45,8 @@ interface InitializerDescriber : Describer {
 
     val initializers: MutableList<Initializer>
 
-    fun initializer(init: (Initializer.() -> Unit)? = null): Initializer {
+    fun initializer(optional: Boolean = false, init: (Initializer.() -> Unit)? = null):
+            Initializer {
         val initializer = Initializer()
         init?.invoke(initializer)
         initializers.add(initializer)

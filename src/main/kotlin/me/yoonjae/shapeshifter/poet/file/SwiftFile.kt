@@ -6,7 +6,7 @@ import me.yoonjae.shapeshifter.poet.declaration.DeclarationDescriber
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class SwiftFile(override var name: String, init: (SwiftFile.() -> Unit)? = null) : File,
+open class SwiftFile(override var name: String, init: (SwiftFile.() -> Unit)? = null) : File,
         DeclarationDescriber by DeclarationDescriber.Delegate() {
 
     init {

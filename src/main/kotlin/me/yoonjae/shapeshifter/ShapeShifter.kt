@@ -1,15 +1,22 @@
 package me.yoonjae.shapeshifter
 
+import me.yoonjae.shapeshifter.system.*
 import me.yoonjae.shapeshifter.translator.*
-import me.yoonjae.shapeshifter.translator.system.*
+import me.yoonjae.shapeshifter.translator.extensions.attr
+import me.yoonjae.shapeshifter.translator.extensions.elements
+import me.yoonjae.shapeshifter.translator.system.ButtonExtension
+import me.yoonjae.shapeshifter.translator.system.EditTextExtension
+import org.w3c.dom.Document
 import java.io.File
 import java.io.FileWriter
+import javax.xml.parsers.DocumentBuilderFactory
 
 class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
 
-    val system = listOf(theme, textAppearance, textStyle, cgSizeExtension, cgFloatExtension,
-            uiEdgeInsetsExtension, uiFontExtension, gravity, view, viewGroup, frameLayout,
-            linearLayout, textView, editText, button, imageView)
+    val system = listOf(Theme(), TextAppearance(), TextStyle(), CGSizeExtension(),
+            CGFloatExtension(), UIEdgeInsetsExtension(), UIFontExtension(), Gravity(), View(),
+            ViewGroup(), FrameLayout(), LinearLayout(), TextView(), EditText(), Button(),
+            ImageView(), ButtonExtension(), EditTextExtension())
 
 
     fun shift() {
@@ -59,7 +66,9 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
     }
 
     private fun shiftControllers() {
-        val translator = ControllerTranslator()
+        val manifest = File(androidAppDir + "/src/main/AndroidManifest.xml")
+        val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(manifest)
+        val translator = ControllerTranslator(extractActivityThemeMap(doc))
         File(androidAppDir + "/src/main/java/com/soomgo/controller/").listFiles { file ->
             if (file.isDirectory) {
                 file.listFiles().forEach {
@@ -71,6 +80,18 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
             }
             true
         }
+    }
+
+    private fun extractActivityThemeMap(doc: Document): Map<String, String> {
+        val map = mutableMapOf<String, String>()
+        doc.getElementsByTagName("activity").elements().forEach {
+            it.attr("android:name")?.let { name ->
+                it.attr("android:theme")?.let {
+                    map.put(name.split(".").last(), it.substring(7)) // @style/...
+                }
+            }
+        }
+        return map
     }
 
     private fun me.yoonjae.shapeshifter.poet.file.File.writeTo(path: String,

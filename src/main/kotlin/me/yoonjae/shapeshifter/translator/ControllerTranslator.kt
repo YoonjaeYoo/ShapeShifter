@@ -5,7 +5,7 @@ import me.yoonjae.shapeshifter.poet.type.Type
 import me.yoonjae.shapeshifter.translator.extensions.toResourceName
 import java.io.File
 
-class ControllerTranslator : Translator<SwiftFile>() {
+class ControllerTranslator(val activityThemeMap: Map<String, String>) : Translator<SwiftFile>() {
 
     override fun translate(file: File): SwiftFile {
         val text = file.readText()
@@ -16,6 +16,21 @@ class ControllerTranslator : Translator<SwiftFile>() {
 
             clazz(resourceName) {
                 superType("BaseViewController") {
+                    initializer {
+                        initializerExpression("super") {
+                            argument("theme",
+                                    activityThemeMap.getOrDefault(resourceName, "AppTheme") + "()")
+                        }
+                    }
+
+                    initializer(true) {
+                        required()
+                        convenience()
+                        parameter("aDecoder", Type("NSCoder"), label = "coder")
+
+                        initializerExpression("self")
+                    }
+
                     if (text.contains("@Inject") &&
                             !text.contains("@Inject(value = R.class, base = true)")) {
                         parseResourceName(text)?.let {
