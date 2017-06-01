@@ -1,8 +1,9 @@
 package me.yoonjae.shapeshifter.system
 
+import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
 
-class Gravity : me.yoonjae.shapeshifter.poet.file.SwiftFile("Gravity.swift") {
+class Gravity : SwiftFile("Gravity.swift") {
     init {
         import("UIKit")
         import("LayoutKit")

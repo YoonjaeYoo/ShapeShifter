@@ -4,8 +4,6 @@ import me.yoonjae.shapeshifter.system.*
 import me.yoonjae.shapeshifter.translator.*
 import me.yoonjae.shapeshifter.translator.extensions.attr
 import me.yoonjae.shapeshifter.translator.extensions.elements
-import me.yoonjae.shapeshifter.translator.system.ButtonExtension
-import me.yoonjae.shapeshifter.translator.system.EditTextExtension
 import org.w3c.dom.Document
 import java.io.File
 import java.io.FileWriter
@@ -16,7 +14,7 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
     val system = listOf(Theme(), TextAppearance(), TextStyle(), CGSizeExtension(),
             CGFloatExtension(), UIEdgeInsetsExtension(), UIFontExtension(), Gravity(), View(),
             ViewGroup(), FrameLayout(), LinearLayout(), TextView(), EditText(), Button(),
-            ImageView(), ButtonExtension(), EditTextExtension())
+            ImageView(), ScrollView())
 
 
     fun shift() {
@@ -27,6 +25,8 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
         shiftDimenResource()
         shiftLayouts()
         shiftControllers()
+        shiftModels()
+        shiftRestService()
     }
 
     private fun shiftStringResource() {
@@ -51,17 +51,8 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
 
     private fun shiftLayouts() {
         val translator = LayoutTranslator()
-        File(androidAppDir + "/src/main/res/layout/").listFiles { file ->
-            translator.translate(file)?.let {
-                val outputFile = File("$iosAppDir/Layouts/${it.name}")
-                val modified = outputFile.exists() && outputFile.readLines().getOrNull(0)?.let {
-                    it.contains("//") && it.contains("modified")
-                } ?: false
-                if (!modified) {
-                    it.writeTo(iosAppDir + "/Layouts")
-                }
-            }
-            true
+        File(androidAppDir + "/src/main/res/layout/").listFiles().forEach { file ->
+            translator.translate(file)?.writeTo(iosAppDir + "/Layouts")
         }
     }
 
@@ -69,7 +60,7 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
         val manifest = File(androidAppDir + "/src/main/AndroidManifest.xml")
         val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(manifest)
         val translator = ControllerTranslator(extractActivityThemeMap(doc))
-        File(androidAppDir + "/src/main/java/com/soomgo/controller/").listFiles { file ->
+        File(androidAppDir + "/src/main/java/com/soomgo/controller/").listFiles().forEach { file ->
             if (file.isDirectory) {
                 file.listFiles().forEach {
                     translator.translate(it)
@@ -78,8 +69,20 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
             } else if (file.name.contains("Activity") || file.name.contains("Fragment")) {
                 translator.translate(file).writeTo(iosAppDir + "/Controllers/", true)
             }
-            true
         }
+    }
+
+    private fun shiftModels() {
+        val translator = ModelTranslator()
+        File(androidAppDir + "/src/main/java/com/soomgo/model/").listFiles().forEach { file ->
+            translator.translate(file)?.writeTo(iosAppDir + "/Models/")
+        }
+    }
+
+    private fun shiftRestService() {
+        val translator = RestServiceTranslator()
+        val file = File(androidAppDir + "/src/main/java/com/soomgo/rest/SoomgoService.java")
+        translator.translate(file)?.writeTo(iosAppDir + "/Rest/")
     }
 
     private fun extractActivityThemeMap(doc: Document): Map<String, String> {
@@ -98,8 +101,16 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
                                                                preventOverlap: Boolean = false) {
         val file = File("$path/$name")
         if (!preventOverlap || !file.exists()) {
-            FileWriter(file.createWithParent()).use { render(it) }
+            if (!file.isModified()) {
+                FileWriter(file.createWithParent()).use { render(it) }
+            }
         }
+    }
+
+    private fun File.isModified(): Boolean {
+        return exists() && readLines().getOrNull(0)?.let {
+            it.contains("//") && it.contains("modified")
+        } ?: false
     }
 
     private fun File.createWithParent(): File {

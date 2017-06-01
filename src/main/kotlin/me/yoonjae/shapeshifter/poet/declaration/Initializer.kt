@@ -47,7 +47,7 @@ interface InitializerDescriber : Describer {
 
     fun initializer(optional: Boolean = false, init: (Initializer.() -> Unit)? = null):
             Initializer {
-        val initializer = Initializer()
+        val initializer = Initializer(optional)
         init?.invoke(initializer)
         initializers.add(initializer)
         return initializer

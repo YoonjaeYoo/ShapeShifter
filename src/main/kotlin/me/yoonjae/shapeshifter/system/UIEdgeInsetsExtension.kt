@@ -1,8 +1,9 @@
 package me.yoonjae.shapeshifter.system
 
+import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
 
-class UIEdgeInsetsExtension : me.yoonjae.shapeshifter.poet.file.SwiftFile("UIEdgeInsetsExtension.swift") {
+class UIEdgeInsetsExtension : SwiftFile("UIEdgeInsetsExtension.swift") {
     init {
         import("CoreGraphics")
         import("UIKit")

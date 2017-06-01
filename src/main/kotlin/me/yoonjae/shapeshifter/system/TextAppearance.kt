@@ -1,8 +1,9 @@
 package me.yoonjae.shapeshifter.system
 
+import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
 
-class TextAppearance : me.yoonjae.shapeshifter.poet.file.SwiftFile("TextAppearance.swift") {
+class TextAppearance : SwiftFile("TextAppearance.swift") {
     init {
         import("UIKit")
         clazz("TextAppearance") {

@@ -1,6 +1,6 @@
 package me.yoonjae.shapeshifter.translator.extensions
 
-fun String.toConfigParameterName() = "config${toResourceName(true)}"
+import me.yoonjae.shapeshifter.poet.type.Type
 
 fun String.toResourceName(capital: Boolean = false): String {
     val prefixBuilder = StringBuilder()
@@ -41,7 +41,51 @@ fun String.toCamelCase(capital: Boolean = false): String {
     return if (capital) camelCase.capitalize() else camelCase.decapitalize()
 }
 
-fun String.toDimen(): String {
+fun String.toSnakeCase(): String {
+    val builder = StringBuilder()
+    for (c in toCharArray()) {
+        if (c.isUpperCase()) {
+            if (builder.isNotEmpty()) {
+                builder.append("_")
+            }
+            builder.append(c.toLowerCase())
+        } else {
+            builder.append(c)
+        }
+    }
+    return builder.toString()
+}
+
+private val WRAPPER_TYPE_MAP = mapOf(
+        "List<(.+)>" to "[$1]"
+)
+private val TYPE_MAP = mapOf(
+        "Integer" to "Int",
+        "Long" to "Int64",
+        "Boolean" to "Bool"
+)
+
+fun String.parseAndroidType(optional: Boolean = false): Type {
+    var type = this
+    listOf(WRAPPER_TYPE_MAP, TYPE_MAP).forEach { map ->
+        type = map.filter {
+            type.contains(it.key.toRegex())
+        }.entries.firstOrNull()?.let {
+            type.replace(it.key.toRegex(), it.value)
+        } ?: type
+    }
+    return Type(type, optional)
+}
+
+fun String.parseXmlString(): String {
+    return if (startsWith("@string/")) {
+        "\"${substring(8)}\".localized()"
+    } else {
+        "\"$this\""
+    }
+}
+
+fun String.parseXmlDimen(): String {
     return if (startsWith("@dimen/")) {
         "Dimen.${substring(7).toCamelCase()}"
     } else if (endsWith("dp")) {
@@ -51,7 +95,7 @@ fun String.toDimen(): String {
     }
 }
 
-fun String.toColor(): String {
+fun String.parseXmlColor(): String {
     return if (startsWith("@color/")) {
         "Color.${substring(7).toCamelCase()}"
     } else if (startsWith("@drawable/")) {
@@ -70,7 +114,7 @@ fun String.toColor(): String {
     }
 }
 
-fun String.toImage(): String {
+fun String.parseXmlImage(): String {
     return if (startsWith("@drawable/")) {
         "UIImage(named: \"${substring(10)}\")"
     } else {
@@ -78,7 +122,7 @@ fun String.toImage(): String {
     }
 }
 
-fun String.toGravity(): String {
+fun String.parseXmlGravity(): String {
     val builder = StringBuilder("[")
     split("|").forEachIndexed { index, gravity ->
         if (index > 0) {
@@ -89,3 +133,10 @@ fun String.toGravity(): String {
     builder.append("]")
     return builder.toString()
 }
+
+fun String.quoted(): String = "\"$this\""
+
+fun String.unquoted(): String = substring(
+        if (this[0] == '"') 1 else 0,
+        if (this[length - 1] == '"') length - 1 else length
+)

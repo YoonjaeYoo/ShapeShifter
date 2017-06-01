@@ -2,7 +2,7 @@ package me.yoonjae.shapeshifter.system
 
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
-import me.yoonjae.shapeshifter.translator.increasedToMinSize
+import me.yoonjae.shapeshifter.translator.extensions.increasedToMinSize
 
 class View : SwiftFile("View.swift") {
     init {

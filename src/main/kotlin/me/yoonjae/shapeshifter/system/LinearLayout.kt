@@ -1,9 +1,10 @@
 package me.yoonjae.shapeshifter.system
 
+import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
-import me.yoonjae.shapeshifter.translator.increasedToMinSize
+import me.yoonjae.shapeshifter.translator.extensions.increasedToMinSize
 
-class LinearLayout : me.yoonjae.shapeshifter.poet.file.SwiftFile("LinearLayout.swift") {
+class LinearLayout : SwiftFile("LinearLayout.swift") {
     init {
         import("UIKit")
         import("LayoutKit")
@@ -25,6 +26,7 @@ class LinearLayout : me.yoonjae.shapeshifter.poet.file.SwiftFile("LinearLayout.s
                 parameter("id", Type("String", true), "nil")
                 parameter("layoutParams", Type("LayoutParams"))
                 parameter("orientation", Type("Orientation"))
+                parameter("weightSum", Type("Int?"), "nil")
                 parameter("padding", Type("UIEdgeInsets")) {
                     initializerExpression("UIEdgeInsets")
                 }
@@ -204,14 +206,17 @@ class LinearLayout : me.yoonjae.shapeshifter.poet.file.SwiftFile("LinearLayout.s
 
             public()
             constant("gravity", Type("Gravity"))
+            constant("weight", Type("Int"))
 
             initializer {
                 parameter("width", Type("CGFloat"))
                 parameter("height", Type("CGFloat"))
                 parameter("margin", Type("UIEdgeInsets"), "UIEdgeInsets()")
                 parameter("gravity", Type("Gravity"), "[]")
+                parameter("weight", Type("Int"), "0")
 
                 assignmentExpression("self.gravity", "gravity")
+                assignmentExpression("self.weight", "weight")
                 initializerExpression("super") {
                     argument("width", "width")
                     argument("height", "height")

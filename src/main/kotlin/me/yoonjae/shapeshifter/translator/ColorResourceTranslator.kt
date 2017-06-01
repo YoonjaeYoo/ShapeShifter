@@ -3,7 +3,7 @@ package me.yoonjae.shapeshifter.translator
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.translator.extensions.iterator
 import me.yoonjae.shapeshifter.translator.extensions.toCamelCase
-import me.yoonjae.shapeshifter.translator.extensions.toColor
+import me.yoonjae.shapeshifter.translator.extensions.parseXmlColor
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -18,7 +18,7 @@ class ColorResourceTranslator : Translator<SwiftFile>() {
                 doc.getElementsByTagName("color").iterator().forEach {
                     if (it != null) {
                         val name = it.attributes.getNamedItem("name").textContent.toCamelCase()
-                        val value = it.firstChild.nodeValue.toColor()
+                        val value = it.firstChild.nodeValue.parseXmlColor()
                         constant(name, value = value) {
                             static()
                         }

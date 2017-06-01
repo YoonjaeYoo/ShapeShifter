@@ -9,9 +9,11 @@ import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
 class Enum(val name: String) : Declaration,
+        TypeInheritanceDescriber by TypeInheritanceDescriber.Delegate(),
         AccessLevelModifierDescriber by AccessLevelModifierDescriber.Delegate() {
 
-    class Case(val name: String) : Element, TypeDescriber by TypeDescriber.Delegate() {
+    class Case(val name: String, val value: String? = null) : Element,
+            TypeDescriber by TypeDescriber.Delegate() {
 
         override fun render(writer: Writer, linePrefix: Element?) {
             writer.write("case ")
@@ -26,13 +28,16 @@ class Enum(val name: String) : Declaration,
                 }
                 writer.write(")")
             }
+            value?.let {
+                writer.write(" = $it")
+            }
         }
     }
 
     val cases = mutableListOf<Case>()
 
-    fun case(name: String, init: (Case.() -> Unit)? = null) {
-        val case = Case(name)
+    fun case(name: String, value: String? = null, init: (Case.() -> Unit)? = null) {
+        val case = Case(name, value)
         init?.invoke(case)
         cases.add(case)
     }
@@ -42,7 +47,15 @@ class Enum(val name: String) : Declaration,
             it.render(writer, linePrefix)
             writer.write(" ")
         }
-        writer.writeln("enum $name {")
+        writer.write("enum $name")
+        if (superTypes.isNotEmpty()) {
+            writer.write(": ")
+            superTypes.forEachIndexed { index, type ->
+                if (index > 0) writer.write(", ")
+                type.render(writer, linePrefix)
+            }
+        }
+        writer.writeln(" {")
         cases.forEach {
             val prefix = (Indent(1) + linePrefix).apply { render(writer) }
             it.render(writer, prefix)

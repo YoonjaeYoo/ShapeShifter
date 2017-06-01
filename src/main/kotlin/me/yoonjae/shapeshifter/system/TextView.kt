@@ -1,9 +1,11 @@
 package me.yoonjae.shapeshifter.system
 
-import me.yoonjae.shapeshifter.translator.increasedToMinSize
+import jdk.nashorn.internal.objects.NativeFunction.function
+import me.yoonjae.shapeshifter.poet.file.SwiftFile
+import me.yoonjae.shapeshifter.translator.extensions.increasedToMinSize
 
 
-class TextView : me.yoonjae.shapeshifter.poet.file.SwiftFile("TextView.swift") {
+class TextView : SwiftFile("TextView.swift") {
     init {
         import("UIKit")
         import("LayoutKit")

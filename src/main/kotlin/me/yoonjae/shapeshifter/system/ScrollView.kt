@@ -4,17 +4,21 @@ import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
 import me.yoonjae.shapeshifter.translator.extensions.increasedToMinSize
 
-class FrameLayout : SwiftFile("FrameLayout.swift") {
+class ScrollView : SwiftFile("ScrollView.swift") {
     init {
         import("UIKit")
         import("LayoutKit")
 
-        clazz("FrameLayout") {
-            public()
-            superType("ViewGroup")
+        clazz("ScrollView") {
+            superType("View") {
+                genericParameter("UIScrollView")
+            }
+
+            constant("child", Type("Layout", true)) {
+                public()
+            }
 
             initializer {
-                override()
                 public()
                 parameter("theme", Type("Theme"), "AppTheme()")
                 parameter("id", Type("String", true), "nil")
@@ -26,9 +30,10 @@ class FrameLayout : SwiftFile("FrameLayout.swift") {
                 parameter("minHeight", Type("CGFloat", true), "nil")
                 parameter("alpha", Type("CGFloat"), "1.0")
                 parameter("background", Type("UIColor", true), "nil")
-                parameter("children", Type("[Layout]"), "[]")
-                parameter("config", Type("(UIView) -> Void", true), "nil")
+                parameter("child", Type("Layout", true), "nil")
+                parameter("config", Type("(UIScrollView) -> Void", true), "nil")
 
+                assignmentExpression("self.child", "child")
                 initializerExpression("super") {
                     argument("theme", "theme")
                     argument("id", "id")
@@ -38,8 +43,23 @@ class FrameLayout : SwiftFile("FrameLayout.swift") {
                     argument("minHeight", "minHeight")
                     argument("alpha", "alpha")
                     argument("background", "background")
-                    argument("children", "children")
-                    argument("config", "config")
+                    trailingClosure {
+                        closureParameter("scrollView")
+
+                        ifStatement("!scrollView.subviews.isEmpty") {
+                            codeBlock {
+                                assignmentExpression("scrollView.contentSize") {
+                                    initializerExpression("CGSize") {
+                                        argument("width", "scrollView.frame.width")
+                                        argument("height", "scrollView.subviews[0].frame.height")
+                                    }
+                                }
+                            }
+                        }
+                        functionCallExpression("config?") {
+                            argument(value = "scrollView")
+                        }
+                    }
                 }
             }
 
@@ -66,35 +86,36 @@ class FrameLayout : SwiftFile("FrameLayout.swift") {
                         }
                     }
                 }
-                variable("minSize", value = "CGSize()")
-                constant("measurements", Type("[LayoutMeasurement]")) {
-                    functionCallExpression("children.map") {
-                        trailingClosure {
-                            closureParameter("child")
-                            constant("measurement") {
-                                functionCallExpression("child.measurement") {
-                                    argument("within", "size.decreasedByInsets(layoutParams.margin)" +
-                                            ".decreasedByInsets(padding)")
-                                }
+                constant("sublayoutSize") {
+                    initializerExpression("CGSize") {
+                        argument("width", "size.width")
+                        argument("height", ".greatestFiniteMagnitude")
+                    }
+                }
+                constant("measurement") {
+                    functionCallExpression("child?.measurement") {
+                        argument("within", "sublayoutSize.decreasedByInsets" +
+                                "(layoutParams.margin).decreasedByInsets(padding)")
+                    }
+                }
+                ifStatement("let measurement = measurement") {
+                    codeBlock {
+                        ifStatement("layoutParams.width == WRAP_CONTENT") {
+                            codeBlock {
+                                assignmentExpression("size.width", "max(size.width, " +
+                                        "measurement.size.width + padding.left + " +
+                                        "padding.right + layoutParams.margin.left + " +
+                                        "layoutParams.margin.right)")
                             }
-                            assignmentExpression("minSize.width", "max(minSize.width, " +
-                                    "measurement.size.width + padding.left + padding.right + " +
-                                    "layoutParams.margin.left + layoutParams.margin.right)")
-                            assignmentExpression("minSize.height", "max(minSize.height, " +
-                                    "measurement.size.height + padding.top + padding.bottom + " +
-                                    "layoutParams.margin.top + layoutParams.margin.bottom)")
-                            returnStatement("measurement")
                         }
-                    }
-                }
-                ifStatement("layoutParams.width == WRAP_CONTENT") {
-                    codeBlock {
-                        assignmentExpression("size.width", "minSize.width")
-                    }
-                }
-                ifStatement("layoutParams.height == WRAP_CONTENT") {
-                    codeBlock {
-                        assignmentExpression("size.height", "minSize.height")
+                        ifStatement("layoutParams.height == WRAP_CONTENT") {
+                            codeBlock {
+                                assignmentExpression("size.height", "max(size.height, " +
+                                        "measurement.size.height + padding.top + " +
+                                        "padding.bottom + layoutParams.margin.top + " +
+                                        "layoutParams.margin.bottom)")
+                            }
+                        }
                     }
                 }
                 returnStatement {
@@ -104,7 +125,7 @@ class FrameLayout : SwiftFile("FrameLayout.swift") {
                             increasedToMinSize()
                         }
                         argument("maxSize", "maxSize")
-                        argument("sublayouts", "measurements")
+                        argument("sublayouts", "measurement == nil ? [] : [measurement!]")
                     }
                 }
             }
@@ -149,50 +170,7 @@ class FrameLayout : SwiftFile("FrameLayout.swift") {
                     }
                 }
             }
-        }
 
-        clazz("FrameLayoutParams") {
-            superType("LayoutParams")
-
-            public()
-            constant("gravity", Type("Gravity"))
-
-            initializer {
-                parameter("width", Type("CGFloat"))
-                parameter("height", Type("CGFloat"))
-                parameter("margin", Type("UIEdgeInsets"), "UIEdgeInsets()")
-                parameter("gravity", Type("Gravity"), "[]")
-
-                assignmentExpression("self.gravity", "gravity")
-                initializerExpression("super") {
-                    argument("width", "width")
-                    argument("height", "height")
-                    argument("margin", "margin")
-                }
-            }
-
-            function("arrangement", Type("CGRect")) {
-                override()
-                parameter("size", Type("CGSize"))
-                parameter("rect", Type("CGRect"), label = "in")
-
-                returnStatement {
-                    functionCallExpression("gravity.alignment.position") {
-                        argument("size", "size.decreasedByInsets(margin)")
-                        argument("in") {
-                            initializerExpression("CGRect") {
-                                argument("origin") {
-                                    initializerExpression("CGPoint") {
-                                        argument("x", "rect.origin.x + margin.left")
-                                        argument("y", "rect.origin.y + margin.top")
-                                    }
-                                }
-                                argument("size", "rect.size.decreasedByInsets(margin)")
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }

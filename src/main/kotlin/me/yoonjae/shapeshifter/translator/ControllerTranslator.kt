@@ -23,7 +23,7 @@ class ControllerTranslator(val activityThemeMap: Map<String, String>) : Translat
                         }
                     }
 
-                    initializer(true) {
+                    initializer {
                         required()
                         convenience()
                         parameter("aDecoder", Type("NSCoder"), label = "coder")
@@ -38,7 +38,7 @@ class ControllerTranslator(val activityThemeMap: Map<String, String>) : Translat
                         }
                         function("layout", Type("Layout")) {
                             override()
-                            returnStatement("${resourceName}Layout()")
+                            returnStatement("${resourceName}Layout(theme: theme)")
                         }
                     }
                 }

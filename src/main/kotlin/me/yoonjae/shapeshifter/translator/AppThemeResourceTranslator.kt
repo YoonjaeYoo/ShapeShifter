@@ -5,7 +5,7 @@ import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.system.Theme
 import me.yoonjae.shapeshifter.translator.extensions.attr
 import me.yoonjae.shapeshifter.translator.extensions.elements
-import me.yoonjae.shapeshifter.translator.extensions.toColor
+import me.yoonjae.shapeshifter.translator.extensions.parseXmlColor
 import org.w3c.dom.Element
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
@@ -51,7 +51,7 @@ class AppThemeResourceTranslator : Translator<SwiftFile>() {
                 it.tagName == "item" && it.attr("name")?.endsWith(name)!!
             }?.textContent?.let {
                 argument(name, when (type.name) {
-                    "UIColor" -> it.toColor()
+                    "UIColor" -> it.parseXmlColor()
                     else -> throw RuntimeException()
                 })
             }

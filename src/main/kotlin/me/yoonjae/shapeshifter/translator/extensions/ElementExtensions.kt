@@ -3,30 +3,38 @@ package me.yoonjae.shapeshifter.translator.extensions
 import org.w3c.dom.Element
 
 val Element.layoutType: String?
-    get() {
-        return when (tagName) {
-            "LinearLayout" -> "LinearLayout"
-            "View" -> "View"
-            "TextView" -> "TextView"
-            "EditText" -> "EditText"
-            "Button" -> "Button"
-            "ImageView" -> "ImageView"
-            "com.flaviofaria.kenburnsview.KenBurnsView" -> "ImageView"
-            "android.support.v7.widget.Toolbar" -> null
-            else -> "FrameLayout"
-        }
+    get() = when (tagName) {
+        "LinearLayout" -> "LinearLayout"
+        "View" -> "View"
+        "TextView" -> "TextView"
+        "EditText" -> "EditText"
+        "Button" -> "Button"
+        "ImageView" -> "ImageView"
+        "com.flaviofaria.kenburnsview.KenBurnsView" -> "ImageView"
+        "ScrollView" -> "ScrollView"
+        "android.support.v7.widget.Toolbar" -> null
+        "include" -> "include"
+        else -> "FrameLayout"
     }
 
 val Element.viewType: String
-    get() {
-        return when (tagName) {
-            "TextView" -> "UILabel"
-            "EditText" -> "UITextField"
-            "Button" -> "UIButton"
-            "ImageView" -> "UIImageView"
-            else -> "UIView"
-        }
+    get() = when (layoutType) {
+        "TextView" -> "UILabel"
+        "EditText" -> "UITextField"
+        "Button" -> "UIButton"
+        "ImageView" -> "UIImageView"
+        "ScrollView" -> "UIScrollView"
+        else -> "UIView"
     }
+
+val Element?.layoutParamsType: String
+    get() = this?.let {
+        when (layoutType) {
+            "FrameLayout" -> "FrameLayoutParams"
+            "LinearLayout" -> "LinearLayoutParams"
+            else -> null
+        }
+    } ?: "LayoutParams"
 
 fun Element.attr(name: String): String? {
     if (hasAttribute(name)) {
@@ -63,12 +71,12 @@ fun Element.layoutMargin(): Map<String, String>? {
     val params = mutableMapOf("top" to "0", "left" to "0", "bottom" to "0", "right" to "0")
     params.keys.forEach { key ->
         attr("android:layout_margin${key.capitalize()}")?.let {
-            params[key] = it.toDimen()
+            params[key] = it.parseXmlDimen()
         }
     }
     attr("android:layout_margin")?.let {
         params.keys.forEach { key ->
-            params[key] = it.toDimen()
+            params[key] = it.parseXmlDimen()
         }
     }
     if (params.values.all { it == "0" }) {
@@ -81,12 +89,12 @@ fun Element.padding(): Map<String, String>? {
     val params = mutableMapOf("top" to "0", "left" to "0", "bottom" to "0", "right" to "0")
     params.keys.forEach { key ->
         attr("android:padding${key.capitalize()}")?.let {
-            params[key] = it.toDimen()
+            params[key] = it.parseXmlDimen()
         }
     }
     attr("android:padding")?.let {
         params.keys.forEach { key ->
-            params[key] = it.toDimen()
+            params[key] = it.parseXmlDimen()
         }
     }
     if (params.values.all { it == "0" }) {
@@ -100,7 +108,7 @@ fun Element.layoutWidth(): String {
     return when (width) {
         "match_parent" -> "MATCH_PARENT"
         "wrap_content" -> "WRAP_CONTENT"
-        else -> width.toDimen()
+        else -> width.parseXmlDimen()
     }
 }
 
@@ -109,6 +117,6 @@ fun Element.layoutHeight(): String {
     return when (height) {
         "match_parent" -> "MATCH_PARENT"
         "wrap_content" -> "WRAP_CONTENT"
-        else -> height.toDimen()
+        else -> height.parseXmlDimen()
     }
 }

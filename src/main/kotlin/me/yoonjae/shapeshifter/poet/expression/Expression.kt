@@ -63,6 +63,12 @@ interface ExpressionDescriber : Describer, GeneralExpressionDescriber,
                     also { expressions.add(it) }
         }
 
+        override fun dictionaryLiteralExpression(init: (DictionaryLiteralExpression.() -> Unit)?):
+                DictionaryLiteralExpression {
+            return super<ExpressionDescriber>.dictionaryLiteralExpression(init).
+                    also { expressions.add(it) }
+        }
+
         override fun assignmentExpression(target: String, value: String?,
                                           init: (AssignmentExpression.() -> Unit)?):
                 AssignmentExpression {

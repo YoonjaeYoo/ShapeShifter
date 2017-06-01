@@ -1,8 +1,9 @@
 package me.yoonjae.shapeshifter.system
 
+import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
 
-class ViewGroup : me.yoonjae.shapeshifter.poet.file.SwiftFile("ViewGroup.swift") {
+class ViewGroup : SwiftFile("ViewGroup.swift") {
     init {
         import("UIKit")
         import("LayoutKit")

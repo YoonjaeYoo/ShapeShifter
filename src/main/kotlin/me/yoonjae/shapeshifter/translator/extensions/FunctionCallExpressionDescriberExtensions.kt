@@ -1,4 +1,4 @@
-package me.yoonjae.shapeshifter.translator
+package me.yoonjae.shapeshifter.translator.extensions
 
 import me.yoonjae.shapeshifter.poet.expression.FunctionCallExpressionDescriber
 

@@ -1,6 +1,8 @@
 package me.yoonjae.shapeshifter.system
 
-class TextStyle : me.yoonjae.shapeshifter.poet.file.SwiftFile("TextStyle.swift") {
+import me.yoonjae.shapeshifter.poet.file.SwiftFile
+
+class TextStyle : SwiftFile("TextStyle.swift") {
     init {
         import("UIKit")
         enum("TextStyle") {

@@ -1,8 +1,9 @@
 package me.yoonjae.shapeshifter.system
 
+import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
 
-class UIFontExtension : me.yoonjae.shapeshifter.poet.file.SwiftFile("UIFontExtension.swift") {
+class UIFontExtension : SwiftFile("UIFontExtension.swift") {
     init {
         import("CoreGraphics")
         import("UIKit")

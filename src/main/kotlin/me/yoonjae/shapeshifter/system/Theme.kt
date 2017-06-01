@@ -21,6 +21,12 @@ class Theme : SwiftFile("Theme.swift") {
                 "textColorHint" to Type("UIColor", true),
                 "windowBackground" to Type("UIColor", true)
         )
+        val FIELD_DEFAULT_VALUES = mapOf(
+                "colorControlActivated" to "colorPrimary",
+                "colorControlNormal" to "colorPrimary",
+                "colorControlHighlight" to "colorPrimary",
+                "colorButtonNormal" to "colorPrimary"
+        )
     }
 
     init {
@@ -32,7 +38,15 @@ class Theme : SwiftFile("Theme.swift") {
             initializer {
                 FIELDS.forEach { name, type -> parameter(name, type, "nil") }
 
-                FIELDS.forEach { name, _ -> assignmentExpression("self.$name", name) }
+                FIELDS.forEach { name, _ ->
+                    assignmentExpression("self.$name") {
+                        generalExpression(
+                                FIELD_DEFAULT_VALUES[name]?.let {
+                                    "$name ?? $it"
+                                } ?: name
+                        )
+                    }
+                }
             }
         }
     }

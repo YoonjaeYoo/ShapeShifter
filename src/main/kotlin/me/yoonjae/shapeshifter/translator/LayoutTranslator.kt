@@ -97,14 +97,16 @@ class LayoutTranslator : Translator<SwiftFile>() {
     private fun ArgumentDescriber.layoutArguments(path: String, element: Element, parent: Element? = null,
                                                   idTypeMap: Map<String, String>? = null) {
         argument("theme", "theme")
-        when (element.tagName) {
-            "FrameLayout" -> frameLayoutArguments(path, element, parent)
+        when (element.layoutType) {
+            "FrameLayout" ->
+                frameLayoutArguments(path, element, parent)
             "LinearLayout" -> linearLayoutArguments(path, element, parent)
             "View" -> viewArguments(path, element, parent)
             "Button" -> buttonArguments(path, element, parent)
             "TextView" -> textViewArguments(path, element, parent)
+            "EditText" -> editTextArguments(path, element, parent)
             "ImageView" -> imageViewArguments(path, element, parent)
-            "com.flaviofaria.kenburnsview.KenBurnsView" -> imageViewArguments(path, element, parent)
+            "ScrollView" -> scrollViewArguments(path, element, parent)
             "include" -> {
             }
             else -> {
@@ -139,6 +141,8 @@ class LayoutTranslator : Translator<SwiftFile>() {
         }
     }
 
+    private fun String.toConfigParameterName() = "config${toResourceName(true)}"
+
     private fun ArgumentDescriber.frameLayoutArguments(path: String, element: Element, parent: Element? = null) {
         idArgument(element)
         layoutParamsArgument(element, parent)
@@ -164,6 +168,9 @@ class LayoutTranslator : Translator<SwiftFile>() {
                 "vertical" -> ".vertical"
                 else -> ".horizontal"
             })
+        }
+        element.attr("android:weightSum")?.let {
+            argument("weightSum", it)
         }
         paddingArgument(element)
         minWidthArgument(element)
@@ -197,9 +204,7 @@ class LayoutTranslator : Translator<SwiftFile>() {
         minHeightArgument(element)
         alphaArgument(element)
         backgroundArgument(element)
-        element.attr("android:gravity")?.let {
-            argument("gravity", it.toGravity())
-        }
+        gravityArgument(element)
         textArgument(element)
         textAppearanceArgument(element)
         textColorArgument(element)
@@ -215,10 +220,30 @@ class LayoutTranslator : Translator<SwiftFile>() {
         minHeightArgument(element)
         alphaArgument(element)
         backgroundArgument(element)
+        gravityArgument(element)
         listOf("android:lines", "android:singleLine").forEach { name ->
             element.attr(name)?.let {
                 argument(name.substring(8), it)
             }
+        }
+        textArgument(element)
+        textAppearanceArgument(element)
+        textColorArgument(element)
+        textSizeArgument(element)
+        textStyleArgument(element)
+    }
+
+    private fun ArgumentDescriber.editTextArguments(path: String, element: Element, parent: Element? = null) {
+        idArgument(element)
+        layoutParamsArgument(element, parent)
+        paddingArgument(element)
+        minWidthArgument(element)
+        minHeightArgument(element)
+        alphaArgument(element)
+        backgroundArgument(element)
+        gravityArgument(element)
+        element.attr("android:hint")?.let {
+            argument("hint", it.parseXmlString())
         }
         textArgument(element)
         textAppearanceArgument(element)
@@ -239,15 +264,29 @@ class LayoutTranslator : Translator<SwiftFile>() {
             argument("scaleType", ".$it")
         }
         element.attr("android:src")?.let {
-            argument("src", it.toImage())
+            argument("src", it.parseXmlImage())
+        }
+    }
+
+    private fun ArgumentDescriber.scrollViewArguments(path: String, element: Element, parent: Element? = null) {
+        idArgument(element)
+        layoutParamsArgument(element, parent)
+        paddingArgument(element)
+        minWidthArgument(element)
+        minHeightArgument(element)
+        alphaArgument(element)
+        backgroundArgument(element)
+        argument("child") {
+            element.childNodes.elements().firstOrNull()?.let {
+                layoutExpression(path, it, element)
+            }
         }
     }
 
     private fun ArgumentDescriber.layoutParamsArgument(element: Element, parent: Element? = null,
                                                        init: (ArgumentDescriber.() -> Unit)? = null) {
         argument("layoutParams") {
-            val prefix = if (parent == null) "Layout" else parent.tagName
-            initializerExpression("${prefix}Params") {
+            initializerExpression(parent.layoutParamsType) {
                 argument("width", element.layoutWidth())
                 argument("height", element.layoutHeight())
                 element.layoutMargin()?.let {
@@ -258,7 +297,10 @@ class LayoutTranslator : Translator<SwiftFile>() {
                     }
                 }
                 element.attr("android:layout_gravity")?.let {
-                    argument("gravity", it.toGravity())
+                    argument("gravity", it.parseXmlGravity())
+                }
+                element.attr("android:layout_weight")?.let {
+                    argument("weight", it)
                 }
                 init?.invoke(this)
             }
@@ -281,13 +323,13 @@ class LayoutTranslator : Translator<SwiftFile>() {
 
     private fun ArgumentDescriber.minWidthArgument(element: Element) {
         element.attr("android:minWidth")?.let {
-            argument("minWidth", it.toDimen())
+            argument("minWidth", it.parseXmlDimen())
         }
     }
 
     private fun ArgumentDescriber.minHeightArgument(element: Element) {
         element.attr("android:minHeight")?.let {
-            argument("minHeight", it.toDimen())
+            argument("minHeight", it.parseXmlDimen())
         }
     }
 
@@ -299,18 +341,19 @@ class LayoutTranslator : Translator<SwiftFile>() {
 
     private fun ArgumentDescriber.backgroundArgument(element: Element) {
         element.attr("android:background")?.let {
-            argument("background", it.toColor())
+            argument("background", it.parseXmlColor())
+        }
+    }
+
+    private fun ArgumentDescriber.gravityArgument(element: Element) {
+        element.attr("android:gravity")?.let {
+            argument("gravity", it.parseXmlGravity())
         }
     }
 
     private fun ArgumentDescriber.textArgument(element: Element) {
         element.attr("android:text")?.let {
-            val text = if (it.startsWith("@string/")) {
-                "\"${it.substring(8)}\".localized()"
-            } else {
-                "\"$it\""
-            }
-            argument("text", text)
+            argument("text", it.parseXmlString())
         }
     }
 
@@ -326,13 +369,13 @@ class LayoutTranslator : Translator<SwiftFile>() {
 
     private fun ArgumentDescriber.textColorArgument(element: Element) {
         element.attr("android:textColor")?.let {
-            argument("textColor", it.toColor())
+            argument("textColor", it.parseXmlColor())
         }
     }
 
     private fun ArgumentDescriber.textSizeArgument(element: Element) {
         element.attr("android:textSize")?.let {
-            argument("textSize", it.toDimen())
+            argument("textSize", it.parseXmlDimen())
         }
     }
 
