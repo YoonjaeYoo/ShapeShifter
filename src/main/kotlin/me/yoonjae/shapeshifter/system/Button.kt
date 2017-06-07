@@ -1,9 +1,10 @@
 package me.yoonjae.shapeshifter.system
 
+import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
 import me.yoonjae.shapeshifter.translator.extensions.increasedToMinSize
 
-class Button : me.yoonjae.shapeshifter.poet.file.SwiftFile("Button.swift") {
+class Button : SwiftFile("Button.swift") {
     init {
         import("UIKit")
         import("LayoutKit")
@@ -36,6 +37,7 @@ class Button : me.yoonjae.shapeshifter.poet.file.SwiftFile("Button.swift") {
                 constant("defaultTextAppearance", value = "TextAppearance.AppCompat.Subhead(theme)")
                 initializerExpression("super") {
                     argument("theme", "theme")
+                    argument("id", "id")
                     argument("layoutParams", "layoutParams")
                     argument("minWidth", "minWidth ?? 88")
                     argument("minHeight", "minHeight ?? 44")
@@ -56,7 +58,6 @@ class Button : me.yoonjae.shapeshifter.poet.file.SwiftFile("Button.swift") {
                                 }
                                 argument("alignment", ".fill")
                                 argument("flexibility", ".inflexible")
-                                argument("viewReuseId", "id")
                                 trailingClosure {
                                     closureParameter("button")
                                     assignmentExpression("button.alpha", "alpha")

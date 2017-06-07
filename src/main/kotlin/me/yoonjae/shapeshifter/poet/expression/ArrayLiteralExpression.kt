@@ -6,10 +6,10 @@ import me.yoonjae.shapeshifter.poet.Indent
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class ArrayLiteralExpression : LiteralExpression,
+class ArrayLiteralExpression : LiteralExpression(),
         ExpressionDescriber by ExpressionDescriber.Delegate() {
 
-    override fun render(writer: Writer, linePrefix: Element?) {
+    override fun renderExpression(writer: Writer, linePrefix: Element?) {
         writer.write("[")
         if (expressions.size == 1) {
             expressions[0].render(writer, linePrefix)

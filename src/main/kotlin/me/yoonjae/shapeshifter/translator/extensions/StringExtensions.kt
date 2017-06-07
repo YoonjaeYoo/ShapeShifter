@@ -88,7 +88,7 @@ fun String.parseXmlString(): String {
 fun String.parseXmlDimen(): String {
     return if (startsWith("@dimen/")) {
         "Dimen.${substring(7).toCamelCase()}"
-    } else if (endsWith("dp")) {
+    } else if (endsWith("dp") || endsWith("sp")) {
         substring(0, length - 2)
     } else {
         "0"

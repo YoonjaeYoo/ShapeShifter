@@ -3,7 +3,7 @@ package me.yoonjae.shapeshifter.poet.declaration
 import me.yoonjae.shapeshifter.poet.statement.Statement
 import me.yoonjae.shapeshifter.poet.type.Type
 
-interface Declaration : Statement
+abstract class Declaration : Statement()
 
 interface DeclarationDescriber : ImportDescriber, ConstantDescriber, VariableDescriber,
         TypeAliasDescriber, FunctionDescriber, InitializerDescriber, EnumDescriber,

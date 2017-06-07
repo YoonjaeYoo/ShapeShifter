@@ -107,6 +107,7 @@ class LayoutTranslator : Translator<SwiftFile>() {
             "EditText" -> editTextArguments(path, element, parent)
             "ImageView" -> imageViewArguments(path, element, parent)
             "ScrollView" -> scrollViewArguments(path, element, parent)
+            "RecyclerView" -> recyclerViewArguments(path, element, parent)
             "include" -> {
             }
             else -> {
@@ -281,6 +282,16 @@ class LayoutTranslator : Translator<SwiftFile>() {
                 layoutExpression(path, it, element)
             }
         }
+    }
+
+    private fun ArgumentDescriber.recyclerViewArguments(path: String, element: Element, parent: Element? = null) {
+        idArgument(element)
+        layoutParamsArgument(element, parent)
+        paddingArgument(element)
+        minWidthArgument(element)
+        minHeightArgument(element)
+        alphaArgument(element)
+        backgroundArgument(element)
     }
 
     private fun ArgumentDescriber.layoutParamsArgument(element: Element, parent: Element? = null,

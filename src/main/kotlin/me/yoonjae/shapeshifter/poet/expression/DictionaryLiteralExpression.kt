@@ -6,7 +6,7 @@ import me.yoonjae.shapeshifter.poet.Indent
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class DictionaryLiteralExpression : LiteralExpression {
+class DictionaryLiteralExpression : LiteralExpression() {
 
     class KeyValue(val keyExpression: Expression, val valueExpression: Expression) : Element {
         constructor(key: String, value: String) :
@@ -36,7 +36,7 @@ class DictionaryLiteralExpression : LiteralExpression {
         return keyValue
     }
 
-    override fun render(writer: Writer, linePrefix: Element?) {
+    override fun renderExpression(writer: Writer, linePrefix: Element?) {
         writer.write("[")
         if (keyValues.isEmpty()) {
             writer.write(":")

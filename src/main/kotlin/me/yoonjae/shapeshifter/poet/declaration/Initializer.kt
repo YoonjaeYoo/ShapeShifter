@@ -9,7 +9,7 @@ import me.yoonjae.shapeshifter.poet.statement.render
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Initializer(var optional: Boolean = false) : Declaration,
+class Initializer(var optional: Boolean = false) : Declaration(),
         DeclarationModifierDescriber by DeclarationModifierDescriber.Delegate(),
         ParameterDescriber by ParameterDescriber.Delegate(),
         StatementDescriber by StatementDescriber.Delegate() {

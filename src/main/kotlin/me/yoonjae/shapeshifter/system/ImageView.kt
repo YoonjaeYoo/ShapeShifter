@@ -1,7 +1,7 @@
 package me.yoonjae.shapeshifter.system
 
-import jdk.nashorn.internal.objects.NativeFunction.function
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
+import me.yoonjae.shapeshifter.poet.type.Type
 import me.yoonjae.shapeshifter.translator.extensions.increasedToMinSize
 
 
@@ -14,29 +14,30 @@ class ImageView : SwiftFile("ImageView.swift") {
             public()
             superType("ViewGroup")
 
-            constant("scaleType", me.yoonjae.shapeshifter.poet.type.Type("ScaleType")) { public() }
-            constant("src", me.yoonjae.shapeshifter.poet.type.Type("UIImage", true)) { public() }
+            constant("scaleType", Type("ScaleType")) { public() }
+            constant("src", Type("UIImage", true)) { public() }
 
             initializer {
                 public()
-                parameter("theme", me.yoonjae.shapeshifter.poet.type.Type("Theme"), "AppTheme()")
-                parameter("id", me.yoonjae.shapeshifter.poet.type.Type("String", true), "nil")
-                parameter("layoutParams", me.yoonjae.shapeshifter.poet.type.Type("LayoutParams"))
-                parameter("padding", me.yoonjae.shapeshifter.poet.type.Type("UIEdgeInsets")) {
+                parameter("theme", Type("Theme"), "AppTheme()")
+                parameter("id", Type("String", true), "nil")
+                parameter("layoutParams", Type("LayoutParams"))
+                parameter("padding", Type("UIEdgeInsets")) {
                     initializerExpression("UIEdgeInsets")
                 }
-                parameter("minWidth", me.yoonjae.shapeshifter.poet.type.Type("CGFloat", true), "nil")
-                parameter("minHeight", me.yoonjae.shapeshifter.poet.type.Type("CGFloat", true), "nil")
-                parameter("alpha", me.yoonjae.shapeshifter.poet.type.Type("CGFloat"), "1.0")
-                parameter("background", me.yoonjae.shapeshifter.poet.type.Type("UIColor", true), "nil")
-                parameter("scaleType", me.yoonjae.shapeshifter.poet.type.Type("ScaleType"), ".fitCenter")
-                parameter("src", me.yoonjae.shapeshifter.poet.type.Type("UIImage", true), "nil")
-                parameter("config", me.yoonjae.shapeshifter.poet.type.Type("(UIImageView) -> Void", true), "nil")
+                parameter("minWidth", Type("CGFloat", true), "nil")
+                parameter("minHeight", Type("CGFloat", true), "nil")
+                parameter("alpha", Type("CGFloat"), "1.0")
+                parameter("background", Type("UIColor", true), "nil")
+                parameter("scaleType", Type("ScaleType"), ".fitCenter")
+                parameter("src", Type("UIImage", true), "nil")
+                parameter("config", Type("(UIImageView) -> Void", true), "nil")
 
                 assignmentExpression("self.scaleType", "scaleType")
                 assignmentExpression("self.src", "src")
                 initializerExpression("super") {
                     argument("theme", "theme")
+                    argument("id", "id")
                     argument("layoutParams", "layoutParams")
                     argument("padding", "padding")
                     argument("minWidth", "minWidth")
@@ -57,23 +58,13 @@ class ImageView : SwiftFile("ImageView.swift") {
                                 trailingClosure {
                                     closureParameter("imageView")
                                     ifStatement("scaleType == .center") {
-                                        codeBlock {
-                                            assignmentExpression("imageView.contentMode", ".center")
-                                        }
-                                        elseClause {
-                                            ifStatement("scaleType == .centerCrop") {
-                                                codeBlock {
-                                                    assignmentExpression("imageView.contentMode",
-                                                            ".scaleAspectFill")
-                                                }
-                                                elseClause {
-                                                    ifStatement("scaleType == .fitCenter") {
-                                                        codeBlock {
-                                                            assignmentExpression("imageView.contentMode",
-                                                                    ".scaleAspectFit")
-                                                        }
-                                                    }
-                                                }
+                                        assignmentExpression("imageView.contentMode", ".center")
+                                        elseIfStatement("scaleType == .centerCrop") {
+                                            assignmentExpression("imageView.contentMode",
+                                                    ".scaleAspectFill")
+                                            elseIfStatement("scaleType == .fitCenter") {
+                                                assignmentExpression("imageView.contentMode",
+                                                        ".scaleAspectFit")
                                             }
                                         }
                                     }
@@ -88,10 +79,10 @@ class ImageView : SwiftFile("ImageView.swift") {
                 }
             }
 
-            function("measurement", me.yoonjae.shapeshifter.poet.type.Type("LayoutMeasurement")) {
+            function("measurement", Type("LayoutMeasurement")) {
                 override()
                 public()
-                parameter("maxSize", me.yoonjae.shapeshifter.poet.type.Type("CGSize"), label = "within")
+                parameter("maxSize", Type("CGSize"), label = "within")
 
                 constant("srcSize", value = "self.src == nil ? CGSize() : self.src!.size")
                 constant("size") {
@@ -106,7 +97,7 @@ class ImageView : SwiftFile("ImageView.swift") {
                                                 "layoutParams.margin.left + layoutParams.margin.right)")
                                 argument("height",
                                         "layoutParams.height == MATCH_PARENT ? .greatestFiniteMagnitude : " +
-                                                "(layoutParams.width == WRAP_CONTENT ? " +
+                                                "(layoutParams.height == WRAP_CONTENT ? " +
                                                 "srcSize.height + layoutParams.margin.top + " +
                                                 "layoutParams.margin.bottom : layoutParams.height + " +
                                                 "layoutParams.margin.top + layoutParams.margin.bottom)")
@@ -128,11 +119,11 @@ class ImageView : SwiftFile("ImageView.swift") {
                 }
             }
 
-            function("arrangement", me.yoonjae.shapeshifter.poet.type.Type("LayoutArrangement")) {
+            function("arrangement", Type("LayoutArrangement")) {
                 override()
                 public()
-                parameter("rect", me.yoonjae.shapeshifter.poet.type.Type("CGRect"), label = "within")
-                parameter("measurement", me.yoonjae.shapeshifter.poet.type.Type("LayoutMeasurement"))
+                parameter("rect", Type("CGRect"), label = "within")
+                parameter("measurement", Type("LayoutMeasurement"))
 
                 constant("frame") {
                     functionCallExpression("layoutParams.arrangement") {

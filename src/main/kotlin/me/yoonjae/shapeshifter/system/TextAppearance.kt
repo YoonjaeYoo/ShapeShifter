@@ -1,5 +1,6 @@
 package me.yoonjae.shapeshifter.system
 
+import me.yoonjae.shapeshifter.poet.declaration.ClassDescriber
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
 
@@ -48,14 +49,14 @@ class TextAppearance : SwiftFile("TextAppearance.swift") {
         }
     }
 
-    private fun me.yoonjae.shapeshifter.poet.declaration.ClassDescriber.textAppearance(name: String, textColor: String, textSize: Int) {
+    private fun ClassDescriber.textAppearance(name: String, textColor: String, textSize: Int) {
         clazz(name) {
             public()
             superType("TextAppearance")
 
             initializer {
                 public()
-                parameter("theme", me.yoonjae.shapeshifter.poet.type.Type("Theme"), label = "_")
+                parameter("theme", Type("Theme"), label = "_")
                 initializerExpression("super") {
                     argument(null, "theme")
                     argument("textColor", "theme.$textColor")

@@ -1,10 +1,9 @@
 package me.yoonjae.shapeshifter.system
 
-import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
 import me.yoonjae.shapeshifter.translator.extensions.increasedToMinSize
 
-class LinearLayout : SwiftFile("LinearLayout.swift") {
+class LinearLayout : me.yoonjae.shapeshifter.poet.file.SwiftFile("LinearLayout.swift") {
     init {
         import("UIKit")
         import("LayoutKit")
@@ -91,40 +90,28 @@ class LinearLayout : SwiftFile("LinearLayout.swift") {
                                 }
                             }
                             ifStatement("orientation == .vertical") {
-                                codeBlock {
-                                    generalExpression("childSize.height -= " +
-                                            "measurement.size.height")
-                                    ifStatement("layoutParams.width == WRAP_CONTENT") {
-                                        codeBlock {
-                                            assignmentExpression("size.width", "max(size.width, " +
-                                                    "measurement.size.width + padding.left + " +
-                                                    "padding.right + layoutParams.margin.left + " +
-                                                    "layoutParams.margin.right)")
-                                        }
-                                    }
-                                    ifStatement("layoutParams.height == WRAP_CONTENT") {
-                                        codeBlock {
-                                            generalExpression("size.height += measurement.size.height")
-                                        }
-                                    }
+                                generalExpression("childSize.height -= " +
+                                        "measurement.size.height")
+                                ifStatement("layoutParams.width == WRAP_CONTENT") {
+                                    assignmentExpression("size.width", "max(size.width, " +
+                                            "measurement.size.width + padding.left + " +
+                                            "padding.right + layoutParams.margin.left + " +
+                                            "layoutParams.margin.right)")
+                                }
+                                ifStatement("layoutParams.height == WRAP_CONTENT") {
+                                    generalExpression("size.height += measurement.size.height")
                                 }
                                 elseClause {
-                                    codeBlock {
-                                        generalExpression("childSize.width -= " +
-                                                "measurement.size.width")
-                                        ifStatement("layoutParams.width == WRAP_CONTENT") {
-                                            codeBlock {
-                                                generalExpression("size.width += measurement.size.width")
-                                            }
-                                        }
-                                        ifStatement("layoutParams.height == WRAP_CONTENT") {
-                                            codeBlock {
-                                                assignmentExpression("size.height", "max(size.height, " +
-                                                        "measurement.size.height + padding.top + " +
-                                                        "padding.bottom + layoutParams.margin.top + " +
-                                                        "layoutParams.margin.bottom)")
-                                            }
-                                        }
+                                    generalExpression("childSize.width -= " +
+                                            "measurement.size.width")
+                                    ifStatement("layoutParams.width == WRAP_CONTENT") {
+                                        generalExpression("size.width += measurement.size.width")
+                                    }
+                                    ifStatement("layoutParams.height == WRAP_CONTENT") {
+                                        assignmentExpression("size.height", "max(size.height, " +
+                                                "measurement.size.height + padding.top + " +
+                                                "padding.bottom + layoutParams.margin.top + " +
+                                                "layoutParams.margin.bottom)")
                                     }
                                 }
                             }
@@ -175,15 +162,11 @@ class LinearLayout : SwiftFile("LinearLayout.swift") {
                                     generalExpression("measurement.arrangement(within: childRect)")
                                 }
                                 ifStatement("orientation == .vertical") {
-                                    codeBlock {
-                                        generalExpression("childRect.origin.y += " +
-                                                "measurement.size.height")
-                                    }
+                                    generalExpression("childRect.origin.y += " +
+                                            "measurement.size.height")
                                     elseClause {
-                                        codeBlock {
-                                            generalExpression("childRect.origin.x += " +
-                                                    "measurement.size.width")
-                                        }
+                                        generalExpression("childRect.origin.x += " +
+                                                "measurement.size.width")
                                     }
                                 }
                                 returnStatement("arrangement")

@@ -7,7 +7,7 @@ import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifierDescriber
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Extension(val name: String) : Declaration,
+class Extension(val name: String) : Declaration(),
         AccessLevelModifierDescriber by AccessLevelModifierDescriber.Delegate(),
         GenericParameterDescriber by GenericParameterDescriber.Delegate(),
         TypeInheritanceDescriber by TypeInheritanceDescriber.Delegate(),

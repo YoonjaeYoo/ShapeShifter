@@ -14,16 +14,19 @@ class View : SwiftFile("View.swift") {
             genericParameter("V") {
                 superType("UIView")
             }
+            superType("BaseView")
             superType("ConfigurableLayout")
 
             constant("theme", Type("Theme")) { public() }
-            constant("layoutParams", Type("LayoutParams")) { public() }
+            variable("layoutParams", Type("LayoutParams")) { public() }
             constant("id", Type("String", true)) { public() }
-            constant("padding", Type("UIEdgeInsets")) { public() }
-            constant("minWidth", Type("CGFloat", true)) { public() }
-            constant("minHeight", Type("CGFloat", true)) { public() }
-            constant("config", Type("(V) -> Void", true)) { public() }
-            constant("flexibility", value = "Flexibility.inflexible") { public() }
+            variable("padding", Type("UIEdgeInsets")) { public() }
+            variable("minWidth", Type("CGFloat", true)) { public() }
+            variable("minHeight", Type("CGFloat", true)) { public() }
+            variable("alpha", Type("CGFloat"), "1.0") { public() }
+            variable("background", Type("UIColor", true), "nil") { public() }
+            variable("config", Type("(V) -> Void", true)) { public() }
+            variable("flexibility", value = "Flexibility.inflexible") { public() }
             variable("needsView", Type("Bool"), "true") { public() }
             variable("viewReuseId", Type("String", true)) {
                 public()
@@ -32,6 +35,15 @@ class View : SwiftFile("View.swift") {
                     returnStatement("id")
                 }
             }
+            variable("parent", Type("BaseView", true), "nil") { public() }
+            variable("view", Type("V", true)) {
+                public()
+
+                codeBlock {
+                    returnStatement("_view")
+                }
+            }
+            variable("_view", Type("V", true)) { private() }
 
             initializer {
                 public()
@@ -53,11 +65,13 @@ class View : SwiftFile("View.swift") {
                 assignmentExpression("self.padding", "padding")
                 assignmentExpression("self.minWidth", "minWidth")
                 assignmentExpression("self.minHeight", "minHeight")
+                assignmentExpression("self.alpha", "alpha")
+                assignmentExpression("self.background", "background")
                 assignmentExpression("self.config") {
                     closureExpression {
                         closureParameter("view")
-                        assignmentExpression("view.alpha", "alpha")
-                        assignmentExpression("view.backgroundColor", "background")
+                        assignmentExpression("view.alpha", "self.alpha")
+                        assignmentExpression("view.backgroundColor", "self.background")
                         functionCallExpression("config?") {
                             argument(value = "view")
                         }
@@ -74,7 +88,9 @@ class View : SwiftFile("View.swift") {
 
             function("makeView", Type("UIView")) {
                 public()
-                returnStatement("V()")
+                constant("view", value = "V()")
+                assignmentExpression("_view", "view")
+                returnStatement("view")
             }
 
             function("measurement", Type("LayoutMeasurement")) {
@@ -129,6 +145,38 @@ class View : SwiftFile("View.swift") {
                         argument("layout", "self")
                         argument("frame", "frame")
                         argument("sublayouts", "[]")
+                    }
+                }
+            }
+
+            function("findView", Type("BaseView", true)) {
+                public()
+                parameter("id", Type("String"), label = "by")
+
+                returnStatement("id == self.viewReuseId ? self : nil")
+            }
+
+            function("requestLayout") {
+                public()
+                parameter("view", Type("UIView"), label = "in")
+
+                ifStatement("parent == nil") {
+                    functionCallExpression("DispatchQueue.global(qos: .background).async") {
+                        trailingClosure {
+                            constant("arrangement",
+                                    value = "self.arrangement(width: view.bounds.width, " +
+                                            "height: view.bounds.height)")
+                            functionCallExpression("DispatchQueue.main.async") {
+                                argument("execute") {
+                                    closureExpression {
+                                        generalExpression("arrangement.makeViews(in: view)")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    elseClause {
+                        generalExpression("parent!.requestLayout(in: view)")
                     }
                 }
             }

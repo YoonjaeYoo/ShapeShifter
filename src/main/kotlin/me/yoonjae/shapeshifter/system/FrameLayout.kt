@@ -88,14 +88,10 @@ class FrameLayout : SwiftFile("FrameLayout.swift") {
                     }
                 }
                 ifStatement("layoutParams.width == WRAP_CONTENT") {
-                    codeBlock {
-                        assignmentExpression("size.width", "minSize.width")
-                    }
+                    assignmentExpression("size.width", "minSize.width")
                 }
                 ifStatement("layoutParams.height == WRAP_CONTENT") {
-                    codeBlock {
-                        assignmentExpression("size.height", "minSize.height")
-                    }
+                    assignmentExpression("size.height", "minSize.height")
                 }
                 returnStatement {
                     functionCallExpression("LayoutMeasurement") {

@@ -45,50 +45,26 @@ class Gravity : SwiftFile("Gravity.swift") {
                 codeBlock {
                     variable("vertical", Type("Alignment.Vertical"))
                     ifStatement("contains(.bottom)") {
-                        codeBlock {
-                            assignmentExpression("vertical", ".bottom")
-                        }
-                        elseClause {
-                            ifStatement("contains(.centerVertical) || contains(.center)") {
-                                codeBlock {
-                                    assignmentExpression("vertical", ".center")
-                                }
+                        assignmentExpression("vertical", ".bottom")
+                        elseIfStatement("contains(.centerVertical) || contains(.center)") {
+                            assignmentExpression("vertical", ".center")
+                            elseIfStatement("contains(.fillVertical) || contains(.fill)") {
+                                assignmentExpression("vertical", ".fill")
                                 elseClause {
-                                    ifStatement("contains(.fillVertical) || contains(.fill)") {
-                                        codeBlock {
-                                            assignmentExpression("vertical", ".fill")
-                                        }
-                                        elseClause {
-                                            codeBlock {
-                                                assignmentExpression("vertical", ".top")
-                                            }
-                                        }
-                                    }
+                                    assignmentExpression("vertical", ".top")
                                 }
                             }
                         }
                     }
                     variable("horizontal", Type("Alignment.Horizontal"))
                     ifStatement("contains(.end) || contains(.right)") {
-                        codeBlock {
-                            assignmentExpression("horizontal", ".trailing")
-                        }
-                        elseClause {
-                            ifStatement("contains(.centerHorizontal) || contains(.center)") {
-                                codeBlock {
-                                    assignmentExpression("horizontal", ".center")
-                                }
+                        assignmentExpression("horizontal", ".trailing")
+                        elseIfStatement("contains(.centerHorizontal) || contains(.center)") {
+                            assignmentExpression("horizontal", ".center")
+                            elseIfStatement("contains(.fillHorizontal) || contains(.fill)") {
+                                assignmentExpression("horizontal", ".fill")
                                 elseClause {
-                                    ifStatement("contains(.fillHorizontal) || contains(.fill)") {
-                                        codeBlock {
-                                            assignmentExpression("horizontal", ".fill")
-                                        }
-                                        elseClause {
-                                            codeBlock {
-                                                assignmentExpression("horizontal", ".leading")
-                                            }
-                                        }
-                                    }
+                                    assignmentExpression("horizontal", ".leading")
                                 }
                             }
                         }
@@ -105,25 +81,13 @@ class Gravity : SwiftFile("Gravity.swift") {
             variable("contentVerticalAlignment", Type("UIControlContentVerticalAlignment")) {
                 codeBlock {
                     ifStatement("contains(.bottom)") {
-                        codeBlock {
-                            returnStatement(".bottom")
-                        }
-                        elseClause {
-                            ifStatement("contains(.centerVertical) || contains(.center)") {
-                                codeBlock {
-                                    returnStatement(".center")
-                                }
+                        returnStatement(".bottom")
+                        elseIfStatement("contains(.centerVertical) || contains(.center)") {
+                            returnStatement(".center")
+                            elseIfStatement("contains(.fillVertical) || contains(.fill)") {
+                                returnStatement(".fill")
                                 elseClause {
-                                    ifStatement("contains(.fillVertical) || contains(.fill)") {
-                                        codeBlock {
-                                            returnStatement(".fill")
-                                        }
-                                        elseClause {
-                                            codeBlock {
-                                                returnStatement(".top")
-                                            }
-                                        }
-                                    }
+                                    returnStatement(".top")
                                 }
                             }
                         }
@@ -134,24 +98,32 @@ class Gravity : SwiftFile("Gravity.swift") {
             variable("contentHorizontalAlignment", Type("UIControlContentHorizontalAlignment")) {
                 codeBlock {
                     ifStatement("contains(.end) || contains(.right)") {
-                        codeBlock {
-                            returnStatement(".right")
-                        }
-                        elseClause {
-                            ifStatement("contains(.centerHorizontal) || contains(.center)") {
-                                codeBlock {
-                                    returnStatement(".center")
-                                }
+                        returnStatement(".right")
+                        elseIfStatement("contains(.centerHorizontal) || contains(.center)") {
+                            returnStatement(".center")
+                            elseIfStatement("contains(.fillHorizontal) || contains(.fill)") {
+                                returnStatement(".fill")
                                 elseClause {
-                                    ifStatement("contains(.fillHorizontal) || contains(.fill)") {
-                                        codeBlock {
-                                            returnStatement(".fill")
-                                        }
-                                        elseClause {
-                                            codeBlock {
-                                                returnStatement(".left")
-                                            }
-                                        }
+                                    returnStatement(".left")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            variable("textAlignment", Type("NSTextAlignment")) {
+                codeBlock {
+                    ifStatement("contains(.end) || contains(.right)") {
+                        returnStatement(".right")
+                        elseIfStatement("contains(.centerHorizontal) || contains(.center)") {
+                            returnStatement(".center")
+                            elseIfStatement("contains(.fillHorizontal) || contains(.fill)") {
+                                returnStatement(".justified")
+                                elseIfStatement("contains(.start) || contains(.left)") {
+                                    returnStatement(".left")
+                                    elseClause {
+                                        returnStatement(".natural")
                                     }
                                 }
                             }

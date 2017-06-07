@@ -2,7 +2,7 @@ package me.yoonjae.shapeshifter.poet.expression
 
 import me.yoonjae.shapeshifter.poet.Describer
 
-interface LiteralExpression : Expression
+abstract class LiteralExpression : Expression()
 
 interface LiteralExpressionDescriber : Describer, ArrayLiteralExpressionDescriber,
         DictionaryLiteralExpressionDescriber {

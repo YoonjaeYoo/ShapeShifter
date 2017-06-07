@@ -13,21 +13,15 @@ class CGFloatExtension : SwiftFile("CGFloatExtension.swift") {
 
                 codeBlock {
                     ifStatement("self == 0") {
-                        codeBlock {
-                            returnStatement("0")
-                        }
+                        returnStatement("0")
                     }
                     ifStatement("self < 0") {
-                        codeBlock {
-                            returnStatement("-(-self).roundedDownToFractionalPoint")
-                        }
+                        returnStatement("-(-self).roundedDownToFractionalPoint")
                     }
                     constant("scale", value = "UIScreen.main.scale")
                     constant("pointPrecision", value = "1.0 / scale")
                     ifStatement("self <= pointPrecision") {
-                        codeBlock {
-                            returnStatement("pointPrecision")
-                        }
+                        returnStatement("pointPrecision")
                     }
                     returnStatement("ceil(self * scale) / scale")
                 }
@@ -37,21 +31,15 @@ class CGFloatExtension : SwiftFile("CGFloatExtension.swift") {
 
                 codeBlock {
                     ifStatement("self == 0") {
-                        codeBlock {
-                            returnStatement("0")
-                        }
+                        returnStatement("0")
                     }
                     ifStatement("self < 0") {
-                        codeBlock {
-                            returnStatement("-(-self).roundedUpToFractionalPoint")
-                        }
+                        returnStatement("-(-self).roundedUpToFractionalPoint")
                     }
                     constant("scale", value = "UIScreen.main.scale")
                     constant("pointPrecision", value = "1.0 / scale")
                     ifStatement("self < pointPrecision") {
-                        codeBlock {
-                            returnStatement("pointPrecision")
-                        }
+                        returnStatement("pointPrecision")
                     }
                     returnStatement("floor(self * scale) / scale")
                 }

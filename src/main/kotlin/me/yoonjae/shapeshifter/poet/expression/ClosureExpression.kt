@@ -8,14 +8,19 @@ import me.yoonjae.shapeshifter.poet.statement.render
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class ClosureExpression : Expression,
+class ClosureExpression : Expression(),
         ClosureParameterDescriber by ClosureParameterDescriber.Delegate(),
         StatementDescriber by StatementDescriber.Delegate() {
 
-    override fun render(writer: Writer, linePrefix: Element?) {
-        writer.write("{ ")
-        closureParameters.render(writer, linePrefix)
-        writer.writeln(" in")
+    override fun renderExpression(writer: Writer, linePrefix: Element?) {
+        writer.write("{")
+        if (closureParameters.isNotEmpty()) {
+            writer.write(" ")
+            closureParameters.render(writer, linePrefix)
+            writer.writeln(" in")
+        } else {
+            writer.writeln()
+        }
         (Indent(1) + linePrefix).render(writer)
         statements.render(writer, Indent(1) + linePrefix)
         writer.writeln()

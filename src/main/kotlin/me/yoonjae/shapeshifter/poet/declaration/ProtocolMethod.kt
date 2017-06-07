@@ -6,7 +6,7 @@ import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifierDescriber
 import me.yoonjae.shapeshifter.poet.type.Type
 import java.io.Writer
 
-class ProtocolMethod(val name: String, var result: Type? = null) : Declaration,
+class ProtocolMethod(val name: String, var result: Type? = null) : Declaration(),
         DeclarationModifierDescriber by DeclarationModifierDescriber.Delegate(),
         GenericParameterDescriber by GenericParameterDescriber.Delegate(),
         ParameterDescriber by ParameterDescriber.Delegate() {

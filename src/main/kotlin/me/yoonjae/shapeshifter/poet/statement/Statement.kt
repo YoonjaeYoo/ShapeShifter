@@ -9,10 +9,11 @@ import me.yoonjae.shapeshifter.poet.type.Type
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-interface Statement : Element
+abstract class Statement : Element
 
 interface StatementDescriber : ExpressionDescriber, DeclarationDescriber,
-        ReturnStatementDescriber, IfStatementDescriber {
+        ReturnStatementDescriber, IfStatementDescriber, SwitchStatementDescriber,
+        ForInStatementDescriber {
 
     val statements: MutableList<Statement>
 
@@ -20,7 +21,9 @@ interface StatementDescriber : ExpressionDescriber, DeclarationDescriber,
             ExpressionDescriber by ExpressionDescriber.Delegate(),
             DeclarationDescriber by DeclarationDescriber.Delegate(),
             ReturnStatementDescriber by ReturnStatementDescriber.Delegate(),
-            IfStatementDescriber by IfStatementDescriber.Delegate() {
+            IfStatementDescriber by IfStatementDescriber.Delegate(),
+            SwitchStatementDescriber by SwitchStatementDescriber.Delegate(),
+            ForInStatementDescriber by ForInStatementDescriber.Delegate() {
 
         override val statements = mutableListOf<Statement>()
 
@@ -30,29 +33,29 @@ interface StatementDescriber : ExpressionDescriber, DeclarationDescriber,
                     also { statements.add(it) }
         }
 
-        override fun functionCallExpression(target: String,
+        override fun functionCallExpression(expression: String,
                                             init: (FunctionCallExpression.() -> Unit)?):
                 FunctionCallExpression {
-            return super<StatementDescriber>.functionCallExpression(target, init).
+            return super<StatementDescriber>.functionCallExpression(expression, init).
                     also { statements.add(it) }
         }
 
-        override fun functionCallExpression(target: Expression,
+        override fun functionCallExpression(expression: Expression,
                                             init: (FunctionCallExpression.() -> Unit)?):
                 FunctionCallExpression {
-            return super<StatementDescriber>.functionCallExpression(target, init).
+            return super<StatementDescriber>.functionCallExpression(expression, init).
                     also { statements.add(it) }
         }
 
-        override fun initializerExpression(target: String, init: (InitializerExpression.() -> Unit)?):
+        override fun initializerExpression(expression: String, init: (InitializerExpression.() -> Unit)?):
                 InitializerExpression {
-            return super<StatementDescriber>.initializerExpression(target, init).
+            return super<StatementDescriber>.initializerExpression(expression, init).
                     also { statements.add(it) }
         }
 
-        override fun initializerExpression(target: Expression, init: (InitializerExpression.() -> Unit)?):
+        override fun initializerExpression(expression: Expression, init: (InitializerExpression.() -> Unit)?):
                 InitializerExpression {
-            return super<StatementDescriber>.initializerExpression(target, init).
+            return super<StatementDescriber>.initializerExpression(expression, init).
                     also { statements.add(it) }
         }
 
@@ -84,6 +87,18 @@ interface StatementDescriber : ExpressionDescriber, DeclarationDescriber,
                 AssignmentExpression {
             return super<StatementDescriber>.assignmentExpression(target, value, init).
                     also { statements.add(it) }
+        }
+
+        override fun explicitMemberExpression(expression: String, identifier: String,
+                                              init: (ExplicitMemberExpression.() -> Unit)?):
+                ExplicitMemberExpression {
+            return super<StatementDescriber>.explicitMemberExpression(expression, identifier, init)
+        }
+
+        override fun explicitMemberExpression(expression: Expression, identifier: String,
+                                              init: (ExplicitMemberExpression.() -> Unit)?):
+                ExplicitMemberExpression {
+            return super<StatementDescriber>.explicitMemberExpression(expression, identifier, init)
         }
 
         override fun import(name: String, init: (Import.() -> Unit)?): Import {
@@ -143,8 +158,33 @@ interface StatementDescriber : ExpressionDescriber, DeclarationDescriber,
                     also { statements.add(it) }
         }
 
-        override fun ifStatement(condition: String?, init: (IfStatement.() -> Unit)?): IfStatement {
+        override fun ifStatement(condition: String, init: (IfStatement.() -> Unit)?): IfStatement {
             return super<StatementDescriber>.ifStatement(condition, init).
+                    also { statements.add(it) }
+        }
+
+        override fun ifStatement(condition: Expression, init: (IfStatement.() -> Unit)?): IfStatement {
+            return super<StatementDescriber>.ifStatement(condition, init).
+                    also { statements.add(it) }
+        }
+
+        override fun switchStatement(value: String, init: (SwitchStatement.() -> Unit)?): SwitchStatement {
+            return super<StatementDescriber>.switchStatement(value, init).
+                    also { statements.add(it) }
+        }
+
+        override fun switchStatement(value: Expression?, init: (SwitchStatement.() -> Unit)?): SwitchStatement {
+            return super<StatementDescriber>.switchStatement(value, init).
+                    also { statements.add(it) }
+        }
+
+        override fun forInStatement(pattern: String, expression: Expression, init: (ForInStatement.() -> Unit)?): ForInStatement {
+            return super<StatementDescriber>.forInStatement(pattern, expression, init).
+                    also { statements.add(it) }
+        }
+
+        override fun forInStatement(pattern: String, expression: String, init: (ForInStatement.() -> Unit)?): ForInStatement {
+            return super<StatementDescriber>.forInStatement(pattern, expression, init).
                     also { statements.add(it) }
         }
     }

@@ -39,6 +39,13 @@ class ModelTranslator : Translator<SwiftFile>() {
                 variable(variable.nameAsString, type)
             }
 
+            if (extending) {
+                initializer {
+                    override()
+                    initializerExpression("super")
+                }
+            }
+
             initializer {
                 required()
                 parameter("map", Type("[String: Any]"), label = "_")

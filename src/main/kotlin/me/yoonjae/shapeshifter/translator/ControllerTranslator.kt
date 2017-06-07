@@ -36,9 +36,15 @@ class ControllerTranslator(val activityThemeMap: Map<String, String>) : Translat
                         parseResourceName(text)?.let {
                             resourceName = it
                         }
-                        function("layout", Type("Layout")) {
+                        function("viewDidLoad", Type("BaseView")) {
                             override()
-                            returnStatement("${resourceName}Layout(theme: theme)")
+                            functionCallExpression("super.viewDidLoad")
+
+                            assignmentExpression("contentView") {
+                                initializerExpression("${resourceName}Layout") {
+                                    argument("theme", "theme")
+                                }
+                            }
                         }
                     }
                 }

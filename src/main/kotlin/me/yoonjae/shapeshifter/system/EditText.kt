@@ -1,10 +1,11 @@
 package me.yoonjae.shapeshifter.system
 
+import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
 import me.yoonjae.shapeshifter.translator.extensions.increasedToMinSize
 
 
-class EditText : me.yoonjae.shapeshifter.poet.file.SwiftFile("EditText.swift") {
+class EditText : SwiftFile("EditText.swift") {
     init {
         import("UIKit")
         import("LayoutKit")
@@ -50,6 +51,7 @@ class EditText : me.yoonjae.shapeshifter.poet.file.SwiftFile("EditText.swift") {
                 }
                 initializerExpression("super") {
                     argument("theme", "theme")
+                    argument("id", "id")
                     argument("layoutParams", "layoutParams")
                     argument("padding", "padding")
                     argument("minWidth", "minWidth")

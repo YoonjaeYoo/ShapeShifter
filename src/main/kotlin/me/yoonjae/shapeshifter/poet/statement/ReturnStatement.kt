@@ -5,7 +5,7 @@ import me.yoonjae.shapeshifter.poet.Element
 import me.yoonjae.shapeshifter.poet.expression.ExpressionDescriber
 import java.io.Writer
 
-class ReturnStatement(val value: String? = null) : Statement,
+class ReturnStatement(val value: String? = null) : Statement(),
         ExpressionDescriber by ExpressionDescriber.Delegate() {
 
     init {

@@ -17,7 +17,8 @@ class ViewGroup : SwiftFile("ViewGroup.swift") {
                 genericParameter("UIView")
             }
 
-            constant("children", Type("[Layout]")) { public() }
+            variable("children", value = "[Layout]()") { public() }
+
             initializer {
                 public()
                 parameter("theme", Type("Theme"), "AppTheme()")
@@ -33,7 +34,6 @@ class ViewGroup : SwiftFile("ViewGroup.swift") {
                 parameter("children", Type("[Layout]"), "[]")
                 parameter("config", Type("(UIView) -> Void", true), "nil")
 
-                assignmentExpression("self.children", "children")
                 initializerExpression("super") {
                     argument("theme", "theme")
                     argument("id", "id")
@@ -44,6 +44,15 @@ class ViewGroup : SwiftFile("ViewGroup.swift") {
                     argument("alpha", "alpha")
                     argument("background", "background")
                     argument("config", "config")
+                }
+                forInStatement("child", "children") {
+                    ifStatement("child is BaseView") {
+                        variable("view", value = "child as! BaseView")
+                        assignmentExpression("view.parent", "self")
+                    }
+                    functionCallExpression("self.children.append") {
+                        argument(value = "child")
+                    }
                 }
             }
 
@@ -66,6 +75,23 @@ class ViewGroup : SwiftFile("ViewGroup.swift") {
                 functionCallExpression("fatalError") {
                     argument(value = "\"not implemented\"")
                 }
+            }
+
+            function("findView", Type("BaseView", true)) {
+                override()
+                public()
+                parameter("id", Type("String"), label = "by")
+
+                forInStatement("child", "children") {
+                    ifStatement("child is BaseView") {
+                        constant("base", value = "child as! BaseView")
+                        constant("view", value = "base.findView(by: id)")
+                        ifStatement("view != nil") {
+                            returnStatement("view")
+                        }
+                    }
+                }
+                returnStatement("id == self.viewReuseId ? self : nil")
             }
         }
 
@@ -92,7 +118,7 @@ class ViewGroup : SwiftFile("ViewGroup.swift") {
                 parameter("rect", Type("CGRect"), label = "in")
 
                 returnStatement {
-                    functionCallExpression("Alignment.fill.position") {
+                    functionCallExpression("Alignment.topLeading.position") {
                         argument("size", "size.decreasedByInsets(margin)")
                         argument("in") {
                             initializerExpression("CGRect") {

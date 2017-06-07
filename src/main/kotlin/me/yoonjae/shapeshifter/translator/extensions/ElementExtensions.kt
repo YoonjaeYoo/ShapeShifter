@@ -12,6 +12,8 @@ val Element.layoutType: String?
         "ImageView" -> "ImageView"
         "com.flaviofaria.kenburnsview.KenBurnsView" -> "ImageView"
         "ScrollView" -> "ScrollView"
+        "android.support.v4.widget.NestedScrollView" -> "ScrollView"
+        "android.support.v7.widget.RecyclerView" -> "RecyclerView"
         "android.support.v7.widget.Toolbar" -> null
         "include" -> "include"
         else -> "FrameLayout"
@@ -24,6 +26,7 @@ val Element.viewType: String
         "Button" -> "UIButton"
         "ImageView" -> "UIImageView"
         "ScrollView" -> "UIScrollView"
+        "RecyclerView" -> "UITableView"
         else -> "UIView"
     }
 

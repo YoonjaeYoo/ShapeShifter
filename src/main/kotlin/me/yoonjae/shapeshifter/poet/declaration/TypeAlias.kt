@@ -5,7 +5,7 @@ import me.yoonjae.shapeshifter.poet.Element
 import me.yoonjae.shapeshifter.poet.modifier.AccessLevelModifierDescriber
 import java.io.Writer
 
-class TypeAlias(val name: String, var type: String) : Declaration,
+class TypeAlias(val name: String, var type: String) : Declaration(),
         AccessLevelModifierDescriber by AccessLevelModifierDescriber.Delegate() {
 
     override fun render(writer: Writer, linePrefix: Element?) {

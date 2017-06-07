@@ -8,7 +8,7 @@ import me.yoonjae.shapeshifter.poet.type.TypeDescriber
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Enum(val name: String) : Declaration,
+class Enum(val name: String) : Declaration(),
         TypeInheritanceDescriber by TypeInheritanceDescriber.Delegate(),
         AccessLevelModifierDescriber by AccessLevelModifierDescriber.Delegate() {
 

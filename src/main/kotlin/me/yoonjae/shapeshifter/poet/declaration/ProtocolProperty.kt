@@ -6,21 +6,21 @@ import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifierDescriber
 import me.yoonjae.shapeshifter.poet.type.Type
 import java.io.Writer
 
-class ProtocolProperty(val name: String, var type: Type) : Declaration,
+class ProtocolProperty(val name: String, var type: Type) : Declaration(),
         DeclarationModifierDescriber by DeclarationModifierDescriber.Delegate() {
 
     var get: GetKeyword = GetKeyword()
     var set: SetKeyword? = null
 
-    fun get(init: (GetKeyword.() -> Unit)) {
+    fun get(init: (GetKeyword.() -> Unit)? = null) {
         val get = GetKeyword()
-        get.init()
+        init?.invoke(get)
         this.get = get
     }
 
-    fun set(init: (SetKeyword.() -> Unit)) {
+    fun set(init: (SetKeyword.() -> Unit)? = null) {
         val set = SetKeyword()
-        set.init()
+        init?.invoke(set)
         this.set = set
     }
 

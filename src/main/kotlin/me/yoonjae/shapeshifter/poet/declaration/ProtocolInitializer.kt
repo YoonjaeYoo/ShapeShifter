@@ -5,7 +5,7 @@ import me.yoonjae.shapeshifter.poet.Element
 import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifierDescriber
 import java.io.Writer
 
-class ProtocolInitializer : Declaration,
+class ProtocolInitializer : Declaration(),
         DeclarationModifierDescriber by DeclarationModifierDescriber.Delegate(),
         ParameterDescriber by ParameterDescriber.Delegate() {
 

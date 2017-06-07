@@ -4,14 +4,14 @@ import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import java.io.Writer
 
-class FunctionCallExpression(val target: Expression) : Expression,
+class FunctionCallExpression(val expression: Expression) : Expression(),
         ArgumentDescriber by ArgumentDescriber.Delegate(),
         TrailingClosureDescriber by TrailingClosureDescriber.Delegate() {
 
     constructor(target: String) : this(GeneralExpression(target))
 
-    override fun render(writer: Writer, linePrefix: Element?) {
-        target.render(writer, linePrefix)
+    override fun renderExpression(writer: Writer, linePrefix: Element?) {
+        expression.renderExpression(writer, linePrefix)
         arguments.render(writer, linePrefix)
         trailingClosure?.let {
             writer.write(" ")
@@ -24,19 +24,19 @@ interface FunctionCallExpressionDescriber : Describer {
 
     val functionCallExpressions: MutableList<FunctionCallExpression>
 
-    fun functionCallExpression(target: String,
+    fun functionCallExpression(expression: String,
                                init: (FunctionCallExpression.() -> Unit)? = null):
             FunctionCallExpression {
-        val functionCallExpression = FunctionCallExpression(target)
+        val functionCallExpression = FunctionCallExpression(expression)
         init?.invoke(functionCallExpression)
         functionCallExpressions.add(functionCallExpression)
         return functionCallExpression
     }
 
-    fun functionCallExpression(target: Expression,
+    fun functionCallExpression(expression: Expression,
                                init: (FunctionCallExpression.() -> Unit)? = null):
             FunctionCallExpression {
-        val functionCallExpression = FunctionCallExpression(target)
+        val functionCallExpression = FunctionCallExpression(expression)
         init?.invoke(functionCallExpression)
         functionCallExpressions.add(functionCallExpression)
         return functionCallExpression

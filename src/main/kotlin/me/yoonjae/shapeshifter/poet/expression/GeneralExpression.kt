@@ -4,9 +4,9 @@ import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import java.io.Writer
 
-class GeneralExpression(val value: String) : Expression {
+class GeneralExpression(val value: String) : Expression() {
 
-    override fun render(writer: Writer, linePrefix: Element?) {
+    override fun renderExpression(writer: Writer, linePrefix: Element?) {
         writer.write(value)
     }
 }

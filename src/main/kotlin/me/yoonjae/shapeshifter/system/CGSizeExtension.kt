@@ -1,8 +1,9 @@
 package me.yoonjae.shapeshifter.system
 
+import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
 
-class CGSizeExtension : me.yoonjae.shapeshifter.poet.file.SwiftFile("CGSizeExtension.swift") {
+class CGSizeExtension : SwiftFile("CGSizeExtension.swift") {
     init {
         import("CoreGraphics")
         import("UIKit")

@@ -4,7 +4,7 @@ import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import java.io.Writer
 
-class Import(val name: String) : Declaration {
+class Import(val name: String) : Declaration() {
 
     override fun render(writer: Writer, linePrefix: Element?) {
         writer.write("import $name")

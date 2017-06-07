@@ -7,7 +7,7 @@ import me.yoonjae.shapeshifter.poet.modifier.DeclarationModifierDescriber
 import me.yoonjae.shapeshifter.poet.type.Type
 import java.io.Writer
 
-class Constant(val name: String, var type: Type? = null, value: String? = null) : Declaration,
+class Constant(val name: String, var type: Type? = null, value: String? = null) : Declaration(),
         DeclarationModifierDescriber by DeclarationModifierDescriber.Delegate(),
         ExpressionDescriber by ExpressionDescriber.Delegate() {
 

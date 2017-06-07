@@ -11,10 +11,10 @@ class ScrollView : SwiftFile("ScrollView.swift") {
 
         clazz("ScrollView") {
             superType("View") {
-                genericParameter("UIScrollView")
+                genericParameter("UISmartScrollView")
             }
 
-            constant("child", Type("Layout", true)) {
+            variable("child", Type("Layout", true)) {
                 public()
             }
 
@@ -31,9 +31,8 @@ class ScrollView : SwiftFile("ScrollView.swift") {
                 parameter("alpha", Type("CGFloat"), "1.0")
                 parameter("background", Type("UIColor", true), "nil")
                 parameter("child", Type("Layout", true), "nil")
-                parameter("config", Type("(UIScrollView) -> Void", true), "nil")
+                parameter("config", Type("(UISmartScrollView) -> Void", true), "nil")
 
-                assignmentExpression("self.child", "child")
                 initializerExpression("super") {
                     argument("theme", "theme")
                     argument("id", "id")
@@ -43,24 +42,13 @@ class ScrollView : SwiftFile("ScrollView.swift") {
                     argument("minHeight", "minHeight")
                     argument("alpha", "alpha")
                     argument("background", "background")
-                    trailingClosure {
-                        closureParameter("scrollView")
-
-                        ifStatement("!scrollView.subviews.isEmpty") {
-                            codeBlock {
-                                assignmentExpression("scrollView.contentSize") {
-                                    initializerExpression("CGSize") {
-                                        argument("width", "scrollView.frame.width")
-                                        argument("height", "scrollView.subviews[0].frame.height")
-                                    }
-                                }
-                            }
-                        }
-                        functionCallExpression("config?") {
-                            argument(value = "scrollView")
-                        }
-                    }
+                    argument("config", "config")
                 }
+                ifStatement("child is BaseView") {
+                    variable("view", value = "child as! BaseView")
+                    assignmentExpression("view.parent", "self")
+                }
+                assignmentExpression("self.child", "child")
             }
 
             function("measurement", Type("LayoutMeasurement")) {
@@ -99,23 +87,17 @@ class ScrollView : SwiftFile("ScrollView.swift") {
                     }
                 }
                 ifStatement("let measurement = measurement") {
-                    codeBlock {
-                        ifStatement("layoutParams.width == WRAP_CONTENT") {
-                            codeBlock {
-                                assignmentExpression("size.width", "max(size.width, " +
-                                        "measurement.size.width + padding.left + " +
-                                        "padding.right + layoutParams.margin.left + " +
-                                        "layoutParams.margin.right)")
-                            }
-                        }
-                        ifStatement("layoutParams.height == WRAP_CONTENT") {
-                            codeBlock {
-                                assignmentExpression("size.height", "max(size.height, " +
-                                        "measurement.size.height + padding.top + " +
-                                        "padding.bottom + layoutParams.margin.top + " +
-                                        "layoutParams.margin.bottom)")
-                            }
-                        }
+                    ifStatement("layoutParams.width == WRAP_CONTENT") {
+                        assignmentExpression("size.width", "max(size.width, " +
+                                "measurement.size.width + padding.left + " +
+                                "padding.right + layoutParams.margin.left + " +
+                                "layoutParams.margin.right)")
+                    }
+                    ifStatement("layoutParams.height == WRAP_CONTENT") {
+                        assignmentExpression("size.height", "max(size.height, " +
+                                "measurement.size.height + padding.top + " +
+                                "padding.bottom + layoutParams.margin.top + " +
+                                "layoutParams.margin.bottom)")
                     }
                 }
                 returnStatement {
@@ -142,23 +124,28 @@ class ScrollView : SwiftFile("ScrollView.swift") {
                         argument("in", "rect")
                     }
                 }
-                constant("childRect") {
-                    initializerExpression("CGRect") {
-                        argument("origin") {
-                            initializerExpression("CGPoint") {
-                                argument("x", "padding.left")
-                                argument("y", "padding.top")
-                            }
-                        }
-                        argument("size", "frame.size.decreasedByInsets(padding)")
-                    }
-                }
                 constant("arrangements", Type("[LayoutArrangement]")) {
                     functionCallExpression("measurement.sublayouts.map") {
                         trailingClosure {
-                            closureParameter("measurement") {
-                                returnStatement("measurement.arrangement(within: childRect)")
+                            closureParameter("measurement")
+                            constant("childRect") {
+                                initializerExpression("CGRect") {
+                                    argument("origin") {
+                                        initializerExpression("CGPoint") {
+                                            argument("x", "padding.left")
+                                            argument("y", "padding.top")
+                                        }
+                                    }
+                                    argument("size") {
+                                        initializerExpression("CGSize") {
+                                            argument("width", "frame.width - padding.left - " +
+                                                    "padding.right")
+                                            argument("height", "measurement.size.height")
+                                        }
+                                    }
+                                }
                             }
+                            returnStatement("measurement.arrangement(within: childRect)")
                         }
                     }
                 }
@@ -171,6 +158,22 @@ class ScrollView : SwiftFile("ScrollView.swift") {
                 }
             }
 
+            function("findView", Type("BaseView", true)) {
+                override()
+                public()
+                parameter("id", Type("String"), label = "by")
+
+                ifStatement("let child = child") {
+                    ifStatement("child is BaseView") {
+                        constant("base", value = "child as! BaseView")
+                        constant("view", value = "base.findView(by: id)")
+                        ifStatement("view != nil") {
+                            returnStatement("view")
+                        }
+                    }
+                }
+                returnStatement("id == self.viewReuseId ? self : nil")
+            }
         }
     }
 }

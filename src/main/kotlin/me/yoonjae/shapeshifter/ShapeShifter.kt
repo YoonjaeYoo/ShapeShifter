@@ -12,9 +12,9 @@ import javax.xml.parsers.DocumentBuilderFactory
 class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
 
     val system = listOf(Theme(), TextAppearance(), TextStyle(), CGSizeExtension(),
-            CGFloatExtension(), UIEdgeInsetsExtension(), UIFontExtension(), Gravity(), View(),
-            ViewGroup(), FrameLayout(), LinearLayout(), TextView(), EditText(), Button(),
-            ImageView(), ScrollView())
+            CGFloatExtension(), UIEdgeInsetsExtension(), UIFontExtension(), Gravity(), BaseView(),
+            View(), ViewGroup(), FrameLayout(), LinearLayout(), TextView(), EditText(), Button(),
+            ImageView(), ScrollView(), RecyclerView())
 
 
     fun shift() {

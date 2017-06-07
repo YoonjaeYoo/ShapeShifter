@@ -39,15 +39,17 @@ class RestServiceTranslator : Translator<SwiftFile>() {
                                     it.pathKey() == null && it.queryKey() == null)
                     )
                 }
-                parameter("completionHandler", Type("(HTTPResult) -> Void", true))
+                parameter("progressHandler", Type("(HTTPProgress) -> Void", true), "nil")
+                parameter("completionHandler", Type("(HTTPResult) -> Void", true), "nil")
 
-                variable("json") {
-                    initializerExpression("Dictionary<String, Any>")
-                }
-                method.parameters.forEach { parameter ->
-                    parameter.jsonKey()?.let {
-                        ifStatement("${parameter.nameAsString} != nil") {
-                            codeBlock {
+                val json = method.parameters.filter { it.jsonKey() != null }
+                if (json.isNotEmpty()) {
+                    variable("json") {
+                        initializerExpression("Dictionary<String, Any>")
+                    }
+                    method.parameters.forEach { parameter ->
+                        parameter.jsonKey()?.let {
+                            ifStatement("${parameter.nameAsString} != nil") {
                                 assignmentExpression("json[${it.quoted()}]", parameter.value())
                             }
                         }
@@ -59,8 +61,11 @@ class RestServiceTranslator : Translator<SwiftFile>() {
                 functionCallExpression("Just.${httpMethod.toLowerCase()}") {
                     argument(value = "BASE_URL + " + path(method, httpMethod))
                     paramArgument(method)
-                    argument("json", "json")
+                    if (json.isNotEmpty()) {
+                        argument("json", "json")
+                    }
                     headerArgument(method)
+                    argument("asyncProgressHandler", "progressHandler")
                     argument("asyncCompletionHandler", "completionHandler")
                 }
             }
@@ -78,11 +83,14 @@ class RestServiceTranslator : Translator<SwiftFile>() {
     }
 
     private fun FunctionCallExpression.paramArgument(method: MethodDeclaration) {
-        argument("params") {
-            dictionaryLiteralExpression {
-                method.parameters.forEach { parameter ->
-                    parameter.queryKey()?.let {
-                        keyValue(it.quoted(), parameter.value())
+        val params = method.parameters.filter { it.queryKey() != null }
+        if (params.isNotEmpty()) {
+            argument("params") {
+                dictionaryLiteralExpression {
+                    params.forEach { parameter ->
+                        parameter.queryKey()?.let {
+                            keyValue(it.quoted(), parameter.value())
+                        }
                     }
                 }
             }
@@ -90,11 +98,14 @@ class RestServiceTranslator : Translator<SwiftFile>() {
     }
 
     private fun FunctionCallExpression.headerArgument(method: MethodDeclaration) {
-        argument("headers") {
-            dictionaryLiteralExpression {
-                method.parameters.forEach { parameter ->
-                    parameter.headerKey()?.let {
-                        keyValue(it.quoted(), parameter.value())
+        val headers = method.parameters.filter { it.headerKey() != null }
+        if (headers.isNotEmpty()) {
+            argument("headers") {
+                dictionaryLiteralExpression {
+                    headers.forEach { parameter ->
+                        parameter.headerKey()?.let {
+                            keyValue(it.quoted(), parameter.value())
+                        }
                     }
                 }
             }
@@ -131,7 +142,7 @@ class RestServiceTranslator : Translator<SwiftFile>() {
     private fun Parameter.value(): String = if (isAnnotationPresent("Body")) {
         "$nameAsString?.properties()"
     } else if (headerKey() == "Authorization") {
-        "Token: \\($nameAsString)".quoted()
+        "Token \\($nameAsString)".quoted()
     } else {
         nameAsString
     }

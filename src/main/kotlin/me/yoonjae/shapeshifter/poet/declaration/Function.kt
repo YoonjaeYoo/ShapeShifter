@@ -9,7 +9,7 @@ import me.yoonjae.shapeshifter.poet.type.Type
 import me.yoonjae.shapeshifter.poet.writeln
 import java.io.Writer
 
-class Function(val name: String, var result: Type? = null) : Declaration,
+class Function(val name: String, var result: Type? = null) : Declaration(),
         DeclarationModifierDescriber by DeclarationModifierDescriber.Delegate(),
         GenericParameterDescriber by GenericParameterDescriber.Delegate(),
         ParameterDescriber by ParameterDescriber.Delegate(),

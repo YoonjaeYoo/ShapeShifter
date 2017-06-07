@@ -15,29 +15,21 @@ class UIFontExtension : SwiftFile("UIFontExtension.swift") {
                 parameter("style", Type("TextStyle"))
 
                 ifStatement("style == .bold") {
-                    codeBlock {
+                    returnStatement {
+                        functionCallExpression("UIFont.boldSystemFont") {
+                            argument("ofSize", "size")
+                        }
+                    }
+                    elseIfStatement("style == .italic") {
                         returnStatement {
-                            functionCallExpression("UIFont.boldSystemFont") {
+                            functionCallExpression("UIFont.italicSystemFont") {
                                 argument("ofSize", "size")
                             }
                         }
-                    }
-                    elseClause {
-                        ifStatement("style == .italic") {
-                            codeBlock {
-                                returnStatement {
-                                    functionCallExpression("UIFont.italicSystemFont") {
-                                        argument("ofSize", "size")
-                                    }
-                                }
-                            }
-                            elseClause {
-                                codeBlock {
-                                    returnStatement {
-                                        functionCallExpression("UIFont.systemFont") {
-                                            argument("ofSize", "size")
-                                        }
-                                    }
+                        elseClause {
+                            returnStatement {
+                                functionCallExpression("UIFont.systemFont") {
+                                    argument("ofSize", "size")
                                 }
                             }
                         }
