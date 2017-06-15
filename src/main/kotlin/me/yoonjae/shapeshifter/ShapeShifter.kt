@@ -18,7 +18,7 @@ class ShapeShifter(val androidAppDir: String, val iosAppDir: String) {
 
 
     fun shift() {
-        system.forEach { it.writeTo(iosAppDir + "/System/") }
+//        system.forEach { it.writeTo(iosAppDir + "/System/") }
         shiftStringResource()
         shiftAppThemeResource()
         shiftColorResource()

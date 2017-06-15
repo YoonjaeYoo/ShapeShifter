@@ -35,7 +35,7 @@ class EditText : SwiftFile("EditText.swift") {
                 parameter("textColor", Type("UIColor", true), "nil")
                 parameter("textSize", Type("CGFloat", true), "nil")
                 parameter("textStyle", Type("TextStyle", true), "nil")
-                parameter("config", Type("(UITextField) -> Void", true), "nil")
+                parameter("config", Type("(EditText) -> Void", true), "nil")
 
                 constant("defaultTextAppearance", value = "TextAppearance.AppCompat.Subhead(theme)")
                 assignmentExpression("self.text", "text")
@@ -58,18 +58,20 @@ class EditText : SwiftFile("EditText.swift") {
                     argument("minHeight", "minHeight")
                     argument("alpha", "alpha")
                     argument("background", "background")
-                    trailingClosure {
-                        closureParameter("textField")
-                        assignmentExpression("textField.alpha", "alpha")
-                        assignmentExpression("textField.backgroundColor", "background")
-                        assignmentExpression("textField.layer.masksToBounds", "false")
-                        assignmentExpression("textField.layer.shadowColor",
+                }
+                assignmentExpression("self.config") {
+                    closureExpression {
+                        closureParameter("editText")
+                        assignmentExpression("editText.view!.alpha", "alpha")
+                        assignmentExpression("editText.view!.backgroundColor", "background")
+                        assignmentExpression("editText.view!.layer.masksToBounds", "false")
+                        assignmentExpression("editText.view!.layer.shadowColor",
                                 "theme.colorControlNormal?.cgColor ?? UIColor.black.cgColor")
-                        assignmentExpression("textField.layer.shadowOffset",
+                        assignmentExpression("editText.view!.layer.shadowOffset",
                                 "CGSize(width: 0.0, height: 1.0)")
-                        assignmentExpression("textField.layer.shadowOpacity", "1.0")
-                        assignmentExpression("textField.layer.shadowRadius", "0.0 ")
-                        assignmentExpression("textField.leftView") {
+                        assignmentExpression("editText.view!.layer.shadowOpacity", "1.0")
+                        assignmentExpression("editText.view!.layer.shadowRadius", "0.0 ")
+                        assignmentExpression("editText.view!.leftView") {
                             initializerExpression("UIView") {
                                 argument("frame") {
                                     initializerExpression("CGRect") {
@@ -80,8 +82,8 @@ class EditText : SwiftFile("EditText.swift") {
                                 }
                             }
                         }
-                        assignmentExpression("textField.leftViewMode", ".always")
-                        assignmentExpression("textField.rightView") {
+                        assignmentExpression("editText.view!.leftViewMode", ".always")
+                        assignmentExpression("editText.view!.rightView") {
                             initializerExpression("UIView") {
                                 argument("frame") {
                                     initializerExpression("CGRect") {
@@ -92,20 +94,20 @@ class EditText : SwiftFile("EditText.swift") {
                                 }
                             }
                         }
-                        assignmentExpression("textField.rightViewMode", ".always")
-                        assignmentExpression("textField.contentVerticalAlignment",
+                        assignmentExpression("editText.view!.rightViewMode", ".always")
+                        assignmentExpression("editText.view!.contentVerticalAlignment",
                                 "gravity.contentVerticalAlignment")
-                        assignmentExpression("textField.contentHorizontalAlignment",
+                        assignmentExpression("editText.view!.contentHorizontalAlignment",
                                 "gravity.contentHorizontalAlignment")
-                        assignmentExpression("textField.placeholder", "hint")
-                        assignmentExpression("textField.text", "text")
-                        assignmentExpression("textField.textColor", "textColor ?? " +
+                        assignmentExpression("editText.view!.placeholder", "hint")
+                        assignmentExpression("editText.view!.text", "text")
+                        assignmentExpression("editText.view!.textColor", "textColor ?? " +
                                 "textAppearance?.textColor ?? theme.textColorPrimary ?? " +
                                 "UIColor.black")
-                        assignmentExpression("textField.tintColor", "theme.colorControlNormal ?? " +
+                        assignmentExpression("editText.view!.tintColor", "theme.colorControlNormal ?? " +
                                 "UIColor.black")
                         functionCallExpression("config?") {
-                            argument(null, "textField")
+                            argument(value = "self")
                         }
                     }
                 }
@@ -195,7 +197,7 @@ class EditText : SwiftFile("EditText.swift") {
                     parameter("textColor", Type("UIColor", true), "Color.white")
                     parameter("textSize", Type("CGFloat", true), "nil")
                     parameter("textStyle", Type("TextStyle", true), "nil")
-                    parameter("config", Type("(UITextField) -> Void", true), "nil")
+                    parameter("config", Type("(EditText) -> Void", true), "nil")
 
                     initializerExpression("super") {
                         argument("theme", "theme")
@@ -220,7 +222,7 @@ class EditText : SwiftFile("EditText.swift") {
                             assignmentExpression("textField.tintColor", "theme.colorControlNormal ?? " +
                                     "UIColor.white")
                             functionCallExpression("config?") {
-                                argument(null, "textField")
+                                argument(value = "self")
                             }
                         }
                     }

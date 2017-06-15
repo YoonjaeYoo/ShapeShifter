@@ -17,15 +17,15 @@ class View : SwiftFile("View.swift") {
             superType("BaseView")
             superType("ConfigurableLayout")
 
-            constant("theme", Type("Theme")) { public() }
+            variable("theme", Type("Theme")) { public() }
+            variable("id", Type("String", true)) { public() }
             variable("layoutParams", Type("LayoutParams")) { public() }
-            constant("id", Type("String", true)) { public() }
             variable("padding", Type("UIEdgeInsets")) { public() }
             variable("minWidth", Type("CGFloat", true)) { public() }
             variable("minHeight", Type("CGFloat", true)) { public() }
             variable("alpha", Type("CGFloat"), "1.0") { public() }
             variable("background", Type("UIColor", true), "nil") { public() }
-            variable("config", Type("(V) -> Void", true)) { public() }
+            variable("config", Type("(View) -> Void", true)) { public() }
             variable("flexibility", value = "Flexibility.inflexible") { public() }
             variable("needsView", Type("Bool"), "true") { public() }
             variable("viewReuseId", Type("String", true)) {
@@ -57,7 +57,7 @@ class View : SwiftFile("View.swift") {
                 parameter("minHeight", Type("CGFloat", true), "nil")
                 parameter("alpha", Type("CGFloat"), "1.0")
                 parameter("background", Type("UIColor", true), "nil")
-                parameter("config", Type("(V) -> Void", true), "nil")
+                parameter("config", Type("(View) -> Void", true), "nil")
 
                 assignmentExpression("self.theme", "theme")
                 assignmentExpression("self.layoutParams", "layoutParams")
@@ -70,11 +70,8 @@ class View : SwiftFile("View.swift") {
                 assignmentExpression("self.config") {
                     closureExpression {
                         closureParameter("view")
-                        assignmentExpression("view.alpha", "self.alpha")
-                        assignmentExpression("view.backgroundColor", "self.background")
-                        functionCallExpression("config?") {
-                            argument(value = "view")
-                        }
+                        assignmentExpression("view.view!.alpha", "self.alpha")
+                        assignmentExpression("view.view!.backgroundColor", "self.background")
                     }
                 }
             }
@@ -83,14 +80,13 @@ class View : SwiftFile("View.swift") {
                 public()
                 parameter("view", Type("V"))
 
-                generalExpression("config?(view)")
+                assignmentExpression("_view", "view")
+                generalExpression("config?(self)")
             }
 
             function("makeView", Type("UIView")) {
                 public()
-                constant("view", value = "V()")
-                assignmentExpression("_view", "view")
-                returnStatement("view")
+                returnStatement("V()")
             }
 
             function("measurement", Type("LayoutMeasurement")) {

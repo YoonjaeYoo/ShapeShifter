@@ -3,6 +3,7 @@ package me.yoonjae.shapeshifter.poet.expression
 import me.yoonjae.shapeshifter.poet.Describer
 import me.yoonjae.shapeshifter.poet.Element
 import me.yoonjae.shapeshifter.poet.statement.Statement
+import me.yoonjae.shapeshifter.poet.type.Type
 import java.io.Writer
 
 abstract class Expression : Statement() {
@@ -91,8 +92,9 @@ interface ExpressionDescriber : Describer, GeneralExpressionDescriber,
                     also { expressions.add(it) }
         }
 
-        override fun closureExpression(init: (ClosureExpression.() -> Unit)?): ClosureExpression {
-            return super<ExpressionDescriber>.closureExpression(init).also { expressions.add(it) }
+        override fun closureExpression(result: Type?, init: (ClosureExpression.() -> Unit)?): ClosureExpression {
+            return super<ExpressionDescriber>.closureExpression(result, init).
+                    also { expressions.add(it) }
         }
 
         override fun arrayLiteralExpression(init: (ArrayLiteralExpression.() -> Unit)?):

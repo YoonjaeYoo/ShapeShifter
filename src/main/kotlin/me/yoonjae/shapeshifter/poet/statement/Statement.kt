@@ -59,8 +59,9 @@ interface StatementDescriber : ExpressionDescriber, DeclarationDescriber,
                     also { statements.add(it) }
         }
 
-        override fun closureExpression(init: (ClosureExpression.() -> Unit)?): ClosureExpression {
-            return super<StatementDescriber>.closureExpression(init).also { statements.add(it) }
+        override fun closureExpression(result: Type?, init: (ClosureExpression.() -> Unit)?): ClosureExpression {
+            return super<StatementDescriber>.closureExpression(result, init).
+                    also { statements.add(it) }
         }
 
         override fun arrayLiteralExpression(init: (ArrayLiteralExpression.() -> Unit)?):

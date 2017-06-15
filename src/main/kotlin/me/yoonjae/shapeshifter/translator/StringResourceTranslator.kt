@@ -13,7 +13,12 @@ class StringResourceTranslator : Translator<StringsFile>() {
             for (string in doc.getElementsByTagName("string").iterator()) {
                 if (string != null) {
                     val name = string.attributes.getNamedItem("name").textContent
-                    val value = string.firstChild.nodeValue
+                    var value = string.firstChild.nodeValue
+                    mapOf(Regex("%\\d\\$[s]") to "%@", Regex("%\\d\\$") to "%").forEach {
+                        if (value.contains(it.key)) {
+                            value = value.replace(it.key, it.value)
+                        }
+                    }
                     string(name, value)
                 }
             }

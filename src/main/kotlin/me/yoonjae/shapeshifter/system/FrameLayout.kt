@@ -27,7 +27,7 @@ class FrameLayout : SwiftFile("FrameLayout.swift") {
                 parameter("alpha", Type("CGFloat"), "1.0")
                 parameter("background", Type("UIColor", true), "nil")
                 parameter("children", Type("[Layout]"), "[]")
-                parameter("config", Type("(UIView) -> Void", true), "nil")
+                parameter("config", Type("(FrameLayout) -> Void", true), "nil")
 
                 initializerExpression("super") {
                     argument("theme", "theme")
@@ -39,7 +39,15 @@ class FrameLayout : SwiftFile("FrameLayout.swift") {
                     argument("alpha", "alpha")
                     argument("background", "background")
                     argument("children", "children")
-                    argument("config", "config")
+                }
+                assignmentExpression("self.config") {
+                    closureExpression {
+                        closureParameter("view")
+
+                        functionCallExpression("config?") {
+                            argument(value = "self")
+                        }
+                    }
                 }
             }
 

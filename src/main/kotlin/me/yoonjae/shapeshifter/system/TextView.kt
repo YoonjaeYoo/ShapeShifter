@@ -12,17 +12,19 @@ class TextView : SwiftFile("TextView.swift") {
 
         clazz("TextView") {
             public()
-            superType("ViewGroup")
+            superType("View") {
+                genericParameter("UILabel")
+            }
 
-            variable("gravity", Type("Gravity"), "[]")
-            variable("lines", Type("Int"), "0")
-            variable("singleLine", Type("Bool"), "false")
-            variable("text", Type("String", true), "nil")
-            variable("attributedText", Type("NSAttributedString", true), "nil")
-            variable("textAppearance", Type("TextAppearance", true), "nil")
-            variable("textColor", Type("UIColor", true), "nil")
-            variable("textSize", Type("CGFloat", true), "nil")
-            variable("textStyle", Type("TextStyle", true), "nil")
+            variable("gravity", Type("Gravity"), "[]") { public() }
+            variable("lines", Type("Int"), "0") { public() }
+            variable("singleLine", Type("Bool"), "false") { public() }
+            variable("text", Type("String", true), "nil") { public() }
+            variable("attributedText", Type("NSAttributedString", true), "nil") { public() }
+            variable("textAppearance", Type("TextAppearance", true), "nil") { public() }
+            variable("textColor", Type("UIColor", true), "nil") { public() }
+            variable("textSize", Type("CGFloat", true), "nil") { public() }
+            variable("textStyle", Type("TextStyle", true), "nil") { public() }
 
             initializer {
                 public()
@@ -45,7 +47,7 @@ class TextView : SwiftFile("TextView.swift") {
                 parameter("textColor", Type("UIColor", true), "nil")
                 parameter("textSize", Type("CGFloat", true), "nil")
                 parameter("textStyle", Type("TextStyle", true), "nil")
-                parameter("config", Type("(UILabel) -> Void", true), "nil")
+                parameter("config", Type("(TextView) -> Void", true), "nil")
 
                 initializerExpression("super") {
                     argument("theme", "theme")
@@ -68,22 +70,22 @@ class TextView : SwiftFile("TextView.swift") {
                 assignmentExpression("self.textStyle", "textStyle")
                 assignmentExpression("self.config") {
                     closureExpression {
-                        closureParameter("label")
+                        closureParameter("view")
 
-                        assignmentExpression("label.alpha", "self.alpha")
-                        assignmentExpression("label.backgroundColor", "self.background")
-                        assignmentExpression("label.numberOfLines",
+                        assignmentExpression("view.view!.alpha", "self.alpha")
+                        assignmentExpression("view.view!.backgroundColor", "self.background")
+                        assignmentExpression("view.view!.numberOfLines",
                                 "self.singleLine ? 1 : self.lines")
-                        assignmentExpression("label.textAlignment", "self.gravity.textAlignment")
-                        assignmentExpression("label.text", "self.text")
-                        assignmentExpression("label.textColor") {
+                        assignmentExpression("view.view!.textAlignment", "self.gravity.textAlignment")
+                        assignmentExpression("view.view!.text", "self.text")
+                        assignmentExpression("view.view!.textColor") {
                             generalExpression("self.textColor ?? textAppearance?.textColor ?? " +
-                                    "defaultTextAppearance.textColor ?? " +
+                                    "self.defaultTextAppearance().textColor ?? " +
                                     "theme.textColorPrimary ?? UIColor.black")
                         }
-                        assignmentExpression("label.font", "self.calculateFont()")
+                        assignmentExpression("view.view!.font", "self.calculateFont()")
                         functionCallExpression("config?") {
-                            argument(null, "label")
+                            argument(value = "self")
                         }
                     }
                 }

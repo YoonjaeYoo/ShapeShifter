@@ -140,3 +140,5 @@ fun String.unquoted(): String = substring(
         if (this[0] == '"') 1 else 0,
         if (this[length - 1] == '"') length - 1 else length
 )
+
+fun String.urlEncoded(): String = "$this.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!"

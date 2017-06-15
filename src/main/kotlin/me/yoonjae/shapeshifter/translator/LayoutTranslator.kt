@@ -15,8 +15,8 @@ class LayoutTranslator : Translator<SwiftFile>() {
         val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)
         return doc.documentElement.layoutType?.let { layoutType ->
             val resourceName = file.name.substring(0, file.name.lastIndexOf('.')).toResourceName(true)
-            val map = mutableMapOf<String, String>()
-            extractIdTypeMap(file.parent, map, doc.documentElement)
+            val idElementMap = mutableMapOf<String, Element>()
+            extractIdElementMap(idElementMap, doc.documentElement)
             return SwiftFile("${resourceName}Layout.swift") {
                 import("UIKit")
                 import("LayoutKit")
@@ -24,54 +24,61 @@ class LayoutTranslator : Translator<SwiftFile>() {
 
                 clazz("${resourceName}Layout") {
                     superType(layoutType)
+
+                    idElementMap.forEach { id, element ->
+                        element.layoutType?.let {
+                            function(id.toResourceName(), Type(it)) {
+                                returnStatement {
+                                    generalExpression("findView(by: ${id.quoted()}) as! $it")
+                                }
+                            }
+                        }
+                    }
+
                     initializer {
                         public()
                         parameter("theme", Type("Theme"), "AppTheme()")
-                        map.forEach { id, type ->
-                            parameter(id.toConfigParameterName(), Type("($type) -> Void", true), "nil")
-                        }
-                        parameter("config", Type("(${doc.documentElement.viewType}) -> Void", true),
-                                "nil")
-                        layoutExpression(file.parent, doc.documentElement)
+                        parameter("id", Type("String", true),
+                                doc.documentElement.id()?.quoted() ?: "nil")
+                        parameter("config",
+                                Type("(${resourceName}Layout) -> Void", true), "nil")
+                        layoutExpression(doc.documentElement)
                     }
                 }
             }
         }
     }
 
-    private fun extractIdTypeMap(path: String, map: MutableMap<String, String>, element: Element) {
+    private fun extractIdElementMap(map: MutableMap<String, Element>, element: Element) {
         element.layoutType?.let {
             element.id()?.let {
-                map.put(it, element.viewType)
+                map.put(it, element)
             }
         }
-        element.childNodes.elements().forEach { extractIdTypeMap(path, map, it) }
-        if (element.tagName == "include") {
-            element.attr("layout")?.let {
-                // @layout/progress_bar_circular -> ProgressBarCircularLayout
-                val file = File(path, "${it.substring(8)}.xml")
-                val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)
-                extractIdTypeMap(path, map, doc.documentElement)
-            }
-        }
+        element.childNodes.elements().forEach { extractIdElementMap(map, it) }
     }
 
-    private fun ExpressionDescriber.layoutExpression(path: String, element: Element,
+    private fun ExpressionDescriber.layoutExpression(element: Element,
                                                      parent: Element? = null) {
         if (parent == null) {
             initializerExpression("super") {
-                layoutArguments(path, element, parent)
+                layoutArguments(element, parent)
+            }
+            assignmentExpression("self.config") {
+                closureExpression {
+                    closureParameter("view")
+
+                    functionCallExpression("config?") {
+                        argument(value = "self")
+                    }
+                }
             }
         } else {
             if (element.tagName == "include") {
                 element.attr("layout")?.let {
                     // @layout/progress_bar_circular -> ProgressBarCircularLayout
-                    val file = File(path, "${it.substring(8)}.xml")
-                    val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)
-                    val map = mutableMapOf<String, String>()
-                    extractIdTypeMap(path, map, doc.documentElement)
                     initializerExpression("${it.substring(8).toResourceName(true)}Layout") {
-                        layoutArguments(path, element, parent, map)
+                        layoutArguments(element, parent)
                     }
                 }
             } else {
@@ -80,12 +87,12 @@ class LayoutTranslator : Translator<SwiftFile>() {
                         if (style != null && style.startsWith("$it.")) {
                             @Suppress("IMPLICIT_CAST_TO_ANY")
                             functionCallExpression(style) {
-                                layoutArguments(path, element, parent)
+                                layoutArguments(element, parent)
                             }
                         } else {
                             @Suppress("IMPLICIT_CAST_TO_ANY")
                             initializerExpression(it) {
-                                layoutArguments(path, element, parent)
+                                layoutArguments(element, parent)
                             }
                         }
                     }
@@ -94,58 +101,32 @@ class LayoutTranslator : Translator<SwiftFile>() {
         }
     }
 
-    private fun ArgumentDescriber.layoutArguments(path: String, element: Element, parent: Element? = null,
-                                                  idTypeMap: Map<String, String>? = null) {
+    private fun ArgumentDescriber.layoutArguments(element: Element, parent: Element? = null) {
         argument("theme", "theme")
         when (element.layoutType) {
             "FrameLayout" ->
-                frameLayoutArguments(path, element, parent)
-            "LinearLayout" -> linearLayoutArguments(path, element, parent)
-            "View" -> viewArguments(path, element, parent)
-            "Button" -> buttonArguments(path, element, parent)
-            "TextView" -> textViewArguments(path, element, parent)
-            "EditText" -> editTextArguments(path, element, parent)
-            "ImageView" -> imageViewArguments(path, element, parent)
-            "ScrollView" -> scrollViewArguments(path, element, parent)
-            "RecyclerView" -> recyclerViewArguments(path, element, parent)
-            "include" -> {
-            }
+                frameLayoutArguments(element, parent)
+            "LinearLayout" -> linearLayoutArguments(element, parent)
+            "View<UIView>" -> viewArguments(element, parent)
+            "Button" -> buttonArguments(element, parent)
+            "TextView" -> textViewArguments(element, parent)
+            "EditText" -> editTextArguments(element, parent)
+            "ImageView" -> imageViewArguments(element, parent)
+            "CircularImageView" -> imageViewArguments(element, parent)
+            "ScrollView" -> scrollViewArguments(element, parent)
+            "RecyclerView" -> recyclerViewArguments(element, parent)
             else -> {
-                idArgument(element)
-                layoutParamsArgument(element, parent)
-                println("  ${element.tagName}")
-            }
-        }
-        idTypeMap?.forEach { id, _ ->
-            val resouceName = id.toResourceName(true)
-            argument("config$resouceName", "config$resouceName")
-        }
-        if (parent == null) {
-            argument("config") {
-                closureExpression {
-                    closureParameter("view")
-
-                    element.id()?.let {
-                        functionCallExpression("${it.toConfigParameterName()}?") {
-                            argument(value = "view")
-                        }
-                    }
-                    functionCallExpression("config?") {
-                        argument(value = "view")
-                    }
+                idArgument(element, parent)
+                if (element.tagName != "include") {
+                    layoutParamsArgument(element, parent)
                 }
-            }
-        } else {
-            element.id()?.let {
-                argument("config", it.toConfigParameterName())
+                println("  ${element.tagName}")
             }
         }
     }
 
-    private fun String.toConfigParameterName() = "config${toResourceName(true)}"
-
-    private fun ArgumentDescriber.frameLayoutArguments(path: String, element: Element, parent: Element? = null) {
-        idArgument(element)
+    private fun ArgumentDescriber.frameLayoutArguments(element: Element, parent: Element? = null) {
+        idArgument(element, parent)
         layoutParamsArgument(element, parent)
         paddingArgument(element)
         minWidthArgument(element)
@@ -155,15 +136,20 @@ class LayoutTranslator : Translator<SwiftFile>() {
         argument("children") {
             arrayLiteralExpression {
                 element.childNodes.elements().forEach {
-                    layoutExpression(path, it, element)
+                    layoutExpression(it, element)
                 }
             }
         }
     }
 
-    private fun ArgumentDescriber.linearLayoutArguments(path: String, element: Element, parent: Element? = null) {
-        idArgument(element)
+    private fun ArgumentDescriber.linearLayoutArguments(element: Element, parent: Element? = null) {
+        idArgument(element, parent)
         layoutParamsArgument(element, parent)
+        paddingArgument(element)
+        minWidthArgument(element)
+        minHeightArgument(element)
+        alphaArgument(element)
+        backgroundArgument(element)
         argument("orientation") {
             generalExpression(when (element.attr("android:orientation")) {
                 "vertical" -> ".vertical"
@@ -173,22 +159,17 @@ class LayoutTranslator : Translator<SwiftFile>() {
         element.attr("android:weightSum")?.let {
             argument("weightSum", it)
         }
-        paddingArgument(element)
-        minWidthArgument(element)
-        minHeightArgument(element)
-        alphaArgument(element)
-        backgroundArgument(element)
         argument("children") {
             arrayLiteralExpression {
                 element.childNodes.elements().forEach {
-                    layoutExpression(path, it, element)
+                    layoutExpression(it, element)
                 }
             }
         }
     }
 
-    private fun ArgumentDescriber.viewArguments(path: String, element: Element, parent: Element? = null) {
-        idArgument(element)
+    private fun ArgumentDescriber.viewArguments(element: Element, parent: Element? = null) {
+        idArgument(element, parent)
         layoutParamsArgument(element, parent)
         paddingArgument(element)
         minWidthArgument(element)
@@ -197,8 +178,8 @@ class LayoutTranslator : Translator<SwiftFile>() {
         backgroundArgument(element)
     }
 
-    private fun ArgumentDescriber.buttonArguments(path: String, element: Element, parent: Element? = null) {
-        idArgument(element)
+    private fun ArgumentDescriber.buttonArguments(element: Element, parent: Element? = null) {
+        idArgument(element, parent)
         layoutParamsArgument(element, parent)
         paddingArgument(element)
         minWidthArgument(element)
@@ -213,8 +194,8 @@ class LayoutTranslator : Translator<SwiftFile>() {
         textStyleArgument(element)
     }
 
-    private fun ArgumentDescriber.textViewArguments(path: String, element: Element, parent: Element? = null) {
-        idArgument(element)
+    private fun ArgumentDescriber.textViewArguments(element: Element, parent: Element? = null) {
+        idArgument(element, parent)
         layoutParamsArgument(element, parent)
         paddingArgument(element)
         minWidthArgument(element)
@@ -234,8 +215,8 @@ class LayoutTranslator : Translator<SwiftFile>() {
         textStyleArgument(element)
     }
 
-    private fun ArgumentDescriber.editTextArguments(path: String, element: Element, parent: Element? = null) {
-        idArgument(element)
+    private fun ArgumentDescriber.editTextArguments(element: Element, parent: Element? = null) {
+        idArgument(element, parent)
         layoutParamsArgument(element, parent)
         paddingArgument(element)
         minWidthArgument(element)
@@ -253,8 +234,8 @@ class LayoutTranslator : Translator<SwiftFile>() {
         textStyleArgument(element)
     }
 
-    private fun ArgumentDescriber.imageViewArguments(path: String, element: Element, parent: Element? = null) {
-        idArgument(element)
+    private fun ArgumentDescriber.imageViewArguments(element: Element, parent: Element? = null) {
+        idArgument(element, parent)
         layoutParamsArgument(element, parent)
         paddingArgument(element)
         minWidthArgument(element)
@@ -269,8 +250,8 @@ class LayoutTranslator : Translator<SwiftFile>() {
         }
     }
 
-    private fun ArgumentDescriber.scrollViewArguments(path: String, element: Element, parent: Element? = null) {
-        idArgument(element)
+    private fun ArgumentDescriber.scrollViewArguments(element: Element, parent: Element? = null) {
+        idArgument(element, parent)
         layoutParamsArgument(element, parent)
         paddingArgument(element)
         minWidthArgument(element)
@@ -279,13 +260,13 @@ class LayoutTranslator : Translator<SwiftFile>() {
         backgroundArgument(element)
         argument("child") {
             element.childNodes.elements().firstOrNull()?.let {
-                layoutExpression(path, it, element)
+                layoutExpression(it, element)
             }
         }
     }
 
-    private fun ArgumentDescriber.recyclerViewArguments(path: String, element: Element, parent: Element? = null) {
-        idArgument(element)
+    private fun ArgumentDescriber.recyclerViewArguments(element: Element, parent: Element? = null) {
+        idArgument(element, parent)
         layoutParamsArgument(element, parent)
         paddingArgument(element)
         minWidthArgument(element)
@@ -318,8 +299,12 @@ class LayoutTranslator : Translator<SwiftFile>() {
         }
     }
 
-    private fun ArgumentDescriber.idArgument(element: Element) {
-        element.id()?.let { argument("id", "\"$it\"") }
+    private fun ArgumentDescriber.idArgument(element: Element, parent: Element? = null) {
+        if (parent == null) {
+            argument("id", "id")
+        } else {
+            element.id()?.let { argument("id", "\"$it\"") }
+        }
     }
 
     private fun ArgumentDescriber.paddingArgument(element: Element) {

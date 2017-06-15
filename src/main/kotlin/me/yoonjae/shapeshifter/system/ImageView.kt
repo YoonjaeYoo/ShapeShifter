@@ -31,7 +31,7 @@ class ImageView : SwiftFile("ImageView.swift") {
                 parameter("background", Type("UIColor", true), "nil")
                 parameter("scaleType", Type("ScaleType"), ".fitCenter")
                 parameter("src", Type("UIImage", true), "nil")
-                parameter("config", Type("(UIImageView) -> Void", true), "nil")
+                parameter("config", Type("(ImageView) -> Void", true), "nil")
 
                 assignmentExpression("self.scaleType", "scaleType")
                 assignmentExpression("self.src", "src")
@@ -55,25 +55,27 @@ class ImageView : SwiftFile("ImageView.swift") {
                                         argument("margin", "padding")
                                     }
                                 }
-                                trailingClosure {
-                                    closureParameter("imageView")
-                                    ifStatement("scaleType == .center") {
-                                        assignmentExpression("imageView.contentMode", ".center")
-                                        elseIfStatement("scaleType == .centerCrop") {
-                                            assignmentExpression("imageView.contentMode",
-                                                    ".scaleAspectFill")
-                                            elseIfStatement("scaleType == .fitCenter") {
-                                                assignmentExpression("imageView.contentMode",
-                                                        ".scaleAspectFit")
-                                            }
-                                        }
-                                    }
-                                    assignmentExpression("imageView.image", "src")
-                                    functionCallExpression("config?") {
-                                        argument(null, "imageView")
-                                    }
+                            }
+                        }
+                    }
+                }
+                assignmentExpression("self.config") {
+                    closureExpression {
+                        closureParameter("imageView")
+                        ifStatement("scaleType == .center") {
+                            assignmentExpression("imageView.view!.contentMode", ".center")
+                            elseIfStatement("scaleType == .centerCrop") {
+                                assignmentExpression("imageView.view!.contentMode",
+                                        ".scaleAspectFill")
+                                elseIfStatement("scaleType == .fitCenter") {
+                                    assignmentExpression("imageView.view!.contentMode",
+                                            ".scaleAspectFit")
                                 }
                             }
+                        }
+                        assignmentExpression("imageView.view!.image", "src")
+                        functionCallExpression("config?") {
+                            argument(value = "self")
                         }
                     }
                 }

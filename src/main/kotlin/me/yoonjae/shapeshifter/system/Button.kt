@@ -32,7 +32,7 @@ class Button : SwiftFile("Button.swift") {
                 parameter("textColor", Type("UIColor", true), "nil")
                 parameter("textSize", Type("CGFloat", true), "nil")
                 parameter("textStyle", Type("TextStyle", true), "nil")
-                parameter("config", Type("(UIButton) -> Void", true), "nil")
+                parameter("config", Type("(Button) -> Void", true), "nil")
 
                 constant("defaultTextAppearance", value = "TextAppearance.AppCompat.Subhead(theme)")
                 initializerExpression("super") {
@@ -58,35 +58,37 @@ class Button : SwiftFile("Button.swift") {
                                 }
                                 argument("alignment", ".fill")
                                 argument("flexibility", ".inflexible")
-                                trailingClosure {
-                                    closureParameter("button")
-                                    assignmentExpression("button.alpha", "alpha")
-                                    assignmentExpression("button.backgroundColor",
-                                            "background ?? theme.colorButtonNormal ?? UIColor.white")
-                                    assignmentExpression("button.contentEdgeInsets",
-                                            "padding")
-                                    assignmentExpression("button.contentVerticalAlignment",
-                                            "gravity.contentVerticalAlignment")
-                                    assignmentExpression("button.contentHorizontalAlignment",
-                                            "gravity.contentHorizontalAlignment")
-                                    functionCallExpression("button.setTitle") {
-                                        argument(null, "text")
-                                        argument("for", ".normal")
-                                    }
-                                    functionCallExpression("button.setTitleColor") {
-                                        argument(null, "textColor ?? textAppearance?.textColor ?? " +
-                                                "UIColor.white")
-                                        argument("for", ".normal")
-                                    }
-                                    functionCallExpression("button.setTitleColor") {
-                                        argument(null, "UIColor.lightGray")
-                                        argument("for", ".disabled")
-                                    }
-                                    functionCallExpression("config?") {
-                                        argument(null, "button")
-                                    }
-                                }
                             }
+                        }
+                    }
+                }
+                assignmentExpression("self.config") {
+                    closureExpression {
+                        closureParameter("button")
+                        assignmentExpression("button.view!.alpha", "alpha")
+                        assignmentExpression("button.view!.backgroundColor",
+                                "background ?? theme.colorButtonNormal ?? UIColor.white")
+                        assignmentExpression("button.view!.contentEdgeInsets",
+                                "padding")
+                        assignmentExpression("button.view!.contentVerticalAlignment",
+                                "gravity.contentVerticalAlignment")
+                        assignmentExpression("button.view!.contentHorizontalAlignment",
+                                "gravity.contentHorizontalAlignment")
+                        functionCallExpression("button.view!.setTitle") {
+                            argument(null, "text")
+                            argument("for", ".normal")
+                        }
+                        functionCallExpression("button.view!.setTitleColor") {
+                            argument(null, "textColor ?? textAppearance?.textColor ?? " +
+                                    "UIColor.white")
+                            argument("for", ".normal")
+                        }
+                        functionCallExpression("button.view!.setTitleColor") {
+                            argument(null, "UIColor.lightGray")
+                            argument("for", ".disabled")
+                        }
+                        functionCallExpression("config?") {
+                            argument(null, "self")
                         }
                     }
                 }
@@ -185,7 +187,7 @@ class Button : SwiftFile("Button.swift") {
                     parameter("textColor", Type("UIColor", true), "nil")
                     parameter("textSize", Type("CGFloat", true), "nil")
                     parameter("textStyle", Type("TextStyle", true), "nil")
-                    parameter("config", Type("(UIButton) -> Void", true), "nil")
+                    parameter("config", Type("(Button) -> Void", true), "nil")
 
                     initializerExpression("super") {
                         argument("theme", "theme")
@@ -202,7 +204,15 @@ class Button : SwiftFile("Button.swift") {
                         argument("textColor", "textColor ?? Color.primary")
                         argument("textSize", "textSize")
                         argument("textStyle", "textStyle")
-                        argument("config", "config")
+                    }
+                    assignmentExpression("self.config") {
+                        closureExpression {
+                            closureParameter("view")
+
+                            functionCallExpression("config?") {
+                                argument(value = "self")
+                            }
+                        }
                     }
                 }
             }
@@ -229,7 +239,7 @@ class Button : SwiftFile("Button.swift") {
                     parameter("textColor", Type("UIColor", true), "nil")
                     parameter("textSize", Type("CGFloat", true), "nil")
                     parameter("textStyle", Type("TextStyle", true), "nil")
-                    parameter("config", Type("(UIButton) -> Void", true), "nil")
+                    parameter("config", Type("(Button) -> Void", true), "nil")
 
                     initializerExpression("super") {
                         argument("theme", "theme")
@@ -275,7 +285,7 @@ class Button : SwiftFile("Button.swift") {
                     parameter("textColor", Type("UIColor", true), "nil")
                     parameter("textSize", Type("CGFloat", true), "nil")
                     parameter("textStyle", Type("TextStyle", true), "nil")
-                    parameter("config", Type("(UIButton) -> Void", true), "nil")
+                    parameter("config", Type("(Button) -> Void", true), "nil")
 
                     initializerExpression("super") {
                         argument("theme", "theme")
@@ -292,7 +302,15 @@ class Button : SwiftFile("Button.swift") {
                         argument("textColor", "textColor ?? Color.primary")
                         argument("textSize", "textSize")
                         argument("textStyle", "textStyle")
-                        argument("config", "config")
+                    }
+                    assignmentExpression("self.config") {
+                        closureExpression {
+                            closureParameter("view")
+
+                            functionCallExpression("config?") {
+                                argument(value = "self")
+                            }
+                        }
                     }
                 }
             }
@@ -319,7 +337,7 @@ class Button : SwiftFile("Button.swift") {
                     parameter("textColor", Type("UIColor", true), "nil")
                     parameter("textSize", Type("CGFloat", true), "nil")
                     parameter("textStyle", Type("TextStyle", true), "nil")
-                    parameter("config", Type("(UIButton) -> Void", true), "nil")
+                    parameter("config", Type("(Button) -> Void", true), "nil")
 
                     initializerExpression("super") {
                         argument("theme", "theme")

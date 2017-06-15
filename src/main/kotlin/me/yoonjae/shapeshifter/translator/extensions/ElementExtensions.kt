@@ -5,29 +5,21 @@ import org.w3c.dom.Element
 val Element.layoutType: String?
     get() = when (tagName) {
         "LinearLayout" -> "LinearLayout"
-        "View" -> "View"
+        "View" -> "View<UIView>"
         "TextView" -> "TextView"
         "EditText" -> "EditText"
         "Button" -> "Button"
         "ImageView" -> "ImageView"
         "com.flaviofaria.kenburnsview.KenBurnsView" -> "ImageView"
+        "com.mikhaellopez.circularimageview.CircularImageView" -> "CircularImageView"
         "ScrollView" -> "ScrollView"
         "android.support.v4.widget.NestedScrollView" -> "ScrollView"
         "android.support.v7.widget.RecyclerView" -> "RecyclerView"
         "android.support.v7.widget.Toolbar" -> null
-        "include" -> "include"
+        "include" -> attr("layout")?.let {
+            "${it.substring(8).toResourceName(true)}Layout"
+        } ?: "include"
         else -> "FrameLayout"
-    }
-
-val Element.viewType: String
-    get() = when (layoutType) {
-        "TextView" -> "UILabel"
-        "EditText" -> "UITextField"
-        "Button" -> "UIButton"
-        "ImageView" -> "UIImageView"
-        "ScrollView" -> "UIScrollView"
-        "RecyclerView" -> "UITableView"
-        else -> "UIView"
     }
 
 val Element?.layoutParamsType: String

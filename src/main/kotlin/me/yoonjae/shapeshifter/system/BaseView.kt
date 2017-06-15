@@ -11,6 +11,18 @@ class BaseView : SwiftFile("BaseView.swift") {
             public()
             superType("Layout")
 
+            protocolProperty("theme", Type("Theme")) {
+                get()
+                set()
+            }
+            protocolProperty("id", Type("String", true)) {
+                get()
+                set()
+            }
+            protocolProperty("layoutParams", Type("LayoutParams")) {
+                get()
+                set()
+            }
             protocolProperty("parent", Type("BaseView", true)) {
                 get()
                 set()

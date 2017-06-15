@@ -31,7 +31,7 @@ class ScrollView : SwiftFile("ScrollView.swift") {
                 parameter("alpha", Type("CGFloat"), "1.0")
                 parameter("background", Type("UIColor", true), "nil")
                 parameter("child", Type("Layout", true), "nil")
-                parameter("config", Type("(UISmartScrollView) -> Void", true), "nil")
+                parameter("config", Type("(ScrollView) -> Void", true), "nil")
 
                 initializerExpression("super") {
                     argument("theme", "theme")
@@ -42,7 +42,15 @@ class ScrollView : SwiftFile("ScrollView.swift") {
                     argument("minHeight", "minHeight")
                     argument("alpha", "alpha")
                     argument("background", "background")
-                    argument("config", "config")
+                }
+                assignmentExpression("self.config") {
+                    closureExpression {
+                        closureParameter("view")
+
+                        functionCallExpression("config?") {
+                            argument(value = "self")
+                        }
+                    }
                 }
                 ifStatement("child is BaseView") {
                     variable("view", value = "child as! BaseView")

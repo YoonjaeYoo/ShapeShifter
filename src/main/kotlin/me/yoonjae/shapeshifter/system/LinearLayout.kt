@@ -34,7 +34,7 @@ class LinearLayout : me.yoonjae.shapeshifter.poet.file.SwiftFile("LinearLayout.s
                 parameter("alpha", Type("CGFloat"), "1.0")
                 parameter("background", Type("UIColor", true), "nil")
                 parameter("children", Type("[Layout]"), "[]")
-                parameter("config", Type("(UIView) -> Void", true), "nil")
+                parameter("config", Type("(LinearLayout) -> Void", true), "nil")
 
                 assignmentExpression("self.orientation", "orientation")
                 initializerExpression("super") {
@@ -47,7 +47,15 @@ class LinearLayout : me.yoonjae.shapeshifter.poet.file.SwiftFile("LinearLayout.s
                     argument("alpha", "alpha")
                     argument("background", "background")
                     argument("children", "children")
-                    argument("config", "config")
+                }
+                assignmentExpression("self.config") {
+                    closureExpression {
+                        closureParameter("view")
+
+                        functionCallExpression("config?") {
+                            argument(value = "self")
+                        }
+                    }
                 }
             }
 

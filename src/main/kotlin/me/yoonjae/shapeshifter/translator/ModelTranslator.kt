@@ -3,12 +3,13 @@ package me.yoonjae.shapeshifter.translator
 import com.github.javaparser.JavaParser
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.EnumDeclaration
+import com.github.javaparser.ast.body.FieldDeclaration
 import me.yoonjae.shapeshifter.poet.declaration.ClassDescriber
 import me.yoonjae.shapeshifter.poet.file.SwiftFile
 import me.yoonjae.shapeshifter.poet.type.Type
+import me.yoonjae.shapeshifter.translator.extensions.parseAndroidType
 import me.yoonjae.shapeshifter.translator.extensions.quoted
 import me.yoonjae.shapeshifter.translator.extensions.toSnakeCase
-import me.yoonjae.shapeshifter.translator.extensions.parseAndroidType
 import me.yoonjae.shapeshifter.translator.extensions.value
 import java.io.File
 
@@ -32,6 +33,8 @@ class ModelTranslator : Translator<SwiftFile>() {
             val extending = clazz.extendedTypes.isNotEmpty()
             if (extending) {
                 superType(clazz.getExtendedTypes(0).nameAsString)
+            } else {
+                superType("Mappable")
             }
             clazz.fields.filterNot { it.isStatic }.forEach {
                 val variable = it.getVariable(0)
@@ -54,14 +57,38 @@ class ModelTranslator : Translator<SwiftFile>() {
                         argument(value = "map")
                     }
                 }
-                clazz.fields.filterNot { it.isStatic }.forEach {
-                    var name = it.getVariable(0).nameAsString
-                    if (it.isAnnotationPresent("SerializedName")) {
-                        name = it.getAnnotationByName("SerializedName").get().value()
-                    } else {
-                        name = name.toSnakeCase()
+                constant("dateTransformer") {
+                    closureExpression(Type("Date", true)) {
+                        closureParameter("value", Type("String"))
+                        constant("dateFormatter", value = "DateFormatter()")
+                        assignmentExpression("dateFormatter.dateFormat",
+                                "yyyy-MM-dd'T'HH:mm:ss".quoted())
+                        returnStatement("dateFormatter.date(from: value)")
                     }
-                    generalExpression("${it.getVariable(0).name} <- map.property(${name.quoted()})")
+                }
+                clazz.fields.filterNot { it.isStatic }.forEach {
+                    val fieldName = if (it.isAnnotationPresent("SerializedName")) {
+                        it.getAnnotationByName("SerializedName").get().value()
+                    } else {
+                        it.getVariable(0).nameAsString.toSnakeCase()
+                    }
+                    if (it.isDate()) {
+                        generalExpression("${it.getVariable(0).name} <- " +
+                                "map.transform(${fieldName.quoted()}, transformer: dateTransformer)")
+                    } else {
+                        val method = if (it.isEnum()) {
+                            "enum"
+                        } else if (it.isProperty()) {
+                            "property"
+                        } else {
+                            if (it.isRelations()) {
+                                "relations"
+                            } else {
+                                "relation"
+                            }
+                        }
+                        generalExpression("${it.getVariable(0).name} <- map.$method(${fieldName.quoted()})")
+                    }
                 }
             }
 
@@ -71,12 +98,12 @@ class ModelTranslator : Translator<SwiftFile>() {
                         superType("String")
 
                         it.entries.forEach {
-                            val name = it.nameAsString.toLowerCase()
-                            var value = name
+                            val fieldName = it.nameAsString.toLowerCase()
+                            var value = fieldName
                             if (it.isAnnotationPresent("SerializedName")) {
                                 value = it.getAnnotationByName("SerializedName").get().value()
                             }
-                            case(name, value.quoted())
+                            case(fieldName, value.quoted())
                         }
                     }
                 } else if (it is ClassOrInterfaceDeclaration) {
@@ -85,4 +112,19 @@ class ModelTranslator : Translator<SwiftFile>() {
             }
         }
     }
+
+    private fun FieldDeclaration.isEnum(): Boolean = elementType.toString().contains("Enum")
+
+    private fun FieldDeclaration.isProperty(): Boolean {
+        val primitiveTypes = listOf("Byte", "Short", "Integer", "Long", "Float", "Double",
+                "Boolean", "Char", "String")
+        return primitiveTypes.filter {
+            elementType.toString().contains(it)
+        }.isNotEmpty()
+    }
+
+    private fun FieldDeclaration.isRelations(): Boolean =
+            elementType.arrayLevel > 0 || elementType.toString().contains("List")
+
+    private fun FieldDeclaration.isDate(): Boolean = elementType.toString() == "Date"
 }

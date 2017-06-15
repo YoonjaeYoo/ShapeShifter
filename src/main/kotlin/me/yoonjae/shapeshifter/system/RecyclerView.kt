@@ -27,7 +27,7 @@ class RecyclerView : SwiftFile("RecyclerView.swift") {
                 parameter("alpha", Type("CGFloat"), "1.0")
                 parameter("background", Type("UIColor", true), "nil")
                 parameter("adapter", Type("Adapter", true), "nil")
-                parameter("config", Type("(UITableView) -> Void", true), "nil")
+                parameter("config", Type("(RecyclerView) -> Void", true), "nil")
 
                 initializerExpression("super") {
                     argument("theme", "theme")
@@ -63,7 +63,7 @@ class RecyclerView : SwiftFile("RecyclerView.swift") {
                         assignmentExpression("view.delegate", value = "self.adapter")
                         functionCallExpression("view.reloadData")
                         functionCallExpression("config?") {
-                            argument(value = "view")
+                            argument(value = "self")
                         }
                     }
                 }
